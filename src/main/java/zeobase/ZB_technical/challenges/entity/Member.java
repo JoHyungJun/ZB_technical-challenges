@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import zeobase.ZB_technical.challenges.type.MemberRoleType;
 
 import javax.persistence.*;
 import java.util.List;
@@ -23,7 +24,8 @@ public class Member extends BaseEntity{
 
     private String password;
 
-    //private role
+    @Enumerated(value = EnumType.STRING)
+    private MemberRoleType role;
 
     private String phone;
 
