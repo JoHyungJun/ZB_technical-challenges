@@ -5,19 +5,34 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Member {
+public class Member extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
+
+    private String memberId;
+
+    private String password;
+
+    //private role
+
+    private String phone;
+
+    @OneToMany(mappedBy = "member")
+    private List<Reservation> reservations;
+
+    @OneToMany(mappedBy = "member")
+    private List<Store> stores;
+
+    @OneToMany(mappedBy = "member")
+    private List<Review> reviews;
 }
