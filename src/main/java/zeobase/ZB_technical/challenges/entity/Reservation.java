@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import zeobase.ZB_technical.challenges.type.ReservationAcceptedType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -23,7 +24,8 @@ public class Reservation extends BaseEntity{
 
     private LocalDateTime reservedDate;
 
-    private String accepted;
+    @Enumerated(value = EnumType.STRING)
+    private ReservationAcceptedType accepted;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
