@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import zeobase.ZB_technical.challenges.type.MemberRoleType;
+import zeobase.ZB_technical.challenges.type.MemberStatusType;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,6 +29,9 @@ public class Member extends BaseEntity{
     private MemberRoleType role;
 
     private String phone;
+
+    @Enumerated(value = EnumType.STRING)
+    private MemberStatusType status;
 
     @OneToMany(mappedBy = "member")
     private List<Reservation> reservations;
