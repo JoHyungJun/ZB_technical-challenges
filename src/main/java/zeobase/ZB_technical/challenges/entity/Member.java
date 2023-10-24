@@ -28,6 +28,7 @@ public class Member extends BaseEntity{
     @Enumerated(value = EnumType.STRING)
     private MemberRoleType role;
 
+    @Column(unique = true)
     private String phone;
 
     @Enumerated(value = EnumType.STRING)
