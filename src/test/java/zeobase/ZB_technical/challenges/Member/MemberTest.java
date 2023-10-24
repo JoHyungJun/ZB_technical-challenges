@@ -1,4 +1,4 @@
-package zeobase.ZB_technical.challenges.entity;
+package zeobase.ZB_technical.challenges.Member;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import zeobase.ZB_technical.challenges.entity.Member;
+import zeobase.ZB_technical.challenges.entity.Store;
 import zeobase.ZB_technical.challenges.repository.MemberRepository;
 import zeobase.ZB_technical.challenges.repository.StoreRepository;
 
@@ -19,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
-    StoreRepository storeRepository;
+    private StoreRepository storeRepository;
 
     @Test
     @Transactional

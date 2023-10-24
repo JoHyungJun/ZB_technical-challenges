@@ -1,8 +1,9 @@
-package zeobase.ZB_technical.challenges.entity;
+package zeobase.ZB_technical.challenges.Reservation;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import zeobase.ZB_technical.challenges.entity.Reservation;
 import zeobase.ZB_technical.challenges.repository.MemberRepository;
 import zeobase.ZB_technical.challenges.repository.ReservationRepository;
 
