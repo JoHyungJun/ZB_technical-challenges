@@ -1,10 +1,7 @@
 package zeobase.ZB_technical.challenges.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import zeobase.ZB_technical.challenges.type.ReservationAcceptedType;
 import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
 
@@ -23,13 +20,15 @@ public class Reservation extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //@NonNull
     private LocalDateTime reservedDate;
 
     @Enumerated(value = EnumType.STRING)
     private ReservationAcceptedType accepted;
 
     @Enumerated
-    private ReservationVisitedType visited;
+    @Builder.Default
+    private ReservationVisitedType visited = ReservationVisitedType.UNVISITED;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -38,4 +37,13 @@ public class Reservation extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
+
+
+    public Reservation updateVisited(ReservationVisitedType reservationVisitedType){
+
+        this.visited = reservationVisitedType;
+
+        return this;
+    }
+
 }
