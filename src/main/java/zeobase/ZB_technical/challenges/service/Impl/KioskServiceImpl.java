@@ -34,6 +34,7 @@ public class KioskServiceImpl implements KioskService {
                 .orElseThrow(() -> new KioskException(ErrorCode.MEMBER_PHONE_NOT_FOUND));
 
         // 탈퇴한 회원인지 검증
+        // TODO : security가 막아줄 듯. 추후 체크 후 제거.
         if(member.getStatus() == MemberStatusType.WITHDRAW){
             throw new MemberException(ErrorCode.MEMBER_WITHDRAW);
         }
