@@ -9,14 +9,14 @@ import zeobase.ZB_technical.challenges.type.ErrorCode;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberException extends RuntimeException{
+public class JwtException extends RuntimeException {
 
     private HttpStatus httpStatus;
     private String code;
     private String errorMessage;
 
 
-    public MemberException(ErrorCode errorCode) {
+    public JwtException(ErrorCode errorCode) {
 
         this.httpStatus = errorCode.getHttpStatus();
         this.code = errorCode.name();

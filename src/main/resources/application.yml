@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    username: root
+    url: jdbc:mariadb://localhost:3307/zb_technicalchallenges
+    driverClassName: org.mariadb.jdbc.Driver
+    password: maria950912
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: create
+    show-sql: 'true'
+
+  jwt:
+    secret: ZeRoBaSeTeChNiCaLChAlLeNgEsByHyUnGJuN950912
