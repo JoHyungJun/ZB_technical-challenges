@@ -3,6 +3,7 @@ package zeobase.ZB_technical.challenges.exception;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 import zeobase.ZB_technical.challenges.type.ErrorCode;
 
 @Getter
@@ -10,13 +11,15 @@ import zeobase.ZB_technical.challenges.type.ErrorCode;
 @AllArgsConstructor
 public class ReservationException extends RuntimeException{
 
-    private ErrorCode errorCode;
+    private HttpStatus httpStatus;
+    private String code;
     private String errorMessage;
 
 
     public ReservationException(ErrorCode errorCode) {
 
-        this.errorCode = errorCode;
+        this.httpStatus = errorCode.getHttpStatus();
+        this.code = errorCode.name();
         this.errorMessage = errorCode.getDescription();
     }
 }
