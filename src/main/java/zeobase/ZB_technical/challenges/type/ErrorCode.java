@@ -21,10 +21,17 @@ public enum ErrorCode {
 
 
     // Member
+    INVALID_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "회원가입 정보로 잘못된 인자가 전달되었습니다."),
+
+    ALREADY_EXISTS_MEMBER_ID(HttpStatus.BAD_REQUEST, "이미 존재하는 ID입니다."),
+    ALREADY_EXISTS_PHONE(HttpStatus.BAD_REQUEST, "이미 존재하는 핸드폰 번호입니다."),
+
     MEMBER_PHONE_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 핸드폰 번호입니다."),
     MEMBER_UID_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 아이디입니다."),
 
-    MEMBER_WITHDRAW(HttpStatus.BAD_REQUEST, "탈퇴한 회원입니다."),
+    MISMATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+
+    WITHDRAWAL_MEMBER(HttpStatus.BAD_REQUEST, "탈퇴한 회원입니다."),
 
     // Kiosk
 

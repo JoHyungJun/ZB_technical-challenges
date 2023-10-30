@@ -1,4 +1,4 @@
-package zeobase.ZB_technical.challenges.dto;
+package zeobase.ZB_technical.challenges.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

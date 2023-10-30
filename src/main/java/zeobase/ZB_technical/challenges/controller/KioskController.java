@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import zeobase.ZB_technical.challenges.dto.KioskPhone;
+import zeobase.ZB_technical.challenges.dto.kiosk.KioskPhoneDto;
 import zeobase.ZB_technical.challenges.service.KioskService;
 
 import javax.validation.Valid;
@@ -21,11 +21,11 @@ public class KioskController {
     private final KioskService kioskService;
 
     @PostMapping("/phone")
-    public ResponseEntity<KioskPhone.Response> checkReservationByPhone(@Valid @RequestBody KioskPhone.Request request,
-                                                              BindingResult bindingResult) {
+    public ResponseEntity<KioskPhoneDto.Response> checkReservationByPhone(@Valid @RequestBody KioskPhoneDto.Request request,
+                                                                          BindingResult bindingResult) {
         if(bindingResult.hasErrors()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(KioskPhone.Response.builder()
+                    .body(KioskPhoneDto.Response.builder()
                             .success(false)
                             .message(bindingResult.getFieldErrors()
                                     .get(0)

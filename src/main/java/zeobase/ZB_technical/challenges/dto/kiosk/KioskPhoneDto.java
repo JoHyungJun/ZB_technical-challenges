@@ -1,4 +1,4 @@
-package zeobase.ZB_technical.challenges.dto;
+package zeobase.ZB_technical.challenges.dto.kiosk;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,12 +7,10 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Pattern;
 
-public class KioskPhone {
+public class KioskPhoneDto {
 
     @Getter
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class Request {
 
         @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}",
@@ -22,6 +20,8 @@ public class KioskPhone {
 
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Response {
 
         private Boolean success;
