@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import io.jsonwebtoken.io.Decoders;
 import org.springframework.util.ObjectUtils;
 import zeobase.ZB_technical.challenges.exception.JwtException;
+import zeobase.ZB_technical.challenges.exception.MemberException;
 import zeobase.ZB_technical.challenges.service.Impl.UserDetailsServiceImpl;
 import zeobase.ZB_technical.challenges.type.MemberRoleType;
 

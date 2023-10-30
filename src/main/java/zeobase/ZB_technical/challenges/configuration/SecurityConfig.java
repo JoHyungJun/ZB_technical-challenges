@@ -32,8 +32,7 @@ public class SecurityConfig {
 
                 .authorizeRequests()    // 권한 요청 여부 설정
                 .antMatchers(
-                        "/member/signup",    // 회원가입 요청 비활성화
-                        "/member/signin",               // 로그인 요청 비활성화
+                        "/member/**",               // 멤버 관련 요청 비활성화
                         "/kiosk/phone",                 // 키오스크 인증 요청 비활성화
                         "/kiosk/signin")
                 .permitAll()

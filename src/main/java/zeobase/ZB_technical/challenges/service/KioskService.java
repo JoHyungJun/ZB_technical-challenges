@@ -1,8 +1,8 @@
 package zeobase.ZB_technical.challenges.service;
 
-import zeobase.ZB_technical.challenges.dto.KioskPhone;
+import zeobase.ZB_technical.challenges.dto.kiosk.KioskPhoneDto;
 
 public interface KioskService {
 
-    KioskPhone.Response checkReservationByPhone(KioskPhone.Request kioskPhoneRequest);
+    KioskPhoneDto.Response checkReservationByPhone(KioskPhoneDto.Request kioskPhoneRequest);
 }

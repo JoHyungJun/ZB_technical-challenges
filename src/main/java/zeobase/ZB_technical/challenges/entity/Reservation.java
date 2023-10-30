@@ -2,6 +2,7 @@ package zeobase.ZB_technical.challenges.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import zeobase.ZB_technical.challenges.type.ReservationAcceptedType;
 import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 public class Reservation extends BaseEntity{
 

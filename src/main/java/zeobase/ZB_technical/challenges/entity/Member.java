@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 public class Member extends BaseEntity implements UserDetails {
 
@@ -33,6 +35,8 @@ public class Member extends BaseEntity implements UserDetails {
 
     @Enumerated(value = EnumType.STRING)
     private MemberRoleType role;
+
+    private String name;
 
     @Column(unique = true)
     private String phone;

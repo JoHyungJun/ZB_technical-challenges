@@ -3,7 +3,7 @@ package zeobase.ZB_technical.challenges.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import zeobase.ZB_technical.challenges.dto.ErrorResponse;
+import zeobase.ZB_technical.challenges.dto.common.ErrorResponse;
 import zeobase.ZB_technical.challenges.type.ErrorCode;
 
 @Slf4j
