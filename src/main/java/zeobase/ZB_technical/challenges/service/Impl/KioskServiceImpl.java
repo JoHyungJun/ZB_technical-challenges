@@ -1,9 +1,8 @@
 package zeobase.ZB_technical.challenges.service.Impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import zeobase.ZB_technical.challenges.dto.KioskPhone;
+import zeobase.ZB_technical.challenges.dto.kiosk.KioskPhoneDto;
 import zeobase.ZB_technical.challenges.entity.Member;
 import zeobase.ZB_technical.challenges.entity.Reservation;
 import zeobase.ZB_technical.challenges.exception.KioskException;
@@ -27,7 +26,7 @@ public class KioskServiceImpl implements KioskService {
 
     // 핸드폰 번호로 멤버를 찾고, 예약 상태를 방문한 상태로 교체.
     @Override
-    public KioskPhone.Response checkReservationByPhone(KioskPhone.Request request) {
+    public KioskPhoneDto.Response checkReservationByPhone(KioskPhoneDto.Request request) {
 
         // 존재하는 핸드폰 번호인지 검증
         Member member = memberRepository.findByPhone(request.getPhone())
@@ -36,7 +35,7 @@ public class KioskServiceImpl implements KioskService {
         // 탈퇴한 회원인지 검증
         // TODO : security가 막아줄 듯. 추후 체크 후 제거.
         if(member.getStatus() == MemberStatusType.WITHDRAW){
-            throw new MemberException(ErrorCode.MEMBER_WITHDRAW);
+            throw new MemberException(ErrorCode.WITHDRAWAL_MEMBER);
         }
 
         // 이미 예약 확인한 회원인지 검증
@@ -53,7 +52,7 @@ public class KioskServiceImpl implements KioskService {
         reservationRepository.save(reservation.updateVisited(ReservationVisitedType.VISITED));
 
 
-        return KioskPhone.Response.builder()
+        return KioskPhoneDto.Response.builder()
                 .success(true)
                 .message("방문 처리가 완료되었습니다.")
                 .build();

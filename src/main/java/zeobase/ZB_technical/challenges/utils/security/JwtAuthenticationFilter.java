@@ -31,11 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = jwtUtils.resolveTokenFromRequest(request);
 
-        if(jwtUtils.validateToken(token)) {
+        if(token != null && jwtUtils.validateToken(token)) {
             Authentication authentication = jwtUtils.parseAuthenticationByToken(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
-            log.error("{} is occurred", MALFORMED_JWT_EXCEPTION.name());
         }
 
         filterChain.doFilter(request, response);
