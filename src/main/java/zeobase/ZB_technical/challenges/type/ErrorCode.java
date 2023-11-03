@@ -58,9 +58,12 @@ public enum ErrorCode {
     INVALID_OPENING_HOURS(HttpStatus.BAD_REQUEST, "영업 시간 설정이 올바르지 않습니다."),
     INVALID_RESERVATION_TERM(HttpStatus.BAD_REQUEST, "예약 텀의 시간이 올바르지 않습니다."),
     INVALID_RESERVATION_REQUEST(HttpStatus.BAD_REQUEST, "예약 정보로 잘못된 인자가 전달되었습니다."),
-
     INVALID_RESERVATION_TIME(HttpStatus.BAD_REQUEST, "예약 시간이 올바르지 않습니다."),
+
     ALREADY_RESERVED_TIME(HttpStatus.BAD_REQUEST, "이미 예약된 시간입니다."),
+
+    SHUT_DOWN_STORE(HttpStatus.BAD_REQUEST, "영업을 종료한 가게입니다."),
+    OPEN_PREPARING_STORE(HttpStatus.BAD_REQUEST, "영업 준비 중인 가게입니다."),
     ;
 
     private final HttpStatus httpStatus;
