@@ -15,6 +15,7 @@ import zeobase.ZB_technical.challenges.repository.StoreRepository;
 import zeobase.ZB_technical.challenges.service.StoreService;
 import zeobase.ZB_technical.challenges.type.MemberRoleType;
 import zeobase.ZB_technical.challenges.type.StoreSortedType;
+import zeobase.ZB_technical.challenges.type.StoreStatusType;
 
 import java.time.LocalTime;
 import java.util.Collections;
@@ -152,5 +153,16 @@ public class StoreServiceImpl implements StoreService {
         });
 
         return stores;
+    }
+
+    public void validateStoreStatus(Store store) {
+
+        StoreStatusType status = store.getStatus();
+
+        if(StoreStatusType.SHUT_DOWN == status) {
+            throw new StoreException(SHUT_DOWN_STORE);
+        }else if(StoreStatusType.OPEN_PREPARING == status) {
+            throw new StoreException(OPEN_PREPARING_STORE);
+        }
     }
 }

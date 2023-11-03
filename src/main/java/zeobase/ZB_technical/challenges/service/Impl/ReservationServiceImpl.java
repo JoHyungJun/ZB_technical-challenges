@@ -33,6 +33,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final StoreRepository storeRepository;
 
     private final MemberServiceImpl memberService;
+    private final StoreServiceImpl storeService;
 
 
     // 특정 store id를 통해 전체 예약 불러오기
@@ -40,10 +41,12 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional(readOnly = true)
     public List<ReservationInfoDto> getReservationsInfoByStoreId(Long storeId) {
 
-        // storeId 검증
-        if(!storeRepository.existsById(storeId)) {
-            throw new StoreException(STORE_ID_NOT_FOUND);
-        }
+        // store id 검증
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreException(STORE_ID_NOT_FOUND));
+
+        // store status 검증
+        storeService.validateStoreStatus(store);
 
         List<Reservation> reservations = reservationRepository.findAllByStoreId(storeId, Sort.by(
                     Sort.Order.asc("reservedDate")));
@@ -61,6 +64,9 @@ public class ReservationServiceImpl implements ReservationService {
         // store id 검증
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(STORE_ID_NOT_FOUND));
+
+        // store status 검증
+        storeService.validateStoreStatus(store);
 
         return ReservationAvailableDto.builder()
                 .isAvailable(validateAvailableReservationTime(store, reservationTime))
@@ -80,6 +86,9 @@ public class ReservationServiceImpl implements ReservationService {
         // store id 검증
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new StoreException(STORE_ID_NOT_FOUND));
+
+        // store status 검증
+        storeService.validateStoreStatus(store);
 
         // 예약 가능한 시간인지 검증
         if(!validateAvailableReservationTime(store, request.getReservationDateTime())) {
@@ -108,8 +117,10 @@ public class ReservationServiceImpl implements ReservationService {
     private Boolean validateAvailableReservationTime(Store store, LocalDateTime time) {
 
         // 특정 store id의 특정 날짜의 모든 예약 시간을 가져옴
+        // 단, 점주가 거절한 예약의 경우 필터링
         List<LocalTime> reservedTimes = reservationRepository.findAllReservationByStoreIdAndReservedDate(store.getId(), time.toLocalDate())
                 .stream()
+                .filter(reservation -> reservation.getAcceptedStatus() != ReservationAcceptedType.REJECTED)
                 .map(reservation -> reservation.getReservedDateTime().toLocalTime())
                 .collect(Collectors.toList());
 
@@ -143,7 +154,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // 원하는 예약 시간이 예약된 시간들 중 포함돼 있다면 false 반환
-        if(reservedTimes.contains(time)) {
+        if(reservedTimes.contains(targetTime)) {
             return false;
         }
 
