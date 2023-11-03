@@ -24,7 +24,6 @@ public class KioskPhoneDto {
     @AllArgsConstructor
     public static class Response {
 
-        private Boolean success;
         private String message;
     }
 }

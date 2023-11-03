@@ -1,8 +1,11 @@
 package zeobase.ZB_technical.challenges.service.Impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import zeobase.ZB_technical.challenges.dto.member.MemberPublicInfoDto;
 import zeobase.ZB_technical.challenges.dto.member.MemberSigninDto;
 import zeobase.ZB_technical.challenges.dto.member.MemberSignupDto;
@@ -25,6 +28,7 @@ public class MemberServiceImpl implements MemberService {
 
 
     @Override
+    @Transactional
     public MemberSignupDto.Response signup(MemberSignupDto.Request request) {
 
         if(memberRepository.existsByMemberId(request.getMemberId())) {
@@ -79,5 +83,27 @@ public class MemberServiceImpl implements MemberService {
                 .memberRoleType(member.getRole())
                 .memberStatusType(member.getStatus())
                 .build();
+    }
+
+    public Member getMemberByAuthentication(Authentication authentication) {
+
+        if(authentication == null) {
+            throw new MemberException(UNAUTHORIZED_RESPONSE);
+        }
+
+        return (Member) authentication.getPrincipal();
+    }
+
+    public void validateMemberStatus(Member member) {
+
+        if(!member.isAccountNonExpired()) {
+            throw new MemberException(WITHDRAWAL_MEMBER);
+        }else if(!member.isAccountNonExpired()) {
+            throw new MemberException(BLOCKED_MEMBER);
+        }else if(!member.isCredentialsNonExpired()) {
+            throw new MemberException();    // TODO
+        }else if(!member.isEnabled()) {
+            throw new MemberException(INACTIVE_MEMBER);
+        }
     }
 }

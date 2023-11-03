@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import zeobase.ZB_technical.challenges.utils.security.JwtAuthenticationFilter;
+import zeobase.ZB_technical.challenges.utils.security.JwtExceptionFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ import zeobase.ZB_technical.challenges.utils.security.JwtAuthenticationFilter;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtExceptionFilter jwtExceptionFilter;
 
 
     @Bean
@@ -31,13 +33,10 @@ public class SecurityConfig {
                 .cors().disable()       // cors 비활성화
 
                 .authorizeRequests()    // 권한 요청 여부 설정
-                .antMatchers(
-                        "/member/**",               // 멤버 관련 요청 비활성화
-                        "/kiosk/phone",                 // 키오스크 인증 요청 비활성화
-                        "/kiosk/signin")
+                .antMatchers("/**")
                 .permitAll()
 
-                .antMatchers("/**")           // 이외의 모든 요청 권한 필요
+                .anyRequest()         // 이외의 모든 요청 권한 필요
                 .authenticated()
 
                 .and()
@@ -46,6 +45,7 @@ public class SecurityConfig {
 
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
                 ;
 
         return httpSecurity.build();

@@ -1,12 +1,14 @@
 package zeobase.ZB_technical.challenges.exception;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import zeobase.ZB_technical.challenges.type.ErrorCode;
 
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class JwtException extends RuntimeException {
