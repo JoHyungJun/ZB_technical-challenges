@@ -16,6 +16,7 @@ import zeobase.ZB_technical.challenges.service.StoreService;
 import zeobase.ZB_technical.challenges.type.MemberRoleType;
 import zeobase.ZB_technical.challenges.type.StoreSortedType;
 
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -30,6 +31,9 @@ public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
 
     private final MemberServiceImpl memberService;
+
+    // 최소 예약 텀은 30분으로 설정 -> 추가 요구사항 때 바뀔 수 있음
+    private static final LocalTime MINIMUM_RESERVATION_TERM = LocalTime.of(0, 29);
 
 
     // 점주가 자신의 매장을 등록하는 api
@@ -47,7 +51,17 @@ public class StoreServiceImpl implements StoreService {
 
         // 회원이 점주가 맞는지 검증
         if(MemberRoleType.STORE_OWNER != member.getRole()) {
-            throw new MemberException();
+            throw new MemberException(MISMATCH_ROLE);
+        }
+
+        // 영업 종료 시간이 영업 시작 시간보다 빠른지 검증
+        if(!request.getClosedHours().isAfter(request.getOpenHours())) {
+            throw new StoreException(INVALID_OPENING_HOURS);
+        }
+
+        // 예약 텀 시간을 너무 빠르게 설정했는지 검증
+        if(!request.getReservationTerm().isAfter(MINIMUM_RESERVATION_TERM)) {
+            throw new StoreException(INVALID_RESERVATION_TERM);
         }
 
         Store savedStore = storeRepository.save(
@@ -57,6 +71,9 @@ public class StoreServiceImpl implements StoreService {
                     .longitude(request.getLongitude())
                     .explanation(request.getExplanation())
                     .status(request.getStatus())
+                    .openHours(request.getOpenHours())
+                    .closedHours(request.getClosedHours())
+                    .reservationTerm(request.getReservationTerm())
                     .totalStarRating(0L)
                     .member(member)
                     .build()

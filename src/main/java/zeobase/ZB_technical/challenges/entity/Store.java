@@ -8,6 +8,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import zeobase.ZB_technical.challenges.type.StoreStatusType;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -31,6 +33,12 @@ public class Store extends BaseEntity {
     private String explanation;
 
     private StoreStatusType status;
+
+    private LocalTime openHours;
+
+    private LocalTime closedHours;
+
+    private LocalTime reservationTerm;
 
     private Long totalStarRating;
 
