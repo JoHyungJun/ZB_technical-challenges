@@ -11,7 +11,7 @@ import zeobase.ZB_technical.challenges.type.ErrorCode;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(JwtException.class)
-    public ErrorResponse handleKioskException(JwtException e) {
+    public ErrorResponse handleJwtException(JwtException e) {
 
         log.error("{} is occurred", e.getCode());
 

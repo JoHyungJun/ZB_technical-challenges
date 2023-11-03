@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import zeobase.ZB_technical.challenges.type.StoreStatusType;
 
 import javax.persistence.*;
 import java.util.List;
@@ -29,6 +30,10 @@ public class Store extends BaseEntity {
 
     private String explanation;
 
+    private StoreStatusType status;
+
+    private Long totalStarRating;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -38,4 +43,9 @@ public class Store extends BaseEntity {
 
     @OneToMany(mappedBy = "store")
     private List<Reservation> reservations;
+
+
+    public void modifyStatus(StoreStatusType status) {
+        this.status = status;
+    }
 }

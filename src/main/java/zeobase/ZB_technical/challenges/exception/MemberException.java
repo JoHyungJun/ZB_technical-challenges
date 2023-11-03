@@ -11,7 +11,7 @@ import zeobase.ZB_technical.challenges.type.ErrorCode;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberException extends RuntimeException{
+public class MemberException extends RuntimeException {
 
     private HttpStatus httpStatus;
     private String code;

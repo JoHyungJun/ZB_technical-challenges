@@ -20,13 +20,13 @@ public class KioskController {
 
     private final KioskService kioskService;
 
+
     @PostMapping("/phone")
     public ResponseEntity<KioskPhoneDto.Response> checkReservationByPhone(@Valid @RequestBody KioskPhoneDto.Request request,
                                                                           BindingResult bindingResult) {
         if(bindingResult.hasErrors()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(KioskPhoneDto.Response.builder()
-                            .success(false)
                             .message(bindingResult.getFieldErrors()
                                     .get(0)
                                     .getDefaultMessage())
