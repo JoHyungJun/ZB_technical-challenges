@@ -41,12 +41,12 @@ public class KioskServiceImpl implements KioskService {
 
         // 이미 예약 확인한 회원인지 검증
         Reservation reservation = reservationRepository.findByMemberId(member.getId()).get();
-        if(reservation.getVisited() == ReservationVisitedType.VISITED) {
+        if(reservation.getVisitedStatus() == ReservationVisitedType.VISITED) {
             throw new ReservationException(ErrorCode.RESERVATION_ALREADY_CHECKED);
         }
 
         // 점주가 거절한 예약인지 검증 (점주의 선택을 기다리는 중이라면 예외 발생 x)
-        if(reservation.getAccepted() == ReservationAcceptedType.REJECTED) {
+        if(reservation.getAcceptedStatus() == ReservationAcceptedType.REJECTED) {
             throw new ReservationException(ErrorCode.RESERVATION_ACCEPTED_REJECTED);
         }
 

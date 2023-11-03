@@ -55,6 +55,12 @@ public enum ErrorCode {
 
     INVALID_SORTED_TYPE(HttpStatus.BAD_REQUEST, "정렬 방식으로 잘못된 인자가 전달되었습니다."),
     INVALID_LOCATION_TYPE(HttpStatus.BAD_REQUEST, "위치 정보로 잘못된 형식의 인자가 전달되었습니다."),
+    INVALID_OPENING_HOURS(HttpStatus.BAD_REQUEST, "영업 시간 설정이 올바르지 않습니다."),
+    INVALID_RESERVATION_TERM(HttpStatus.BAD_REQUEST, "예약 텀의 시간이 올바르지 않습니다."),
+    INVALID_RESERVATION_REQUEST(HttpStatus.BAD_REQUEST, "예약 정보로 잘못된 인자가 전달되었습니다."),
+
+    INVALID_RESERVATION_TIME(HttpStatus.BAD_REQUEST, "예약 시간이 올바르지 않습니다."),
+    ALREADY_RESERVED_TIME(HttpStatus.BAD_REQUEST, "이미 예약된 시간입니다."),
     ;
 
     private final HttpStatus httpStatus;
