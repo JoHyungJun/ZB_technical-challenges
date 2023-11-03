@@ -45,7 +45,7 @@ public class MemberController {
 
     @PostMapping("/signin")
     public ResponseEntity<MemberSigninDto.Response> signin(
-            @RequestBody  MemberSigninDto.Request request
+            @RequestBody MemberSigninDto.Request request
     ) {
 
         return ResponseEntity.ok().body(memberService.signin(request));
@@ -54,11 +54,11 @@ public class MemberController {
     @PostMapping("/signout")
     public ResponseEntity signout() {
         // TODO : refresh token을 구현할 경우 DB에서 지우는 작업 구현
-        
+
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping()
+    @GetMapping("")
     public ResponseEntity<MemberPublicInfoDto> userPublicInfo(
             @RequestParam("id") String memberId
     ) {

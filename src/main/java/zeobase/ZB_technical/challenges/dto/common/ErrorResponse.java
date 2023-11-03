@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
+import zeobase.ZB_technical.challenges.type.ErrorCode;
 
 @Getter
 @Builder
@@ -15,4 +16,12 @@ public class ErrorResponse {
     private HttpStatus httpStatus;
     private String errorCode;
     private String errorMessage;
+
+
+    public ErrorResponse(ErrorCode errorCode) {
+
+        this.httpStatus = errorCode.getHttpStatus();
+        this.errorCode = errorCode.name();
+        this.errorMessage = errorCode.getDescription();
+    }
 }
