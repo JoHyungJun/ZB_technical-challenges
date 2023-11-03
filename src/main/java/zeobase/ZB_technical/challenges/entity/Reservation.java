@@ -1,14 +1,14 @@
 package zeobase.ZB_technical.challenges.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import zeobase.ZB_technical.challenges.type.ReservationAcceptedType;
 import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Builder
@@ -22,15 +22,19 @@ public class Reservation extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //@NonNull
-    private LocalDateTime reservedDate;
+    @NotNull
+    private LocalDateTime reservedDateTime;
+
+    @NotNull
+    private LocalDate reservedDate;
 
     @Enumerated(value = EnumType.STRING)
-    private ReservationAcceptedType accepted;
+    @Builder.Default
+    private ReservationAcceptedType acceptedStatus = ReservationAcceptedType.WAITING;
 
     @Enumerated
     @Builder.Default
-    private ReservationVisitedType visited = ReservationVisitedType.UNVISITED;
+    private ReservationVisitedType visitedStatus = ReservationVisitedType.UNVISITED;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -41,9 +45,16 @@ public class Reservation extends BaseEntity{
     private Store store;
 
 
+    public Reservation updateAccepted(ReservationAcceptedType reservationAcceptedType){
+
+        this.acceptedStatus = reservationAcceptedType;
+
+        return this;
+    }
+
     public Reservation updateVisited(ReservationVisitedType reservationVisitedType){
 
-        this.visited = reservationVisitedType;
+        this.visitedStatus = reservationVisitedType;
 
         return this;
     }
