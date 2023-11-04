@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import zeobase.ZB_technical.challenges.dto.kiosk.KioskPhoneDto;
+import zeobase.ZB_technical.challenges.dto.kiosk.KioskSigninDto;
 import zeobase.ZB_technical.challenges.exception.ReviewException;
 import zeobase.ZB_technical.challenges.service.KioskService;
 
@@ -40,5 +41,13 @@ public class KioskController {
         }
 
         return ResponseEntity.ok(kioskService.checkReservationByPhone(request));
+    }
+
+    @PostMapping("/member")
+    public ResponseEntity<KioskSigninDto.Response> checkReservationByMember(
+            @RequestBody KioskSigninDto.Request request
+    ) {
+
+        return ResponseEntity.ok(kioskService.checkReservationByMember(request));
     }
 }

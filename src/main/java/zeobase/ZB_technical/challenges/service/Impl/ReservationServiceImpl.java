@@ -11,6 +11,7 @@ import zeobase.ZB_technical.challenges.dto.reservation.ReservationInfoDto;
 import zeobase.ZB_technical.challenges.entity.Member;
 import zeobase.ZB_technical.challenges.entity.Reservation;
 import zeobase.ZB_technical.challenges.entity.Store;
+import zeobase.ZB_technical.challenges.exception.ReservationException;
 import zeobase.ZB_technical.challenges.exception.StoreException;
 import zeobase.ZB_technical.challenges.repository.ReservationRepository;
 import zeobase.ZB_technical.challenges.repository.StoreRepository;
@@ -161,5 +162,18 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         return true;
+    }
+
+    public void validateReservationAccepted(Reservation reservation) {
+
+        ReservationAcceptedType reservationStatus = reservation.getAcceptedStatus();
+
+        if(ReservationAcceptedType.REJECTED == reservationStatus) {
+            throw new ReservationException(RESERVATION_ACCEPTED_REJECTED);
+        }else if(ReservationAcceptedType.WAITING == reservationStatus) {
+            throw new ReservationException(RESERVATION_ACCEPTED_WAITING);
+        }else if(ReservationAcceptedType.CANCELED == reservationStatus) {
+            throw new ReservationException(RESERVATION_CANCELED);
+        }
     }
 }
