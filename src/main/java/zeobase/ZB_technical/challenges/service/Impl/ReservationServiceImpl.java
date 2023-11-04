@@ -5,17 +5,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import zeobase.ZB_technical.challenges.dto.reservation.ReservationAcceptDto;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationAvailableDto;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationReserveDto;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationInfoDto;
 import zeobase.ZB_technical.challenges.entity.Member;
 import zeobase.ZB_technical.challenges.entity.Reservation;
 import zeobase.ZB_technical.challenges.entity.Store;
+import zeobase.ZB_technical.challenges.exception.MemberException;
 import zeobase.ZB_technical.challenges.exception.ReservationException;
 import zeobase.ZB_technical.challenges.exception.StoreException;
 import zeobase.ZB_technical.challenges.repository.ReservationRepository;
 import zeobase.ZB_technical.challenges.repository.StoreRepository;
 import zeobase.ZB_technical.challenges.service.ReservationService;
+import zeobase.ZB_technical.challenges.type.MemberRoleType;
 import zeobase.ZB_technical.challenges.type.ReservationAcceptedType;
 import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
 
@@ -37,7 +40,6 @@ public class ReservationServiceImpl implements ReservationService {
     private final StoreRepository storeRepository;
 
 
-    // 특정 store id를 통해 전체 예약 불러오기
     @Override
     @Transactional(readOnly = true)
     public List<ReservationInfoDto> getReservationsInfoByStoreId(Long storeId) {
@@ -57,7 +59,6 @@ public class ReservationServiceImpl implements ReservationService {
                 .collect(Collectors.toList());
     }
 
-    // 특정 가게에 대한 특정 시간이 예약 가능 시간인지 검증
     @Override
     @Transactional(readOnly = true)
     public ReservationAvailableDto existsAvailableReservationTime(Long storeId, LocalDateTime reservationTime) {
@@ -114,6 +115,51 @@ public class ReservationServiceImpl implements ReservationService {
                 .memberId(reservation.getMember().getId())
                 .storeId(reservation.getStore().getId())
                 .reservedDateTime(reservation.getReservedDateTime())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ReservationAcceptDto.Response acceptReservationByStoreOwner(ReservationAcceptDto.Request request, Authentication authentication) {
+
+        // reservation id 검증
+        Reservation reservation = reservationRepository.findById(request.getReservationId())
+                .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID));
+
+        // store id 검증
+        Store store = storeRepository.findById(request.getStoreId())
+                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
+
+        // member (authentication) 검증
+        Member member = memberService.getMemberByAuthentication(authentication);
+        
+        // member status 검증
+        memberService.validateMemberStatus(member);
+
+        // member role (가게 점장이 맞는지 여부) 검증
+        if(member.getRole() != MemberRoleType.STORE_OWNER) {
+            throw new MemberException(MISMATCH_ROLE);
+        }
+
+        // store status 검증
+        storeService.validateStoreStatus(store);
+
+        // 현재 member (가게 점장) 가 소유한 store id가 맞는지 검증
+        List<Long> ownStoreIds = member.getStores()
+                .stream()
+                .map(ownStore -> ownStore.getId())
+                .collect(Collectors.toList());
+
+        if(!ownStoreIds.contains(store.getId())) {
+            throw new StoreException(NOT_OWNED_STORE_ID);
+        }
+
+        Reservation updateReservation = reservationRepository.save(
+                reservation.updateAccepted(request.getAccepted()));
+
+        return ReservationAcceptDto.Response.builder()
+                .reservationId(updateReservation.getId())
+                .accepted(updateReservation.getAcceptedStatus())
                 .build();
     }
 

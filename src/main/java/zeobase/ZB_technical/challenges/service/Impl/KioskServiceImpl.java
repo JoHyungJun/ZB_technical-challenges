@@ -78,6 +78,7 @@ public class KioskServiceImpl implements KioskService {
     }
 
     @Override
+    @Transactional
     public KioskSigninDto.Response checkReservationByMember(KioskSigninDto.Request request) {
 
         // 이용자 아이디 검증
