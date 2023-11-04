@@ -25,7 +25,7 @@ public enum ErrorCode {
     // Member
     NOT_FOUND_MEMBER_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 멤버 ID 입니다."),
     NOT_FOUND_MEMBER_PHONE(HttpStatus.BAD_REQUEST, "존재하지 않는 핸드폰 번호입니다."),
-    NOT_FOUND_MEMBER_UID(HttpStatus.BAD_REQUEST, "존재하지 않는 이용자 아이디입니다."),
+    NOT_FOUND_MEMBER_UID(HttpStatus.BAD_REQUEST, "이용자 아이디 정보를 찾을 수 없습니다."),
 
     INVALID_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "회원가입 정보로 잘못된 인자가 전달되었습니다."),
 
@@ -43,8 +43,14 @@ public enum ErrorCode {
     // Kiosk
     INVALID_KIOSK_REQUEST(HttpStatus.BAD_REQUEST, "키오스크 방문 정보로 잘못된 인자가 전달되었습니다."),
 
+    NOT_FOUND_RESERVED_MEMBER(HttpStatus.BAD_REQUEST, "예약된 정보가 없습니다."),
+
+
     // Reservation
     RESERVATION_ACCEPTED_REJECTED(HttpStatus.BAD_REQUEST, "점주에 의해 거절된 예약입니다."),
+    RESERVATION_ACCEPTED_WAITING(HttpStatus.BAD_REQUEST, "점주가 아직 승인하지 않은 예약입니다."),
+    RESERVATION_CANCELED(HttpStatus.BAD_REQUEST, "이용자가 취소한 예약입니다."),
+    
     RESERVATION_ALREADY_CHECKED(HttpStatus.BAD_REQUEST, "이미 방문한 고객입니다."),
 
 
