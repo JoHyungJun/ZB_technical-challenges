@@ -4,5 +4,6 @@ public enum ReservationAcceptedType {
 
     ACCEPTED,
     REJECTED,
-    WAITING
+    WAITING,
+    CANCELED
 }

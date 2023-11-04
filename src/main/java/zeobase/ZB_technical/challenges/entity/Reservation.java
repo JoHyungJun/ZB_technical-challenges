@@ -32,7 +32,7 @@ public class Reservation extends BaseEntity{
     @Builder.Default
     private ReservationAcceptedType acceptedStatus = ReservationAcceptedType.WAITING;
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     @Builder.Default
     private ReservationVisitedType visitedStatus = ReservationVisitedType.UNVISITED;
 
