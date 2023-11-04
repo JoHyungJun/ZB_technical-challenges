@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import zeobase.ZB_technical.challenges.dto.common.ErrorResponse;
+import zeobase.ZB_technical.challenges.dto.reservation.ReservationAcceptDto;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationAvailableDto;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationReserveDto;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationInfoDto;
@@ -47,7 +48,7 @@ public class ReservationController {
     }
 
     @PostMapping("/reserve")
-    public ResponseEntity<?> reserve(
+    public ResponseEntity<ReservationReserveDto.Response> reserve(
             @Valid @RequestBody ReservationReserveDto.Request request,
             BindingResult bindingResult,
             Authentication authentication
@@ -60,5 +61,14 @@ public class ReservationController {
         }
 
         return ResponseEntity.ok().body(reservationService.reserve(request, authentication));
+    }
+
+    @PostMapping("/accept")
+    public ResponseEntity<ReservationAcceptDto.Response> accept(
+            ReservationAcceptDto.Request request,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(reservationService.acceptReservationByStoreOwner(request, authentication));
     }
 }
