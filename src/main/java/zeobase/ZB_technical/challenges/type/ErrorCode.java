@@ -47,6 +47,8 @@ public enum ErrorCode {
 
 
     // Reservation
+    NOT_FOUND_RESERVATION_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 예약 ID 입니다."),
+
     RESERVATION_ACCEPTED_REJECTED(HttpStatus.BAD_REQUEST, "점주에 의해 거절된 예약입니다."),
     RESERVATION_ACCEPTED_WAITING(HttpStatus.BAD_REQUEST, "점주가 아직 승인하지 않은 예약입니다."),
     RESERVATION_CANCELED(HttpStatus.BAD_REQUEST, "이용자가 취소한 예약입니다."),
@@ -64,6 +66,7 @@ public enum ErrorCode {
 
     // Store
     NOT_FOUND_STORE_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 가게 ID 입니다."),
+    NOT_OWNED_STORE_ID(HttpStatus.BAD_REQUEST, "이용자 소유의 가게가 아닙니다."),
 
     INVALID_SORTED_TYPE(HttpStatus.BAD_REQUEST, "정렬 방식으로 잘못된 인자가 전달되었습니다."),
     INVALID_LOCATION_TYPE(HttpStatus.BAD_REQUEST, "위치 정보로 잘못된 형식의 인자가 전달되었습니다."),
@@ -76,6 +79,8 @@ public enum ErrorCode {
 
     STORE_SHUT_DOWN(HttpStatus.BAD_REQUEST, "영업을 종료한 가게입니다."),
     STORE_OPEN_PREPARING(HttpStatus.BAD_REQUEST, "영업 준비 중인 가게입니다."),
+
+
     ;
 
     private HttpStatus httpStatus;
