@@ -7,13 +7,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import zeobase.ZB_technical.challenges.dto.common.ErrorResponse;
-import zeobase.ZB_technical.challenges.dto.member.MemberPublicInfoDto;
+import zeobase.ZB_technical.challenges.dto.member.MemberInfoDto;
 import zeobase.ZB_technical.challenges.dto.member.MemberSigninDto;
 import zeobase.ZB_technical.challenges.dto.member.MemberSignupDto;
+import zeobase.ZB_technical.challenges.exception.MemberException;
 import zeobase.ZB_technical.challenges.service.MemberService;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static zeobase.ZB_technical.challenges.type.ErrorCode.INVALID_SIGN_IN_REQUEST;
 
 @RestController
 @RequestMapping("/member")
@@ -24,7 +27,7 @@ public class MemberController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(
+    public ResponseEntity<MemberSignupDto.Response> signup(
             @Valid @RequestBody MemberSignupDto.Request request,
             BindingResult bindingResult
     ) {
@@ -32,12 +35,7 @@ public class MemberController {
         if(bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ErrorResponse.builder()
-                            .httpStatus(HttpStatus.BAD_REQUEST)
-                            .errorCode("INVALID_SIGN_IN_REQUEST")
-                            .errorMessage(errors.get(0).getDefaultMessage())
-                            .build());
+            throw new MemberException(INVALID_SIGN_IN_REQUEST.modifyDescription(errors.get(0).getDefaultMessage()));
         }
 
         return ResponseEntity.ok().body(memberService.signup(request));
@@ -59,8 +57,8 @@ public class MemberController {
     }
 
     @GetMapping("")
-    public ResponseEntity<MemberPublicInfoDto> userPublicInfo(
-            @RequestParam("id") String memberId
+    public ResponseEntity<MemberInfoDto> userPublicInfo(
+            @RequestParam("id") Long memberId
     ) {
 
         return ResponseEntity.ok().body(

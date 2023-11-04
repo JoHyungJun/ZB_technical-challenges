@@ -1,7 +1,6 @@
 package zeobase.ZB_technical.challenges.service.Impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +28,12 @@ import static zeobase.ZB_technical.challenges.type.ErrorCode.*;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
 
-    private final StoreRepository storeRepository;
+    // 최소 예약 텀은 30분으로 설정 -> 추가 요구사항 때 바뀔 수 있음
+    private static final LocalTime MINIMUM_RESERVATION_TERM = LocalTime.of(0, 29);
 
     private final MemberServiceImpl memberService;
 
-    // 최소 예약 텀은 30분으로 설정 -> 추가 요구사항 때 바뀔 수 있음
-    private static final LocalTime MINIMUM_RESERVATION_TERM = LocalTime.of(0, 29);
+    private final StoreRepository storeRepository;
 
 
     // 점주가 자신의 매장을 등록하는 api
@@ -92,7 +91,7 @@ public class StoreServiceImpl implements StoreService {
         
         // 유효한 storeId인지 검증
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new StoreException(STORE_ID_NOT_FOUND));
+                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
         
         return StoreInfoDto.Response.fromEntity(store);
     }
@@ -145,7 +144,7 @@ public class StoreServiceImpl implements StoreService {
                     case ALPHABET:
                         return o1.getName().compareTo(o2.getName());
                     case STAR_RATING:
-                        return o2.getTotalStarRating().compareTo(o2.getTotalStarRating());
+                        return o2.getAverageStarRating().compareTo(o2.getAverageStarRating());
                     default:
                         return o1.getName().compareTo(o2.getName());
                 }
@@ -160,9 +159,9 @@ public class StoreServiceImpl implements StoreService {
         StoreStatusType status = store.getStatus();
 
         if(StoreStatusType.SHUT_DOWN == status) {
-            throw new StoreException(SHUT_DOWN_STORE);
+            throw new StoreException(STORE_SHUT_DOWN);
         }else if(StoreStatusType.OPEN_PREPARING == status) {
-            throw new StoreException(OPEN_PREPARING_STORE);
+            throw new StoreException(STORE_OPEN_PREPARING);
         }
     }
 }
