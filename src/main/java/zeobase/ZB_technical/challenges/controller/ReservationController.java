@@ -10,13 +10,16 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import zeobase.ZB_technical.challenges.dto.common.ErrorResponse;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationAvailableDto;
-import zeobase.ZB_technical.challenges.dto.reservation.ReservationDto;
+import zeobase.ZB_technical.challenges.dto.reservation.ReservationReserveDto;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationInfoDto;
+import zeobase.ZB_technical.challenges.exception.StoreException;
 import zeobase.ZB_technical.challenges.service.ReservationService;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static zeobase.ZB_technical.challenges.type.ErrorCode.INVALID_RESERVATION_REQUEST;
 
 @RestController
 @RequestMapping("/reservation")
@@ -45,7 +48,7 @@ public class ReservationController {
 
     @PostMapping("/reserve")
     public ResponseEntity<?> reserve(
-            @Valid @RequestBody ReservationDto.Request request,
+            @Valid @RequestBody ReservationReserveDto.Request request,
             BindingResult bindingResult,
             Authentication authentication
     ) {
@@ -53,12 +56,7 @@ public class ReservationController {
         if(bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ErrorResponse.builder()
-                            .httpStatus(HttpStatus.BAD_REQUEST)
-                            .errorCode("INVALID_RESERVATION_REQUEST")
-                            .errorMessage(errors.get(0).getDefaultMessage())
-                            .build());
+            throw new StoreException(INVALID_RESERVATION_REQUEST.modifyDescription(errors.get(0).getDefaultMessage()));
         }
 
         return ResponseEntity.ok().body(reservationService.reserve(request, authentication));

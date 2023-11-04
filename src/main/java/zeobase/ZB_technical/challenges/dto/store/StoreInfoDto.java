@@ -9,6 +9,7 @@ import zeobase.ZB_technical.challenges.type.StoreStatusType;
 import zeobase.ZB_technical.challenges.utils.Distance;
 
 import java.awt.*;
+import java.time.LocalTime;
 
 public class StoreInfoDto {
 
@@ -32,7 +33,10 @@ public class StoreInfoDto {
         private Double longitude;
         private String explanation;
         private StoreStatusType status;
-        private Long totalStarRating;
+        private LocalTime openHours;
+        private LocalTime closedHours;
+        private LocalTime reservationTerm;
+        private Double averageStarRating;
         private Double distanceDiff;
 
 
@@ -45,7 +49,10 @@ public class StoreInfoDto {
                     .longitude(store.getLongitude())
                     .explanation(store.getExplanation())
                     .status(store.getStatus())
-                    .totalStarRating(store.getTotalStarRating())
+                    .averageStarRating(store.getAverageStarRating())
+                    .openHours(store.getOpenHours())
+                    .closedHours(store.getClosedHours())
+                    .reservationTerm(store.getReservationTerm())
                     .distanceDiff(null)
                     .build();
         }
@@ -59,7 +66,7 @@ public class StoreInfoDto {
                     .longitude(store.getLongitude())
                     .explanation(store.getExplanation())
                     .status(store.getStatus())
-                    .totalStarRating(store.getTotalStarRating())
+                    .averageStarRating(store.getAverageStarRating())
                     .distanceDiff(Distance.getDistanceInKilometerByHarversine(
                             locationX, locationY,
                             store.getLatitude(), store.getLongitude()

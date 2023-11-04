@@ -2,11 +2,10 @@ package zeobase.ZB_technical.challenges.service.Impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.ZB_technical.challenges.dto.member.MemberPublicInfoDto;
+import zeobase.ZB_technical.challenges.dto.member.MemberInfoDto;
 import zeobase.ZB_technical.challenges.dto.member.MemberSigninDto;
 import zeobase.ZB_technical.challenges.dto.member.MemberSignupDto;
 import zeobase.ZB_technical.challenges.entity.Member;
@@ -22,9 +21,10 @@ import static zeobase.ZB_technical.challenges.type.ErrorCode.*;
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
+    private final JwtUtils jwtUtils;
+
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtils jwtUtils;
 
 
     @Override
@@ -32,7 +32,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberSignupDto.Response signup(MemberSignupDto.Request request) {
 
         if(memberRepository.existsByMemberId(request.getMemberId())) {
-            throw new MemberException(ALREADY_EXISTS_MEMBER_ID);
+            throw new MemberException(ALREADY_EXISTS_MEMBER_UID);
         }
 
         if(memberRepository.existsByPhone(request.getPhone())) {
@@ -56,10 +56,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public MemberSigninDto.Response signin(MemberSigninDto.Request request) {
 
         Member member = memberRepository.findByMemberId(request.getMemberId())
-                .orElseThrow(() -> new MemberException(MEMBER_UID_NOT_FOUND));
+                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_UID));
 
         if(!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new MemberException(MISMATCH_PASSWORD);
@@ -73,12 +74,13 @@ public class MemberServiceImpl implements MemberService {
     // TODO : signout
 
     @Override
-    public MemberPublicInfoDto getMemberPublicInfoByMemberId(String memberId) {
+    @Transactional
+    public MemberInfoDto getMemberPublicInfoByMemberId(Long memberId) {
 
-        Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_UID_NOT_FOUND));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_ID));
 
-        return MemberPublicInfoDto.builder()
+        return MemberInfoDto.builder()
                 .memberId(member.getMemberId())
                 .memberRoleType(member.getRole())
                 .memberStatusType(member.getStatus())

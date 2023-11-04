@@ -19,28 +19,29 @@ public enum ErrorCode {
     SIGNATURE_EXCEPTION(HttpStatus.BAD_REQUEST, "토큰 서명이 올바르지 않습니다."),
     ILLEGAL_ARGUMENT_EXCEPTION(HttpStatus.BAD_REQUEST, "잘못된 인자가 전달되었습니다."),
 
-    UNAUTHORIZED_RESPONSE(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
+    UNAUTHORIZED_RESPONSE(HttpStatus.UNAUTHORIZED, "인증되지 않은 이용자입니다."),
 
 
     // Member
+    NOT_FOUND_MEMBER_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 멤버 ID 입니다."),
+    NOT_FOUND_MEMBER_PHONE(HttpStatus.BAD_REQUEST, "존재하지 않는 핸드폰 번호입니다."),
+    NOT_FOUND_MEMBER_UID(HttpStatus.BAD_REQUEST, "존재하지 않는 이용자 아이디입니다."),
+
     INVALID_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "회원가입 정보로 잘못된 인자가 전달되었습니다."),
 
-    ALREADY_EXISTS_MEMBER_ID(HttpStatus.BAD_REQUEST, "이미 존재하는 ID입니다."),
+    ALREADY_EXISTS_MEMBER_UID(HttpStatus.BAD_REQUEST, "이미 존재하는 ID 입니다."),
     ALREADY_EXISTS_PHONE(HttpStatus.BAD_REQUEST, "이미 존재하는 핸드폰 번호입니다."),
-
-    MEMBER_PHONE_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 핸드폰 번호입니다."),
-    MEMBER_UID_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 이용자 아이디입니다."),
 
     MISMATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     MISMATCH_ROLE(HttpStatus.BAD_REQUEST, "이용자의 권한이 적절하지 않습니다."),
 
-    WITHDRAWAL_MEMBER(HttpStatus.BAD_REQUEST, "탈퇴한 회원입니다."),
-    BLOCKED_MEMBER(HttpStatus.BAD_REQUEST, "정지된 회원입니다."),
-    INACTIVE_MEMBER(HttpStatus.BAD_REQUEST, "비활성화된 회원입니다."),
+    WITHDRAWAL_MEMBER(HttpStatus.BAD_REQUEST, "탈퇴한 이용자입니다."),
+    BLOCKED_MEMBER(HttpStatus.BAD_REQUEST, "정지된 이용자입니다."),
+    INACTIVE_MEMBER(HttpStatus.BAD_REQUEST, "비활성화된 이용자입니다."),
 
 
     // Kiosk
-
+    INVALID_KIOSK_REQUEST(HttpStatus.BAD_REQUEST, "키오스크 방문 정보로 잘못된 인자가 전달되었습니다."),
 
     // Reservation
     RESERVATION_ACCEPTED_REJECTED(HttpStatus.BAD_REQUEST, "점주에 의해 거절된 예약입니다."),
@@ -48,10 +49,15 @@ public enum ErrorCode {
 
 
     // Review
+    NOT_FOUND_REVIEW_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 리뷰 ID 입니다."),
+    NOT_FOUND_STORE_VISITED_RECORD(HttpStatus.BAD_REQUEST, "매장을 이용하지 않은 이용자는 리뷰를 남길 수 없습니다."),
+    NOT_FOUND_STORE_RESERVED_RECORD(HttpStatus.BAD_REQUEST, "매장을 예약하지 않은 이용자는 리뷰를 남길 수 없습니다."),
+    
+    INVALID_REVIEW_REQUEST(HttpStatus.BAD_REQUEST, "리뷰 정보로 잘못된 인자가 전달되었습니다."),
 
 
     // Store
-    STORE_ID_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 가게 아이디입니다."),
+    NOT_FOUND_STORE_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 가게 ID 입니다."),
 
     INVALID_SORTED_TYPE(HttpStatus.BAD_REQUEST, "정렬 방식으로 잘못된 인자가 전달되었습니다."),
     INVALID_LOCATION_TYPE(HttpStatus.BAD_REQUEST, "위치 정보로 잘못된 형식의 인자가 전달되었습니다."),
@@ -62,10 +68,18 @@ public enum ErrorCode {
 
     ALREADY_RESERVED_TIME(HttpStatus.BAD_REQUEST, "이미 예약된 시간입니다."),
 
-    SHUT_DOWN_STORE(HttpStatus.BAD_REQUEST, "영업을 종료한 가게입니다."),
-    OPEN_PREPARING_STORE(HttpStatus.BAD_REQUEST, "영업 준비 중인 가게입니다."),
+    STORE_SHUT_DOWN(HttpStatus.BAD_REQUEST, "영업을 종료한 가게입니다."),
+    STORE_OPEN_PREPARING(HttpStatus.BAD_REQUEST, "영업 준비 중인 가게입니다."),
     ;
 
-    private final HttpStatus httpStatus;
-    private final String description;
+    private HttpStatus httpStatus;
+    private String description;
+
+
+    public ErrorCode modifyDescription(String description) {
+
+        this.description = description;
+
+        return this;
+    }
 }

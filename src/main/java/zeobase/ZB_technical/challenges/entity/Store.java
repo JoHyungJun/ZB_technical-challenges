@@ -56,4 +56,13 @@ public class Store extends BaseEntity {
     public void modifyStatus(StoreStatusType status) {
         this.status = status;
     }
+
+    public Double getAverageStarRating() {
+
+        if(this.reviews.size() == 0) {
+            return 0.0;
+        }
+
+        return Double.valueOf(this.getTotalStarRating()) / (double) this.getReviews().size();
+    }
 }
