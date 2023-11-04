@@ -11,9 +11,11 @@ public class KioskPhoneDto {
 
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Request {
 
-        @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}",
+        @Pattern(regexp = "^01([0|1|6|7|8|9])([0-9]{3,4})([0-9]{4})",
                 message = "올바른 양식의 핸드폰 번호가 아닙니다.")
         private String phone;
     }

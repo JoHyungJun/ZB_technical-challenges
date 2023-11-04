@@ -11,7 +11,7 @@ import zeobase.ZB_technical.challenges.type.MemberStatusType;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberPublicInfoDto {
+public class MemberInfoDto {
 
     private String memberId;
     private MemberRoleType memberRoleType;

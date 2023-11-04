@@ -7,13 +7,11 @@ import zeobase.ZB_technical.challenges.dto.kiosk.KioskPhoneDto;
 import zeobase.ZB_technical.challenges.entity.Member;
 import zeobase.ZB_technical.challenges.entity.Reservation;
 import zeobase.ZB_technical.challenges.exception.KioskException;
-import zeobase.ZB_technical.challenges.exception.MemberException;
 import zeobase.ZB_technical.challenges.exception.ReservationException;
 import zeobase.ZB_technical.challenges.repository.MemberRepository;
 import zeobase.ZB_technical.challenges.repository.ReservationRepository;
 import zeobase.ZB_technical.challenges.service.KioskService;
 import zeobase.ZB_technical.challenges.type.ErrorCode;
-import zeobase.ZB_technical.challenges.type.MemberStatusType;
 import zeobase.ZB_technical.challenges.type.ReservationAcceptedType;
 import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
 
@@ -21,11 +19,10 @@ import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
 @RequiredArgsConstructor
 public class KioskServiceImpl implements KioskService {
 
-    private final MemberRepository memberRepository;
-    private final ReservationRepository reservationRepository;
-
     private final MemberServiceImpl memberService;
 
+    private final MemberRepository memberRepository;
+    private final ReservationRepository reservationRepository;
 
 
     @Override
@@ -34,7 +31,7 @@ public class KioskServiceImpl implements KioskService {
 
         // 존재하는 핸드폰 번호인지 검증
         Member member = memberRepository.findByPhone(request.getPhone())
-                .orElseThrow(() -> new KioskException(ErrorCode.MEMBER_PHONE_NOT_FOUND));
+                .orElseThrow(() -> new KioskException(ErrorCode.NOT_FOUND_MEMBER_PHONE));
 
         // 회원 status 검증
         memberService.validateMemberStatus(member);

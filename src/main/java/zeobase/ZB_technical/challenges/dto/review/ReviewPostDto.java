@@ -1,0 +1,47 @@
+package zeobase.ZB_technical.challenges.dto.review;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import zeobase.ZB_technical.challenges.entity.Review;
+import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
+public class ReviewPostDto {
+
+    @Builder
+    @Getter
+    public static class Request {
+
+        private Long storeId;
+
+        @Min(0) @Max(5)
+        private Double starRating;
+
+        private String reviewMessage;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Response {
+
+        private Long memberId;
+        private Long storeId;
+        private Long reviewId;
+
+
+        public static ReviewPostDto.Response fromEntity(Review review) {
+
+            return Response.builder()
+                    .memberId(review.getMember().getId())
+                    .storeId(review.getStore().getId())
+                    .reviewId(review.getId())
+                    .build();
+        }
+    }
+}

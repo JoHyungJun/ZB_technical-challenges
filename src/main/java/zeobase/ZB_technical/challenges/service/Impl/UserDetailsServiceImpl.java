@@ -9,7 +9,7 @@ import zeobase.ZB_technical.challenges.entity.Member;
 import zeobase.ZB_technical.challenges.exception.MemberException;
 import zeobase.ZB_technical.challenges.repository.MemberRepository;
 
-import static zeobase.ZB_technical.challenges.type.ErrorCode.MEMBER_UID_NOT_FOUND;
+import static zeobase.ZB_technical.challenges.type.ErrorCode.NOT_FOUND_MEMBER_UID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
 
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_UID_NOT_FOUND));
+                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_UID));
 
         return member;
     }

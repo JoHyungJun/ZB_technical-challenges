@@ -31,7 +31,7 @@ public class StoreController {
         return ResponseEntity.ok().body(storeService.registerStore(request, authentication));
     }
 
-    @GetMapping("/info")
+    @GetMapping("")
     public ResponseEntity<StoreInfoDto.Response> getStoreInfo(
             @RequestParam Long storeId
     ) {
@@ -44,7 +44,7 @@ public class StoreController {
             @RequestParam(defaultValue = "DISTANCE") String sort,   // TODO : 상수처리 안 할 방법 찾기
             @RequestParam(required = false) Double latitude,
             @RequestParam(required = false) Double longitude
-            ) {
+    ) {
 
         return ResponseEntity.ok().body(storeService.getAllSortedStoresInfo(sort, latitude, longitude));
     }

@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationAvailableDto;
-import zeobase.ZB_technical.challenges.dto.reservation.ReservationDto;
+import zeobase.ZB_technical.challenges.dto.reservation.ReservationReserveDto;
 import zeobase.ZB_technical.challenges.dto.reservation.ReservationInfoDto;
 import zeobase.ZB_technical.challenges.entity.Member;
 import zeobase.ZB_technical.challenges.entity.Reservation;
@@ -29,11 +29,11 @@ import static zeobase.ZB_technical.challenges.type.ErrorCode.*;
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
 
-    private final ReservationRepository reservationRepository;
-    private final StoreRepository storeRepository;
-
     private final MemberServiceImpl memberService;
     private final StoreServiceImpl storeService;
+
+    private final ReservationRepository reservationRepository;
+    private final StoreRepository storeRepository;
 
 
     // 특정 store id를 통해 전체 예약 불러오기
@@ -43,7 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new StoreException(STORE_ID_NOT_FOUND));
+                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
         // store status 검증
         storeService.validateStoreStatus(store);
@@ -63,7 +63,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new StoreException(STORE_ID_NOT_FOUND));
+                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
         // store status 검증
         storeService.validateStoreStatus(store);
@@ -75,7 +75,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public ReservationDto.Response reserve(ReservationDto.Request request, Authentication authentication) {
+    public ReservationReserveDto.Response reserve(ReservationReserveDto.Request request, Authentication authentication) {
 
         // authentication으로 member 추출
         Member member = memberService.getMemberByAuthentication(authentication);
@@ -85,7 +85,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         // store id 검증
         Store store = storeRepository.findById(request.getStoreId())
-                .orElseThrow(() -> new StoreException(STORE_ID_NOT_FOUND));
+                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
         // store status 검증
         storeService.validateStoreStatus(store);
@@ -106,7 +106,9 @@ public class ReservationServiceImpl implements ReservationService {
                 .build()
         );
 
-        return ReservationDto.Response.builder()
+        store.getReservations().add(reservation);
+
+        return ReservationReserveDto.Response.builder()
                 .reservationId(reservation.getId())
                 .memberId(reservation.getMember().getId())
                 .storeId(reservation.getStore().getId())
