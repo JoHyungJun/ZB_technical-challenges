@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 
 import static zeobase.ZB_technical.challenges.type.ErrorCode.*;
 
+/**
+ * 매장 관련 로직을 담는 Service 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
@@ -36,7 +39,17 @@ public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
 
 
-    // 점주가 자신의 매장을 등록하는 api
+    /**
+     * 이용자(점주)가 자신의 매장을 등록하는 메서드
+     * 이용자에 관한 검증 후
+     * 이용자 권한(일반 회원인지 점주 회원인지), 설정한 운영 시간, 예약 텀을 검증
+     *
+     * @param request - 매장 정보, 매장 위치, 매장 운영 시간, 매장 영업 상태
+     * @param authentication - 토큰을 활용한 이용자(점주) 검증
+     * @return "dto/store/StoreRegistrationDto.Response"
+     * @exception MemberException
+     * @exception StoreException
+     */
     @Override
     @Transactional
     public StoreRegistrationDto.Response registerStore(
@@ -83,7 +96,14 @@ public class StoreServiceImpl implements StoreService {
                 .build();
     }
 
-    // storeId를 통해 개별 매장의 정보를 가져오는 api
+    /**
+     * 개별 매장의 정보를 전달하는 메서드
+     * storeId 검증
+     *
+     * @param storeId
+     * @return "dto/store/StoreInfoDto.Response"
+     * @exception StoreException
+     */
     @Override
     @Transactional(readOnly = true)
     public StoreInfoDto.Response getStoreInfo(Long storeId) {
@@ -95,7 +115,16 @@ public class StoreServiceImpl implements StoreService {
         return StoreInfoDto.Response.fromEntity(store);
     }
 
-    // 정렬 방식(가나다, 거리, 별점 순)에 따라 가게 정보를 전달해주는 api
+    /**
+     * 모든 매장 목록을 정렬에 따라 정보를 전달하는 메서드
+     * 전달된 인자에 대한 검증 후 요청값에 따라 정렬을 다르게 하여 반환
+     *
+     * @param sortBy - "type/StoreSortedType" 거리(DISTANCE), 이름(ALPHABET), 별점(STAR_RATING)
+     * @param latitude - 위도
+     * @param longitude - 경도
+     * @return List "dto/store/StoreInfoDto.Response"
+     * @exception StoreException
+     */
     // TODO : 리팩토링 필요. JPA로 정렬 방법 적용 + 지저분한 코드 정리
     // TODO : 페이징
     @Override
@@ -153,6 +182,13 @@ public class StoreServiceImpl implements StoreService {
         return stores;
     }
 
+    /**
+     * 가게의 운영 상태를 검증하는 메서드
+     *
+     * @param store - 이용자의 Entity 객체
+     * @return
+     * @exception StoreException
+     */
     public void validateStoreStatus(Store store) {
 
         StoreStatusType status = store.getStatus();

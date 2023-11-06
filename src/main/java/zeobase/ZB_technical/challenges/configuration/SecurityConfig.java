@@ -14,6 +14,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import zeobase.ZB_technical.challenges.utils.security.JwtAuthenticationFilter;
 import zeobase.ZB_technical.challenges.utils.security.JwtExceptionFilter;
 
+/**
+ * 시큐리티 설정 관련 Config 클래스
+ */
 @Configuration
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)

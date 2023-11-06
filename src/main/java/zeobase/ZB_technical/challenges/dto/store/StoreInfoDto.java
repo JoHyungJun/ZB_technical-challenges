@@ -13,6 +13,9 @@ import zeobase.ZB_technical.challenges.utils.Distance;
 import java.awt.*;
 import java.time.LocalTime;
 
+/**
+ * 매장 정보 관련 DTO 클래스
+ */
 public class StoreInfoDto {
 
     @Builder

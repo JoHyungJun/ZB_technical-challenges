@@ -4,6 +4,9 @@ import lombok.*;
 import org.springframework.http.HttpStatus;
 import zeobase.ZB_technical.challenges.type.ErrorCode;
 
+/**
+ * 키오스크 관련 CustomException 클래스
+ */
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

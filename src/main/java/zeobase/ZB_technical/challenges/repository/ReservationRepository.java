@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 예약 관련 JpaRepository 인터페이스
+ */
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     @Query("SELECT r " +

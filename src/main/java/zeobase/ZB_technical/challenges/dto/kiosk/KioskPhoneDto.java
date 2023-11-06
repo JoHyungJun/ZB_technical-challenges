@@ -9,6 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.Pattern;
 import java.time.LocalTime;
 
+/**
+ * 키오스크의 핸드폰 인증 관련 DTO 클래스
+ */
 public class KioskPhoneDto {
 
     @Getter

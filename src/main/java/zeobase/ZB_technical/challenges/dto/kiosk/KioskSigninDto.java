@@ -9,6 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * 키오스크의 id, password 인증 관련 DTO 클래스
+ */
 public class KioskSigninDto {
 
     @Builder

@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * 매장 관련 Entity 클래스
+ */
 @Getter
 @Builder
 @NoArgsConstructor

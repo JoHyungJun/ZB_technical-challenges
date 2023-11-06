@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 
 import static zeobase.ZB_technical.challenges.type.ErrorCode.*;
 
+/**
+ * 리뷰 관련 로직을 담는 Service 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -37,6 +40,14 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReservationRepository reservationRepository;
 
 
+    /**
+     * 개별 리뷰의 정보를 전달하는 메서드
+     * 전달된 reviewId 검증
+     *
+     * @param reviewId
+     * @return "dto/review/ReviewInfoDto"
+     * @exception ReviewException
+     */
     @Override
     @Transactional(readOnly = true)
     public ReviewInfoDto getReviewById(Long reviewId) {
@@ -48,6 +59,14 @@ public class ReviewServiceImpl implements ReviewService {
         return ReviewInfoDto.fromEntity(review);
     }
 
+    /**
+     * 특정 이용자가 작성한 모든 리뷰를 전달하는 메서드
+     * 전달된 memberId 검증
+     *
+     * @param memberId
+     * @return List "dto/review/ReviewInfoDto"
+     * @exception MemberException
+     */
     @Override
     @Transactional(readOnly = true)
     public List<ReviewInfoDto> getAllReviewsByMemberId(Long memberId) {
@@ -62,6 +81,14 @@ public class ReviewServiceImpl implements ReviewService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 특정 매장에 작성된 모든 리뷰를 전달하는 메서드
+     * 전달된 storeId 검증
+     *
+     * @param storeId
+     * @return List "dto/Review/ReviewInfoDto"
+     * @exception StoreException
+     */
     @Override
     @Transactional(readOnly = true)
     public List<ReviewInfoDto> getAllReviewsByStoreId(Long storeId) {
@@ -76,6 +103,16 @@ public class ReviewServiceImpl implements ReviewService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 리뷰를 작성하는 메서드
+     * store, member 관련 검증 후
+     * 해당 이용자의 예약 기록을 추출하여, 해당 매장을 방문하지 않았다면 리뷰 작성 금지 처리
+     *
+     * @param request - 매장 정보, 별점, 리뷰 내용
+     * @param authentication - 토큰을 활용한 이용자(리뷰 작성자) 검증
+     * @return "dto/review/ReviewPostDto.Response"
+     * @exception ReviewException
+     */
     @Override
     @Transactional
     public ReviewPostDto.Response postReview(ReviewPostDto.Request request, Authentication authentication) {
