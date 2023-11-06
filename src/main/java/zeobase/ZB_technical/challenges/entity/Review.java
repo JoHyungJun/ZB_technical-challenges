@@ -8,6 +8,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
+/**
+ * 리뷰 관련 Entity 클래스
+ */
 @Getter
 @Builder
 @NoArgsConstructor

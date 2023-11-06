@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 이용자 관련 Entity 클래스
+ */
 @Getter
 @Builder
 @NoArgsConstructor

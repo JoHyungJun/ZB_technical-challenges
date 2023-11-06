@@ -10,6 +10,9 @@ import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+/**
+ * 리뷰 등록 관련 DTO 클래스
+ */
 public class ReviewPostDto {
 
     @Builder

@@ -18,6 +18,9 @@ import java.io.IOException;
 
 import static zeobase.ZB_technical.challenges.type.ErrorCode.MALFORMED_JWT_EXCEPTION;
 
+/**
+ * Jwt 를 통해 권한을 부여해주는 시큐리티 클래스
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,6 +29,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
 
 
+    /**
+     * 토큰을 받아 검증하고 정상적인 토큰일 경우 Authentication 을 부여
+     *
+     * @param request
+     * @param response
+     * @param filterChain
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 

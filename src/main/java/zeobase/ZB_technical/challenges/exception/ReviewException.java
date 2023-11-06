@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import zeobase.ZB_technical.challenges.type.ErrorCode;
 
+/**
+ * 리뷰 관련 CustomException 클래스
+ */
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

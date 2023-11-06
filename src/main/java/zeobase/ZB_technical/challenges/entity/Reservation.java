@@ -10,6 +10,9 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * 에약 관련 Entity 클래스
+ */
 @Getter
 @Builder
 @NoArgsConstructor

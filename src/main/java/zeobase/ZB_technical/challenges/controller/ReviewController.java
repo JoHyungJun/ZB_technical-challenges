@@ -18,6 +18,9 @@ import java.util.List;
 
 import static zeobase.ZB_technical.challenges.type.ErrorCode.INVALID_REVIEW_REQUEST;
 
+/**
+ * 리뷰 관련 api 를 담는 Controller 클래스
+ */
 @RestController
 @RequestMapping("/review")
 @RequiredArgsConstructor
@@ -26,6 +29,12 @@ public class ReviewController {
     private final ReviewServiceImpl reviewService;
 
 
+    /**
+     * 개별 리뷰의 정보를 전달하는 api
+     *
+     * @param id - reviewId
+     * @return
+     */
     @GetMapping("")
     public ResponseEntity<ReviewInfoDto> reviewInfo(
             @RequestParam Long id
@@ -34,6 +43,12 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.getReviewById(id));
     }
 
+    /**
+     * 특정 이용자가 작성한 모든 리뷰를 전달하는 api
+     *
+     * @param id - memberId
+     * @return
+     */
     @GetMapping("/member")
     public ResponseEntity<List<ReviewInfoDto>> allReviewByMember(
             @RequestParam Long id
@@ -42,6 +57,12 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.getAllReviewsByMemberId(id));
     }
 
+    /**
+     * 특정 매장에 작성된 모든 리뷰를 전달하는 api
+     *
+     * @param id - storeId
+     * @return
+     */
     @GetMapping("/store")
     public ResponseEntity<List<ReviewInfoDto>> allReviewByStore(
             @RequestParam Long id
@@ -50,8 +71,17 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.getAllReviewsByStoreId(id));
     }
 
+    /**
+     * 리뷰를 작성하는 api
+     *
+     * @param request - 매장 정보, 별점, 리뷰 내용
+     * @param bindingResult
+     * @param authentication - 토큰을 활용한 이용자(리뷰 작성자) 검증
+     * @return
+     * @exception ReviewException
+     */
     @PostMapping("")
-    public ResponseEntity<?> postReview(
+    public ResponseEntity<ReviewPostDto.Response> postReview(
             @Valid @RequestBody ReviewPostDto.Request request,
             BindingResult bindingResult,
             Authentication authentication

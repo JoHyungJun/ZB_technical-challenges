@@ -24,6 +24,9 @@ import java.time.LocalDateTime;
 
 import static zeobase.ZB_technical.challenges.type.ErrorCode.*;
 
+/**
+ * 키오스크 관련 로직을 담는 Service 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class KioskServiceImpl implements KioskService {
@@ -38,6 +41,17 @@ public class KioskServiceImpl implements KioskService {
     private final ReservationRepository reservationRepository;
 
 
+    /**
+     * 핸드폰 번호로 키오스크에서 방문 확인을 진행하는 메서드
+     * request 로 전달된 정보와, 매장, 예약, 이용자에 대한 검증 후
+     * 해당 예약 정보를 이용자가 방문했음으로 갱신
+     * 
+     * @param request - 핸드폰 번호, 매장 정보, 예약 정보
+     * @return "dto/kiosk/KioskPhoneDto.Response"
+     * @exception KioskException
+     * @exception StoreException
+     * @exception MemberException
+     */
     @Override
     @Transactional
     public KioskPhoneDto.Response checkReservationByPhone(KioskPhoneDto.Request request) {
@@ -77,6 +91,17 @@ public class KioskServiceImpl implements KioskService {
                 .build();
     }
 
+    /**
+     * 이용자 id, password로 키오스크에서 방문 확인을 진행하는 메서드
+     * request 로 전달된 정보와, 매장, 예약, 이용자에 대한 검증 후
+     * 해당 예약 정보를 이용자가 방문했음으로 갱신
+     *
+     * @param request - id, password, 매장 정보, 예약 정보
+     * @return "dto/kiosk/KioskPhoneDto.Response"
+     * @exception KioskException
+     * @exception StoreException
+     * @exception MemberException
+     */
     @Override
     @Transactional
     public KioskSigninDto.Response checkReservationByMember(KioskSigninDto.Request request) {

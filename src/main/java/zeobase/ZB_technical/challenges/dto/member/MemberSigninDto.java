@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * 이용자의 로그인 관련 DTO 클래스
+ */
 public class MemberSigninDto {
 
     @Getter

@@ -20,6 +20,9 @@ import java.util.List;
 import static zeobase.ZB_technical.challenges.type.ErrorCode.INVALID_KIOSK_REQUEST;
 import static zeobase.ZB_technical.challenges.type.ErrorCode.INVALID_REVIEW_REQUEST;
 
+/**
+ * 키오스크 관련 api 를 담는 Controller 클래스
+ */
 @RestController
 @RequestMapping("/kiosk")
 @RequiredArgsConstructor
@@ -28,6 +31,14 @@ public class KioskController {
     private final KioskService kioskService;
 
 
+    /**
+     * 핸드폰 번호로 키오스크에서 방문 확인을 진행하는 api
+     *
+     * @param request - 핸드폰 번호, 매장 정보, 예약 정보
+     * @param bindingResult
+     * @return
+     * @exception ReviewException
+     */
     @PostMapping("/phone")
     public ResponseEntity<KioskPhoneDto.Response> checkReservationByPhone(
             @Valid @RequestBody KioskPhoneDto.Request request,
@@ -43,6 +54,12 @@ public class KioskController {
         return ResponseEntity.ok(kioskService.checkReservationByPhone(request));
     }
 
+    /**
+     * 이용자 id, password로 키오스크에서 방문 확인을 진행하는 api
+     *
+     * @param request - id, password, 매장 정보, 예약 정보
+     * @return
+     */
     @PostMapping("/member")
     public ResponseEntity<KioskSigninDto.Response> checkReservationByMember(
             @RequestBody KioskSigninDto.Request request

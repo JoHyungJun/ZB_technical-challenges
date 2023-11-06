@@ -17,6 +17,9 @@ import zeobase.ZB_technical.challenges.utils.security.JwtUtils;
 
 import static zeobase.ZB_technical.challenges.type.ErrorCode.*;
 
+/**
+ * 이용자 관련 로직을 담는 Service 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
@@ -27,6 +30,14 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 
 
+    /**
+     * 회원 가입을 진행하는 메서드
+     * id와 핸드폰 번호에 대해 중복 검사 진행
+     *
+     * @param request - 가입에 필요한 회원 정보
+     * @return "dto/member/MemberSignupDto.Response"
+     * @exception MemberException
+     */
     @Override
     @Transactional
     public MemberSignupDto.Response signup(MemberSignupDto.Request request) {
@@ -55,6 +66,14 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
+    /**
+     * 로그인을 진행하는 메서드
+     * id, password 검증 후 토큰 발행
+     *
+     * @param request - id, password
+     * @return "dto/member/MemberSigninDto.Response"
+     * @exception MemberException
+     */
     @Override
     @Transactional
     public MemberSigninDto.Response signin(MemberSigninDto.Request request) {
@@ -71,8 +90,14 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    // TODO : signout
-
+    /**
+     * 개별 이용자의 공개 가능한 정보를 전달하는 메서드
+     * 이용자의 PK 검증
+     *
+     * @param memberId
+     * @return "dto/member/MemberInfoDto"
+     * @exception MemberException
+     */
     @Override
     @Transactional
     public MemberInfoDto getMemberPublicInfoByMemberId(Long memberId) {
@@ -87,6 +112,13 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
+    /**
+     * Authentication 을 통해 이용자 Entity 클래스를 추출하는 메서드
+     * 
+     * @param authentication
+     * @return Member Entity 클래스
+     * @exception MemberException
+     */
     public Member getMemberByAuthentication(Authentication authentication) {
 
         if(authentication == null) {
@@ -96,6 +128,13 @@ public class MemberServiceImpl implements MemberService {
         return (Member) authentication.getPrincipal();
     }
 
+    /**
+     * 이용자의 아이디 상태를 검증하는 메서드
+     *
+     * @param member - 이용자의 Entity 객체
+     * @return
+     * @exception MemberException
+     */
     public void validateMemberStatus(Member member) {
 
         if(!member.isAccountNonExpired()) {
