@@ -65,7 +65,7 @@ public class ReservationController {
 
     @PostMapping("/accept")
     public ResponseEntity<ReservationAcceptDto.Response> accept(
-            ReservationAcceptDto.Request request,
+            @RequestBody ReservationAcceptDto.Request request,
             Authentication authentication
     ) {
 

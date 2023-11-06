@@ -40,7 +40,6 @@ public class Store extends BaseEntity {
 
     private LocalTime reservationTerm;
 
-    private Long totalStarRating;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -63,6 +62,11 @@ public class Store extends BaseEntity {
             return 0.0;
         }
 
-        return Double.valueOf(this.getTotalStarRating()) / (double) this.getReviews().size();
+        Double totalRating = this.reviews
+                .stream()
+                .mapToDouble(review -> review.getStartRating())
+                .sum();
+
+        return totalRating / (double) this.reviews.size();
     }
 }

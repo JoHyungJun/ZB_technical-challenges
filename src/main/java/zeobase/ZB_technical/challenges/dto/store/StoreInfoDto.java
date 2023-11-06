@@ -1,9 +1,11 @@
 package zeobase.ZB_technical.challenges.dto.store;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import zeobase.ZB_technical.challenges.entity.Store;
 import zeobase.ZB_technical.challenges.type.StoreStatusType;
 import zeobase.ZB_technical.challenges.utils.Distance;
@@ -28,15 +30,28 @@ public class StoreInfoDto {
     public static class Response {
 
         private Long id;
+
         private String name;
+
         private Double latitude;
+
         private Double longitude;
+
         private String explanation;
+
         private StoreStatusType status;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
         private LocalTime openHours;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
         private LocalTime closedHours;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
         private LocalTime reservationTerm;
+
         private Double averageStarRating;
+
         private Double distanceDiff;
 
 
@@ -57,6 +72,7 @@ public class StoreInfoDto {
                     .build();
         }
 
+        @Transactional
         public static StoreInfoDto.Response fromEntity(Store store, Double locationX, Double locationY) {
 
             return Response.builder()

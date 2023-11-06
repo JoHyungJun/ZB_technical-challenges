@@ -10,6 +10,8 @@ public class ReservationAcceptDto {
 
     @Builder
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Request {
 
         private Long reservationId;
