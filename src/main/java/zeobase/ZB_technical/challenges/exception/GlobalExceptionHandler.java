@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import zeobase.ZB_technical.challenges.dto.common.ErrorResponse;
 import zeobase.ZB_technical.challenges.type.ErrorCode;
 
+/**
+ * 전체 Exception 을 핸들링하는 ExceptionHandler 클래스
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import zeobase.ZB_technical.challenges.type.ErrorCode;
 
+/**
+ * 공통 에러 응답 클래스
+ */
 @Getter
 @Builder
 @NoArgsConstructor

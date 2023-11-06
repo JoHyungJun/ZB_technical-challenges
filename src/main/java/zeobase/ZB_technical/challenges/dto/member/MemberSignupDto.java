@@ -10,6 +10,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+/**
+ * 이용자의 회원 가입 관련 DTO 클래스
+ */
 public class MemberSignupDto {
 
     @Getter

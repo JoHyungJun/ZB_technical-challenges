@@ -5,6 +5,9 @@ import zeobase.ZB_technical.challenges.entity.Member;
 
 import java.util.Optional;
 
+/**
+ * 이용자 관련 JpaRepository 인터페이스
+ */
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByPhone(String phone);

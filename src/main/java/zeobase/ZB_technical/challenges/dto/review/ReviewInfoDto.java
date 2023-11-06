@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import zeobase.ZB_technical.challenges.entity.Review;
 
+/**
+ * 리뷰 정보 관련 DTO 클래스
+ */
 @Builder
 @Getter
 @NoArgsConstructor

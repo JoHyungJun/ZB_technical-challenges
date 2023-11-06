@@ -26,6 +26,9 @@ import java.util.Date;
 
 import static zeobase.ZB_technical.challenges.type.ErrorCode.*;
 
+/**
+ * Jwt 토큰 생성, 파싱 등 역할의 시큐리티 관련 Util 클래스
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtUtils {
@@ -42,7 +45,9 @@ public class JwtUtils {
     private Key key;
 
 
-    // secret key 초기화
+    /**
+     * 토큰 생성을 위해 초기화 작업을 도와주는 메서드
+     */
     @PostConstruct
     protected void init() {
 
@@ -50,7 +55,13 @@ public class JwtUtils {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 토큰 제작
+    /**
+     * 토큰을 생성하는 메서드
+     * 
+     * @param memberId - 이용자의 UID
+     * @param memberRoleType - 이용자의 권한
+     * @return 이용자 정보를 담은 토큰
+     */
     public String createToken(String memberId, MemberRoleType memberRoleType) {
 
         Claims claims = Jwts.claims();
@@ -67,7 +78,12 @@ public class JwtUtils {
                 .compact();
     }
 
-    // servlet request를 받아 header 부에서 'Authorization'을 찾아, 'Bearer '를 제거한 나머지 문자열 반환
+    /**
+     * request 에서 토큰을 받아 prefix 인 "Bearer "을 제거하고 나머지 토큰을 전달하는 메서드
+     *
+     * @param request
+     * @return "Bearer "을 제거한 토큰 - 비정상적인 토큰의 경우 null 반환
+     */
     public String resolveTokenFromRequest(HttpServletRequest request) {
 
         String token = request.getHeader(TOKEN_HEADER);
@@ -79,7 +95,12 @@ public class JwtUtils {
         return token.substring(TOKEN_PREFIX.length());
     }
 
-    // 토큰 만료 검증
+    /**
+     * 토큰의 만료 일자 등을 검증하는 메서드
+     * 
+     * @param token - 토큰
+     * @return 토큰이 비어있거나, 만료 일자가 지난 토큰의 경우 false 반환
+     */
     public boolean validateToken(String token) {
 
         if(ObjectUtils.isEmpty(token)) {
@@ -91,7 +112,12 @@ public class JwtUtils {
                 .before(new Date());
     }
 
-    // 토큰으로 Authentication 가져오기
+    /**
+     * 토큰 을 통해 이용자 Authentication 을 추출하는 메서드
+     *
+     * @param token - 토큰
+     * @return 
+     */
     public Authentication parseAuthenticationByToken(String token) {
 
         String memberId = (String) parseClaimsByToken(token).getSubject();
@@ -100,7 +126,12 @@ public class JwtUtils {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    // 토큰 에러 검증
+    /**
+     * 토큰을 파싱하며, 파싱 중에 생긴 에러를 감지하는 메서드
+     * 
+     * @param token - 토큰
+     * @return 설정한 secret key 를 이용해 파싱한 Claims 를 반환
+     */
     public Claims parseClaimsByToken(String token) {
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
