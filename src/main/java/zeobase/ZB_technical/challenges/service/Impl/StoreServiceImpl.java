@@ -74,7 +74,6 @@ public class StoreServiceImpl implements StoreService {
                     .openHours(request.getOpenHours())
                     .closedHours(request.getClosedHours())
                     .reservationTerm(request.getReservationTerm())
-                    .totalStarRating(0L)
                     .member(member)
                     .build()
         );
