@@ -30,6 +30,22 @@ public class MemberController {
 
 
     /**
+     * 개별 이용자의 공개 가능한 정보를 전달하는 api
+     *
+     * @param memberId
+     * @return
+     */
+    @GetMapping("")
+    public ResponseEntity<MemberInfoDto> userPublicInfo(
+            @RequestParam("id") Long memberId
+    ) {
+
+        return ResponseEntity.ok().body(
+                memberService.getMemberPublicInfoByMemberId(memberId));
+    }
+
+    /**
+    
      * 회원 가입을 진행하는 api
      *
      * @param request - 가입에 필요한 회원 정보
@@ -64,20 +80,5 @@ public class MemberController {
     ) {
 
         return ResponseEntity.ok().body(memberService.signin(request));
-    }
-
-    /**
-     * 개별 이용자의 공개 가능한 정보를 전달하는 api
-     *
-     * @param memberId
-     * @return
-     */
-    @GetMapping("")
-    public ResponseEntity<MemberInfoDto> userPublicInfo(
-            @RequestParam("id") Long memberId
-    ) {
-
-        return ResponseEntity.ok().body(
-                memberService.getMemberPublicInfoByMemberId(memberId));
     }
 }

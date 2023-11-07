@@ -27,6 +27,13 @@ public class SecurityConfig {
     private final JwtExceptionFilter jwtExceptionFilter;
 
 
+    /**
+     * 시큐리티 필터 체인 설정 관련 메서드
+     *
+     * @param httpSecurity
+     * @return
+     * @exception Exception
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
@@ -54,6 +61,11 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
+    /**
+     * 이용자의 password 암호화 관련 bean 을 반환하는 메서드
+     *
+     * @return
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
