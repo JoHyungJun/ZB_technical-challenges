@@ -40,6 +40,25 @@ public class StoreServiceImpl implements StoreService {
 
 
     /**
+     * 개별 매장의 정보를 전달하는 메서드
+     * storeId (Store 의 PK) 검증
+     *
+     * @param storeId
+     * @return "dto/store/StoreInfoDto.Response"
+     * @exception StoreException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public StoreInfoDto.Response getStoreInfo(Long storeId) {
+
+        // 유효한 storeId인지 검증
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
+
+        return StoreInfoDto.Response.fromEntity(store);
+    }
+
+    /**
      * 이용자(점주)가 자신의 매장을 등록하는 메서드
      * 이용자에 관한 검증 후
      * 이용자 권한(일반 회원인지 점주 회원인지), 설정한 운영 시간, 예약 텀을 검증
@@ -97,25 +116,6 @@ public class StoreServiceImpl implements StoreService {
     }
 
     /**
-     * 개별 매장의 정보를 전달하는 메서드
-     * storeId 검증
-     *
-     * @param storeId
-     * @return "dto/store/StoreInfoDto.Response"
-     * @exception StoreException
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public StoreInfoDto.Response getStoreInfo(Long storeId) {
-        
-        // 유효한 storeId인지 검증
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
-        
-        return StoreInfoDto.Response.fromEntity(store);
-    }
-
-    /**
      * 모든 매장 목록을 정렬에 따라 정보를 전달하는 메서드
      * 전달된 인자에 대한 검증 후 요청값에 따라 정렬을 다르게 하여 반환
      *
@@ -125,7 +125,7 @@ public class StoreServiceImpl implements StoreService {
      * @return List "dto/store/StoreInfoDto.Response"
      * @exception StoreException
      */
-    // TODO : 리팩토링 필요. JPA로 정렬 방법 적용 + 지저분한 코드 정리
+    // TODO : 리팩토링 필요. JPA 로 정렬 방법 적용 + 지저분한 코드 정리
     // TODO : 페이징
     @Override
     @Transactional(readOnly = true)
@@ -172,7 +172,7 @@ public class StoreServiceImpl implements StoreService {
                     case ALPHABET:
                         return o1.getName().compareTo(o2.getName());
                     case STAR_RATING:
-                        return o2.getAverageStarRating().compareTo(o2.getAverageStarRating());
+                        return o2.getAverageStarRating().compareTo(o1.getAverageStarRating());
                     default:
                         return o1.getName().compareTo(o2.getName());
                 }

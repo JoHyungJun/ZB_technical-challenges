@@ -45,7 +45,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     /**
      * 개별 예약의 정보를 전달하는 api
-     * reservationId 검증
+     * reservationId (Reservation 의 PK) 검증
      *
      * @param reservationId
      * @return

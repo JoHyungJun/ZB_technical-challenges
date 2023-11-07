@@ -24,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     /**
      * UserDetails 를 이용하기 위한 메서드
      *
-     * @param memberId - 이용자 UID
+     * @param memberId - Member 의 PK가 아닌 이용자 UID
      * @return Member Entity 클래스
      */
     @Override

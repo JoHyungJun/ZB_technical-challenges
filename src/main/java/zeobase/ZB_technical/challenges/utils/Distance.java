@@ -3,7 +3,7 @@ package zeobase.ZB_technical.challenges.utils;
 import lombok.experimental.UtilityClass;
 
 /**
- * 거리순 계산 관련 Util 클래스
+ * 거리 계산 관련 Util 클래스
  */
 @UtilityClass
 public class Distance {

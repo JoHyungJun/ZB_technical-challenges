@@ -90,6 +90,13 @@ public enum ErrorCode {
     private String description;
 
 
+    /**
+     * ErrorCode 의 설명을 바꾸기 위한 메서드
+     * BindingResult 가 발생했을 시에 활용
+     *
+     * @param description - BindingResult 에서 전달된 첫 번째 메세지를 담음
+     * @return 수정된 자기 자신 ErrorCode
+     */
     public ErrorCode modifyDescription(String description) {
 
         this.description = description;

@@ -44,7 +44,7 @@ public class KioskServiceImpl implements KioskService {
     /**
      * 핸드폰 번호로 키오스크에서 방문 확인을 진행하는 메서드
      * request 로 전달된 정보와, 매장, 예약, 이용자에 대한 검증 후
-     * 해당 예약 정보를 이용자가 방문했음으로 갱신
+     * 해당 예약 정보를 '이용자가 방문했음'으로 갱신
      * 
      * @param request - 핸드폰 번호, 매장 정보, 예약 정보
      * @return "dto/kiosk/KioskPhoneDto.Response"
@@ -94,7 +94,7 @@ public class KioskServiceImpl implements KioskService {
     /**
      * 이용자 id, password로 키오스크에서 방문 확인을 진행하는 메서드
      * request 로 전달된 정보와, 매장, 예약, 이용자에 대한 검증 후
-     * 해당 예약 정보를 이용자가 방문했음으로 갱신
+     * 해당 예약 정보를 '이용자가 방문했음'으로 갱신
      *
      * @param request - id, password, 매장 정보, 예약 정보
      * @return "dto/kiosk/KioskPhoneDto.Response"
