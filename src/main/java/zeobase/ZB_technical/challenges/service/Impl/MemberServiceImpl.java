@@ -31,6 +31,28 @@ public class MemberServiceImpl implements MemberService {
 
 
     /**
+     * 개별 이용자의 공개 가능한 정보를 전달하는 메서드
+     * memberId (Member 의 PK) 검증
+     *
+     * @param memberId
+     * @return "dto/member/MemberInfoDto"
+     * @exception MemberException
+     */
+    @Override
+    @Transactional
+    public MemberInfoDto getMemberPublicInfoByMemberId(Long memberId) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_ID));
+
+        return MemberInfoDto.builder()
+                .memberId(member.getMemberId())
+                .memberRoleType(member.getRole())
+                .memberStatusType(member.getStatus())
+                .build();
+    }
+
+    /**
      * 회원 가입을 진행하는 메서드
      * id와 핸드폰 번호에 대해 중복 검사 진행
      *
@@ -87,28 +109,6 @@ public class MemberServiceImpl implements MemberService {
 
         return MemberSigninDto.Response.builder()
                 .token(jwtUtils.createToken(member.getMemberId(), member.getRole()))
-                .build();
-    }
-
-    /**
-     * 개별 이용자의 공개 가능한 정보를 전달하는 메서드
-     * 이용자의 PK 검증
-     *
-     * @param memberId
-     * @return "dto/member/MemberInfoDto"
-     * @exception MemberException
-     */
-    @Override
-    @Transactional
-    public MemberInfoDto getMemberPublicInfoByMemberId(Long memberId) {
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_ID));
-
-        return MemberInfoDto.builder()
-                .memberId(member.getMemberId())
-                .memberRoleType(member.getRole())
-                .memberStatusType(member.getStatus())
                 .build();
     }
 

@@ -11,7 +11,7 @@ import zeobase.ZB_technical.challenges.type.ReservationVisitedType;
 import java.time.LocalDateTime;
 
 /**
- * 이용자의 회원 가입 관련 DTO 클래스
+ * 공개된 예약의 정보 관련 DTO 클래스
  */
 @Builder
 @Getter

@@ -42,7 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     /**
      * 개별 리뷰의 정보를 전달하는 메서드
-     * 전달된 reviewId 검증
+     * reviewId (Review 의 PK) 검증
      *
      * @param reviewId
      * @return "dto/review/ReviewInfoDto"

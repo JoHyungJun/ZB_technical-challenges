@@ -26,6 +26,20 @@ public class StoreController {
 
 
     /**
+     * 개별 매장의 정보를 전달하는 api
+     *
+     * @param storeId
+     * @return
+     */
+    @GetMapping("")
+    public ResponseEntity<StoreInfoDto.Response> getStoreInfo(
+            @RequestParam Long storeId
+    ) {
+
+        return ResponseEntity.ok().body(storeService.getStoreInfo(storeId));
+    }
+
+    /**
      * 이용자(점주)가 자신의 매장을 등록하는 api
      *
      * @param request - 매장 정보, 매장 위치, 매장 운영 시간, 매장 영업 상태
@@ -39,20 +53,6 @@ public class StoreController {
     ) {
 
         return ResponseEntity.ok().body(storeService.registerStore(request, authentication));
-    }
-
-    /**
-     * 개별 매장의 정보를 전달하는 api
-     *
-     * @param storeId
-     * @return
-     */
-    @GetMapping("")
-    public ResponseEntity<StoreInfoDto.Response> getStoreInfo(
-            @RequestParam Long storeId
-    ) {
-
-        return ResponseEntity.ok().body(storeService.getStoreInfo(storeId));
     }
 
     /**
