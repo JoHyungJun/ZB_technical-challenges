@@ -45,6 +45,7 @@ public class MemberController {
     }
 
     /**
+    
      * 회원 가입을 진행하는 api
      *
      * @param request - 가입에 필요한 회원 정보
@@ -80,5 +81,4 @@ public class MemberController {
 
         return ResponseEntity.ok().body(memberService.signin(request));
     }
-
 }
