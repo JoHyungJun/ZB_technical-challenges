@@ -42,6 +42,8 @@ public enum ErrorCode {
     BLOCKED_MEMBER(HttpStatus.BAD_REQUEST, "정지된 이용자입니다."),
     INACTIVE_MEMBER(HttpStatus.BAD_REQUEST, "비활성화된 이용자입니다."),
 
+    EXPIRED_CREDENTIAL(HttpStatus.BAD_REQUEST, "비밀번호가 만료되었습니다."),
+
 
     // Kiosk
     INVALID_KIOSK_REQUEST(HttpStatus.BAD_REQUEST, "키오스크 방문 정보로 잘못된 인자가 전달되었습니다."),

@@ -142,7 +142,7 @@ public class MemberServiceImpl implements MemberService {
         }else if(!member.isAccountNonExpired()) {
             throw new MemberException(BLOCKED_MEMBER);
         }else if(!member.isCredentialsNonExpired()) {
-            throw new MemberException();    // TODO
+            throw new MemberException(EXPIRED_CREDENTIAL);    // TODO
         }else if(!member.isEnabled()) {
             throw new MemberException(INACTIVE_MEMBER);
         }

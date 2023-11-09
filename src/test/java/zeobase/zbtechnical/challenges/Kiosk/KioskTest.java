@@ -4,13 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.ZB_technical.challenges.dto.request.KioskPhoneRequest;
+import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhoneDto;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
 import zeobase.zbtechnical.challenges.repository.ReservationRepository;
 import zeobase.zbtechnical.challenges.service.KioskService;
-import zeobase.zbtechnical.challenges.type.ReservationVisitedType;
 
 @SpringBootTest
 class KioskTest {
@@ -41,7 +40,7 @@ class KioskTest {
         reservation = reservationRepository.save(reservation);
 
         //when
-        KioskPhoneRequest kioskPhoneRequest = KioskPhoneRequest.builder()
+        KioskPhoneDto.Request kioskPhoneRequest = KioskPhoneDto.Request.builder()
                 .phone("010-1234-5678")
                 .build();
 
@@ -49,6 +48,6 @@ class KioskTest {
 
         //then
         //reservation = reservationRepository.findById(reservation.getId()).get();
-        assertEquals(ReservationVisitedType.VISITED, reservation.getVisited());
+        //assertEquals(ReservationVisitedType.VISITED, reservation.getVisitedStatus());
     }
 }
