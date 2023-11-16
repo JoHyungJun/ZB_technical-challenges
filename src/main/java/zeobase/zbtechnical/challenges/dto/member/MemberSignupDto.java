@@ -19,7 +19,8 @@ public class MemberSignupDto {
     @Builder
     public static class Request {
 
-        private String memberId;
+        @NotNull(message = "사용자의 아이디가 누락되었습니다.")
+        private String UID;
 
         @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?!.*\\s).+$",
                  message = "비밀번호는 영어와 숫자를 혼용해야 하며 공백은 사용할 수 없습니다.")
@@ -27,7 +28,7 @@ public class MemberSignupDto {
         private String password;
 
         @NotNull(message = "사용자의 권한이 누락되었습니다.")
-        private MemberRoleType memberRoleType;
+        private MemberRoleType role;
 
         @NotNull(message = "사용자의 이름이 누락되었습니다.")
         private String name;
@@ -43,7 +44,7 @@ public class MemberSignupDto {
     @AllArgsConstructor
     public static class Response {
 
-        private Long id;
-        private String memberId;
+        private Long memberId;
+        private String UID;
     }
 }

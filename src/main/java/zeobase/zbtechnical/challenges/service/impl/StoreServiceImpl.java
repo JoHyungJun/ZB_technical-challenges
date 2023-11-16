@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import zeobase.zbtechnical.challenges.dto.store.StoreDistanceInfoDto;
 import zeobase.zbtechnical.challenges.dto.store.StoreInfoDto;
 import zeobase.zbtechnical.challenges.dto.store.StoreRegistrationDto;
 import zeobase.zbtechnical.challenges.entity.Member;
@@ -17,8 +18,6 @@ import zeobase.zbtechnical.challenges.type.StoreSortedType;
 import zeobase.zbtechnical.challenges.type.StoreStatusType;
 
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,13 +48,13 @@ public class StoreServiceImpl implements StoreService {
      */
     @Override
     @Transactional(readOnly = true)
-    public StoreInfoDto.Response getStoreInfo(Long storeId) {
+    public StoreInfoDto getStoreInfo(Long storeId) {
 
         // 유효한 storeId인지 검증
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
-        return StoreInfoDto.Response.fromEntity(store);
+        return StoreInfoDto.fromEntity(store);
     }
 
     /**
@@ -129,7 +128,7 @@ public class StoreServiceImpl implements StoreService {
     // TODO : 페이징
     @Override
     @Transactional(readOnly = true)
-    public List<StoreInfoDto.Response> getAllSortedStoresInfo(String sortBy, Double latitude, Double longitude) {
+    public List<StoreDistanceInfoDto> getAllSortedStoresInfo(String sortBy, Double latitude, Double longitude) {
 
         // 전달 받은 sortBy 인자 검증
         StoreSortedType sortedType = null;
@@ -154,30 +153,21 @@ public class StoreServiceImpl implements StoreService {
         }
 
         // 매장 정보 전부 받기
-        List<StoreInfoDto.Response> stores = storeRepository.findAll()
-                .stream()
-                .map(store -> (latitude!=null && longitude!=null) ?
-                        StoreInfoDto.Response.fromEntity(store, latitude, longitude) :
-                        StoreInfoDto.Response.fromEntity(store))
-                .collect(Collectors.toList());
+        List<StoreDistanceInfoDto> stores
+                = storeRepository.findAll()
+                                .stream()
+                                .map(store -> StoreDistanceInfoDto.fromEntity(store, latitude, longitude))
+                                .collect(Collectors.toList());
+
 
         // 정렬 값에 따라 다르게 sort
-        StoreSortedType finalSortedType = sortedType;
-        Collections.sort(stores, new Comparator<StoreInfoDto.Response>() {
-            @Override
-            public int compare(StoreInfoDto.Response o1, StoreInfoDto.Response o2) {
-                switch (finalSortedType) {
-                    case DISTANCE:
-                        return o1.getDistanceDiff().compareTo(o2.getDistanceDiff());
-                    case ALPHABET:
-                        return o1.getName().compareTo(o2.getName());
-                    case STAR_RATING:
-                        return o2.getAverageStarRating().compareTo(o1.getAverageStarRating());
-                    default:
-                        return o1.getName().compareTo(o2.getName());
-                }
-            }
-        });
+        if(sortedType == StoreSortedType.DISTANCE) {
+            stores.sort((x, y) -> x.getDistanceDiff().compareTo(y.getDistanceDiff()));
+        }else if(sortedType == StoreSortedType.ALPHABET) {
+            stores.sort((x, y) -> x.getName().compareTo(y.getName()));
+        }else if(sortedType == StoreSortedType.STAR_RATING) {
+            stores.sort((x, y) -> y.getAverageStarRating().compareTo(x.getAverageStarRating()));
+        }
 
         return stores;
     }

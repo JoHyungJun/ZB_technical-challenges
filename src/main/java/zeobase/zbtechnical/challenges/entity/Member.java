@@ -32,7 +32,7 @@ public class Member extends BaseEntity implements UserDetails {
     private Long id;
 
     @Column(unique = true)
-    private String memberId;
+    private String UID;
 
     private String password;
 
@@ -69,7 +69,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Override
     public String getUsername() {
 
-        return this.getMemberId();
+        return this.getUID();
     }
 
     @Override

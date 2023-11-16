@@ -29,43 +29,43 @@ public class ReviewController {
     /**
      * 개별 리뷰의 정보를 전달하는 api
      *
-     * @param id - reviewId
+     * @param reviewId
      * @return
      */
-    @GetMapping("")
+    @GetMapping("/{reviewId}")
     public ResponseEntity<ReviewInfoDto> reviewInfo(
-            @RequestParam Long id
+            @PathVariable Long reviewId
     ) {
 
-        return ResponseEntity.ok().body(reviewService.getReviewById(id));
+        return ResponseEntity.ok().body(reviewService.getReviewById(reviewId));
     }
 
     /**
      * 특정 이용자가 작성한 모든 리뷰를 전달하는 api
      *
-     * @param id - memberId
+     * @param memberId - memberId
      * @return
      */
-    @GetMapping("/member")
+    @GetMapping("/member/{memberId}")
     public ResponseEntity<List<ReviewInfoDto>> allReviewByMember(
-            @RequestParam Long id
+            @PathVariable Long memberId
     ) {
 
-        return ResponseEntity.ok().body(reviewService.getAllReviewsByMemberId(id));
+        return ResponseEntity.ok().body(reviewService.getAllReviewsByMemberId(memberId));
     }
 
     /**
      * 특정 매장에 작성된 모든 리뷰를 전달하는 api
      *
-     * @param id - storeId
+     * @param storeId - storeId
      * @return
      */
-    @GetMapping("/store")
+    @GetMapping("/store/{storeId}")
     public ResponseEntity<List<ReviewInfoDto>> allReviewByStore(
-            @RequestParam Long id
+            @PathVariable Long storeId
     ) {
 
-        return ResponseEntity.ok().body(reviewService.getAllReviewsByStoreId(id));
+        return ResponseEntity.ok().body(reviewService.getAllReviewsByStoreId(storeId));
     }
 
     /**

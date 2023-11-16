@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
@@ -18,7 +17,7 @@ public class KioskSigninDto {
     @Getter
     public static class Request {
 
-        private String memberId;
+        private String UID;
 
         private String password;
 

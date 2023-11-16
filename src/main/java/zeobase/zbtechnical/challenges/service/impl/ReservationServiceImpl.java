@@ -140,14 +140,14 @@ public class ReservationServiceImpl implements ReservationService {
         storeService.validateStoreStatus(store);
 
         // 예약 가능한 시간인지 검증
-        if(!validateAvailableReservationTime(store, request.getReservationDateTime())) {
+        if(!validateAvailableReservationTime(store, request.getReserveDateTime())) {
             throw new StoreException(ALREADY_RESERVED_TIME);
         }
 
         // 검증을 마쳤다면 예약
         Reservation reservation = reservationRepository.save(Reservation.builder()
-                .reservedDateTime(request.getReservationDateTime())
-                .reservedDate(request.getReservationDateTime().toLocalDate())
+                .reservedDateTime(request.getReserveDateTime())
+                .reservedDate(request.getReserveDateTime().toLocalDate())
                 .acceptedStatus(ReservationAcceptedType.WAITING)
                 .visitedStatus(ReservationVisitedType.UNVISITED)
                 .member(member)
@@ -184,7 +184,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID));
 
         // store id 검증
-        Store store = storeRepository.findById(request.getStoreId())
+        Store store = storeRepository.findById(reservation.getStore().getId())
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
         // member (authentication) 검증
@@ -237,7 +237,7 @@ public class ReservationServiceImpl implements ReservationService {
         // 단, 점주가 거절한 예약의 경우 필터링
         List<LocalTime> reservedTimes = reservationRepository.findAllReservationByStoreIdAndReservedDate(store.getId(), time.toLocalDate())
                 .stream()
-                .filter(reservation -> reservation.getAcceptedStatus() != ReservationAcceptedType.REJECTED)
+                .filter(reservation -> reservation.getAcceptedStatus() == ReservationAcceptedType.ACCEPTED)
                 .map(reservation -> reservation.getReservedDateTime().toLocalTime())
                 .collect(Collectors.toList());
 

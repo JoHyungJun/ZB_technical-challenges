@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import zeobase.zbtechnical.challenges.dto.store.StoreDistanceInfoDto;
 import zeobase.zbtechnical.challenges.dto.store.StoreInfoDto;
 import zeobase.zbtechnical.challenges.dto.store.StoreRegistrationDto;
 import zeobase.zbtechnical.challenges.service.StoreService;
@@ -27,9 +28,9 @@ public class StoreController {
      * @param storeId
      * @return
      */
-    @GetMapping("")
-    public ResponseEntity<StoreInfoDto.Response> getStoreInfo(
-            @RequestParam Long storeId
+    @GetMapping("/{storeId}")
+    public ResponseEntity<StoreInfoDto> getStoreInfo(
+            @PathVariable Long storeId
     ) {
 
         return ResponseEntity.ok().body(storeService.getStoreInfo(storeId));
@@ -60,7 +61,7 @@ public class StoreController {
      * @return
      */
     @GetMapping("/search")
-    public ResponseEntity<List<StoreInfoDto.Response>> getSortedStoresInfo(
+    public ResponseEntity<List<StoreDistanceInfoDto>> getSortedStoresInfo(
             @RequestParam(defaultValue = "DISTANCE") String sort,   // TODO : 상수처리 안 할 방법 찾기
             @RequestParam(required = false) Double latitude,
             @RequestParam(required = false) Double longitude

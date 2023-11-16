@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
 
-        Member member = memberRepository.findByMemberId(memberId)
+        Member member = memberRepository.findByUID(memberId)
                 .orElseThrow(() -> new MemberException(ErrorCode.NOT_FOUND_MEMBER_UID));
 
         return member;
