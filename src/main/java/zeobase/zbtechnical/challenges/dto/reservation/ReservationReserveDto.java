@@ -21,7 +21,7 @@ public class ReservationReserveDto {
         private Long storeId;
 
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-        private LocalDateTime reservationDateTime;
+        private LocalDateTime reserveDateTime;
     }
 
     @Builder

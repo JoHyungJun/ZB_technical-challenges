@@ -57,7 +57,7 @@ public class KioskController {
      * @param request - id, password, 매장 정보, 예약 정보
      * @return
      */
-    @PostMapping("/member")
+    @PostMapping("/signin")
     public ResponseEntity<KioskSigninDto.Response> checkReservationByMember(
             @RequestBody KioskSigninDto.Request request
     ) {

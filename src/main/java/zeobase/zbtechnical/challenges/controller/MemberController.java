@@ -32,9 +32,9 @@ public class MemberController {
      * @param memberId
      * @return
      */
-    @GetMapping("")
+    @GetMapping("/{memberId}")
     public ResponseEntity<MemberInfoDto> userPublicInfo(
-            @RequestParam("id") Long memberId
+            @PathVariable Long memberId
     ) {
 
         return ResponseEntity.ok().body(

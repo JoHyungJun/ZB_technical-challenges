@@ -2,94 +2,60 @@ package zeobase.zbtechnical.challenges.dto.store;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
+import lombok.experimental.SuperBuilder;
 import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.type.StoreStatusType;
-import zeobase.zbtechnical.challenges.utils.Distance;
 
 import java.time.LocalTime;
 
 /**
  * 매장 정보 관련 DTO 클래스
  */
+@SuperBuilder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class StoreInfoDto {
 
-    @Builder
-    @Getter
-    public static class Request {
+    private Long storeId;
 
-        private Double latitude;
-        private Double longitude;
-    }
+    private String name;
 
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Response {
+    private Double latitude;
 
-        private Long id;
+    private Double longitude;
 
-        private String name;
+    private String explanation;
 
-        private Double latitude;
+    private StoreStatusType status;
 
-        private Double longitude;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+    private LocalTime openHours;
 
-        private String explanation;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+    private LocalTime closedHours;
 
-        private StoreStatusType status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+    private LocalTime reservationTerm;
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
-        private LocalTime openHours;
-
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
-        private LocalTime closedHours;
-
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
-        private LocalTime reservationTerm;
-
-        private Double averageStarRating;
-
-        private Double distanceDiff;
+    private Double averageStarRating;
 
 
-        public static StoreInfoDto.Response fromEntity(Store store) {
+    public static StoreInfoDto fromEntity(Store store) {
 
-            return Response.builder()
-                    .id(store.getId())
-                    .name(store.getName())
-                    .latitude(store.getLatitude())
-                    .longitude(store.getLongitude())
-                    .explanation(store.getExplanation())
-                    .status(store.getStatus())
-                    .averageStarRating(store.getAverageStarRating())
-                    .openHours(store.getOpenHours())
-                    .closedHours(store.getClosedHours())
-                    .reservationTerm(store.getReservationTerm())
-                    .distanceDiff(null)
-                    .build();
-        }
-
-        @Transactional
-        public static StoreInfoDto.Response fromEntity(Store store, Double locationX, Double locationY) {
-
-            return Response.builder()
-                    .id(store.getId())
-                    .name(store.getName())
-                    .latitude(store.getLatitude())
-                    .longitude(store.getLongitude())
-                    .explanation(store.getExplanation())
-                    .status(store.getStatus())
-                    .averageStarRating(store.getAverageStarRating())
-                    .distanceDiff(Distance.getDistanceInKilometerByHarversine(
-                            locationX, locationY,
-                            store.getLatitude(), store.getLongitude()
-                    ))
-                    .build();
-        }
+        return StoreInfoDto.builder()
+                .storeId(store.getId())
+                .name(store.getName())
+                .latitude(store.getLatitude())
+                .longitude(store.getLongitude())
+                .explanation(store.getExplanation())
+                .status(store.getStatus())
+                .averageStarRating(store.getAverageStarRating())
+                .openHours(store.getOpenHours())
+                .closedHours(store.getClosedHours())
+                .reservationTerm(store.getReservationTerm())
+                .build();
     }
 }

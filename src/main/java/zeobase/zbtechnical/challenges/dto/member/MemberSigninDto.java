@@ -14,7 +14,7 @@ public class MemberSigninDto {
     @Builder
     public static class Request {
 
-        private String memberId;
+        private String UID;
         private String password;
     }
 

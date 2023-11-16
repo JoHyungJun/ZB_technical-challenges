@@ -18,7 +18,6 @@ public class ReservationAcceptDto {
     public static class Request {
 
         private Long reservationId;
-        private Long storeId;
         private ReservationAcceptedType accepted;
     }
 

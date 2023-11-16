@@ -42,13 +42,14 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberInfoDto getMemberPublicInfoByMemberId(Long memberId) {
 
+        // member id 존재 여부 검증
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_ID));
 
         return MemberInfoDto.builder()
-                .memberId(member.getMemberId())
-                .memberRoleType(member.getRole())
-                .memberStatusType(member.getStatus())
+                .UID(member.getUID())
+                .role(member.getRole())
+                .status(member.getStatus())
                 .build();
     }
 
@@ -64,27 +65,29 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberSignupDto.Response signup(MemberSignupDto.Request request) {
 
-        if(memberRepository.existsByMemberId(request.getMemberId())) {
+        // UID 존재 검증 여부
+        if(memberRepository.existsByUID(request.getUID())) {
             throw new MemberException(ALREADY_EXISTS_MEMBER_UID);
         }
 
+        // 핸드폰 존재 검증 여부
         if(memberRepository.existsByPhone(request.getPhone())) {
             throw new MemberException(ALREADY_EXISTS_PHONE);
         }
 
         Member savedMember = memberRepository.save(
                 Member.builder()
-                    .memberId(request.getMemberId())
+                    .UID(request.getUID())
                     .password(passwordEncoder.encode(request.getPassword()))
-                    .role(request.getMemberRoleType())
+                    .role(request.getRole())
                     .name(request.getName())
                     .phone(request.getPhone())
                     .status(MemberStatusType.ACTIVE)
                     .build());
 
         return MemberSignupDto.Response.builder()
-                .id(savedMember.getId())
-                .memberId(savedMember.getMemberId())
+                .memberId(savedMember.getId())
+                .UID(savedMember.getUID())
                 .build();
     }
 
@@ -100,15 +103,20 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberSigninDto.Response signin(MemberSigninDto.Request request) {
 
-        Member member = memberRepository.findByMemberId(request.getMemberId())
+        // UID 로 멤버 추출
+        Member member = memberRepository.findByUID(request.getUID())
                 .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_UID));
 
+        // 비밀번호 검증
         if(!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new MemberException(MISMATCH_PASSWORD);
         }
 
+        // 멤버 status 검증
+        validateMemberStatus(member);
+
         return MemberSigninDto.Response.builder()
-                .token(jwtUtils.createToken(member.getMemberId(), member.getRole()))
+                .token(jwtUtils.createToken(member.getUID(), member.getRole()))
                 .build();
     }
 
@@ -142,7 +150,7 @@ public class MemberServiceImpl implements MemberService {
         }else if(!member.isAccountNonExpired()) {
             throw new MemberException(BLOCKED_MEMBER);
         }else if(!member.isCredentialsNonExpired()) {
-            throw new MemberException(EXPIRED_CREDENTIAL);    // TODO
+            throw new MemberException(EXPIRED_CREDENTIAL);
         }else if(!member.isEnabled()) {
             throw new MemberException(INACTIVE_MEMBER);
         }

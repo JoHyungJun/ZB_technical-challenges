@@ -60,7 +60,7 @@ public class KioskServiceImpl implements KioskService {
         Member member = memberRepository.findByPhone(request.getPhone())
                 .orElseThrow(() -> new KioskException(ErrorCode.NOT_FOUND_MEMBER_PHONE));
 
-        // 회원 status 검증
+        // 이용자 status 검증
         memberService.validateMemberStatus(member);
 
         // 존재하는 매장 id 인지 검증
@@ -107,7 +107,7 @@ public class KioskServiceImpl implements KioskService {
     public KioskSigninDto.Response checkReservationByMember(KioskSigninDto.Request request) {
 
         // 이용자 아이디 검증
-        Member member = memberRepository.findByMemberId(request.getMemberId())
+        Member member = memberRepository.findByUID(request.getUID())
                 .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_UID));
 
         // 이용자 비밀번호 검증

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReservationInfoDto {
 
-    private Long id;
+    private Long reservationId;
     private Long memberId;
     private LocalDateTime reservedDate;
     private ReservationAcceptedType acceptedStatus;
@@ -29,7 +29,7 @@ public class ReservationInfoDto {
     public static ReservationInfoDto fromEntity(Reservation reservation) {
 
         return ReservationInfoDto.builder()
-                .id(reservation.getId())
+                .reservationId(reservation.getId())
                 .memberId(reservation.getMember().getId())
                 .reservedDate(reservation.getReservedDateTime())
                 .acceptedStatus(reservation.getAcceptedStatus())

@@ -50,9 +50,9 @@ public class ReservationController {
      * @param storeId
      * @return
      */
-    @GetMapping("")
+    @GetMapping("/store/{storeId}")
     public ResponseEntity<List<ReservationInfoDto>> reservationsInfo(
-            @RequestParam Long storeId
+            @PathVariable Long storeId
     ) {
 
         return ResponseEntity.ok().body(reservationService.getReservationsInfoByStoreId(storeId));
@@ -62,16 +62,16 @@ public class ReservationController {
      * 특정 매장의 특정 시간에 예약이 가능한지 (이미 등록된 예약이 없는지) 확인하는 api
      *
      * @param storeId
-     * @param reservationTime - 확인할 날짜 정보
+     * @param reserveTime - 확인할 날짜 정보
      * @return
      */
-    @GetMapping("/available")
+    @GetMapping("/store/{storeId}/available")
     public ResponseEntity<ReservationAvailableDto> validateReservationAvailable(
-            @RequestParam Long storeId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime reservationTime
+            @PathVariable Long storeId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime reserveTime
     ) {
 
-        return ResponseEntity.ok().body(reservationService.existsAvailableReservationTime(storeId, reservationTime));
+        return ResponseEntity.ok().body(reservationService.existsAvailableReservationTime(storeId, reserveTime));
     }
 
     /**
