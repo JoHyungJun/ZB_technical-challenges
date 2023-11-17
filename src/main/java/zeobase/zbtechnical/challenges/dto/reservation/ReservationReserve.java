@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 /**
  * 예약 관련 DTO 클래스
  */
-public class ReservationReserveDto {
+public class ReservationReserve {
 
     @Builder
     @Getter

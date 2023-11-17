@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 /**
  * 이용자의 회원 가입 관련 DTO 클래스
  */
-public class MemberSignupDto {
+public class MemberSignup {
 
     @Getter
     @Builder

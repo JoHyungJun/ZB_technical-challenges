@@ -31,6 +31,7 @@ public enum ErrorCode {
     NOT_FOUND_MEMBER_UID(HttpStatus.BAD_REQUEST, "이용자 아이디 정보를 찾을 수 없습니다."),
 
     INVALID_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "회원가입 정보로 잘못된 인자가 전달되었습니다."),
+    INVALID_MODIFY_REQUEST(HttpStatus.BAD_REQUEST, "회원 정보 수정 정보로 잘못된 인자가 전달되었습니다."),
 
     ALREADY_EXISTS_MEMBER_UID(HttpStatus.BAD_REQUEST, "이미 존재하는 ID 입니다."),
     ALREADY_EXISTS_PHONE(HttpStatus.BAD_REQUEST, "이미 존재하는 핸드폰 번호입니다."),

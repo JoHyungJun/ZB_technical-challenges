@@ -2,12 +2,11 @@ package zeobase.zbtechnical.challenges.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.member.MemberInfoDto;
-import zeobase.zbtechnical.challenges.dto.member.MemberSigninDto;
-import zeobase.zbtechnical.challenges.dto.member.MemberSignupDto;
+import zeobase.zbtechnical.challenges.dto.member.*;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.service.MemberService;
 import zeobase.zbtechnical.challenges.type.ErrorCode;
@@ -33,7 +32,7 @@ public class MemberController {
      * @return
      */
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberInfoDto> userPublicInfo(
+    public ResponseEntity<MemberInfoResponse> userPublicInfo(
             @PathVariable Long memberId
     ) {
 
@@ -50,8 +49,8 @@ public class MemberController {
      * @exception MemberException
      */
     @PostMapping("/signup")
-    public ResponseEntity<MemberSignupDto.Response> signup(
-            @Valid @RequestBody MemberSignupDto.Request request,
+    public ResponseEntity<MemberSignup.Response> signup(
+            @Valid @RequestBody MemberSignup.Request request,
             BindingResult bindingResult
     ) {
 
@@ -71,10 +70,32 @@ public class MemberController {
      * @return
      */
     @PostMapping("/signin")
-    public ResponseEntity<MemberSigninDto.Response> signin(
-            @RequestBody MemberSigninDto.Request request
+    public ResponseEntity<TokenResponse> signin(
+            @RequestBody MemberSigninRequest request
     ) {
 
         return ResponseEntity.ok().body(memberService.signin(request));
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<MemberSignOutResponse> signout(
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(memberService.signout(authentication));
+    }
+
+    /**
+     * 토큰 만료 시 재발급(refresh token)을 진행하는 api
+     *
+     * @param request - refresh token
+     * @return
+     */
+    @PostMapping("/reissue")
+    public ResponseEntity<TokenResponse> reissue(
+            @RequestBody RefreshTokenReissueRequest request
+    ) {
+
+        return ResponseEntity.ok().body(memberService.reissue(request));
     }
 }

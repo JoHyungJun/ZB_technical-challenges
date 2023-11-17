@@ -5,10 +5,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationAcceptDto;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationAvailableDto;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationReserveDto;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationInfoDto;
+import zeobase.zbtechnical.challenges.dto.reservation.ReservationAccept;
+import zeobase.zbtechnical.challenges.dto.reservation.ReservationAvailableResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.ReservationReserve;
+import zeobase.zbtechnical.challenges.dto.reservation.ReservationInfoResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.entity.Store;
@@ -53,9 +53,9 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ReservationInfoDto getReservationInfoById(Long reservationId) {
+    public ReservationInfoResponse getReservationInfoById(Long reservationId) {
 
-        return ReservationInfoDto.fromEntity(
+        return ReservationInfoResponse.fromEntity(
                 reservationRepository.findById(reservationId)
                         .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID))
         );
@@ -71,7 +71,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ReservationInfoDto> getReservationsInfoByStoreId(Long storeId) {
+    public List<ReservationInfoResponse> getReservationsInfoByStoreId(Long storeId) {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
@@ -84,7 +84,7 @@ public class ReservationServiceImpl implements ReservationService {
                     Sort.Order.asc("reservedDate")));
 
         return reservations.stream()
-                .map(reservation -> ReservationInfoDto.fromEntity(reservation))
+                .map(reservation -> ReservationInfoResponse.fromEntity(reservation))
                 .collect(Collectors.toList());
     }
 
@@ -99,7 +99,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ReservationAvailableDto existsAvailableReservationTime(Long storeId, LocalDateTime reservationTime) {
+    public ReservationAvailableResponse existsAvailableReservationTime(Long storeId, LocalDateTime reservationTime) {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
@@ -108,7 +108,7 @@ public class ReservationServiceImpl implements ReservationService {
         // store status 검증
         storeService.validateStoreStatus(store);
 
-        return ReservationAvailableDto.builder()
+        return ReservationAvailableResponse.builder()
                 .isAvailable(validateAvailableReservationTime(store, reservationTime))
                 .build();
     }
@@ -124,7 +124,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional
-    public ReservationReserveDto.Response reserve(ReservationReserveDto.Request request, Authentication authentication) {
+    public ReservationReserve.Response reserve(ReservationReserve.Request request, Authentication authentication) {
 
         // authentication으로 member 추출
         Member member = memberService.getMemberByAuthentication(authentication);
@@ -155,7 +155,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .build()
         );
 
-        return ReservationReserveDto.Response.builder()
+        return ReservationReserve.Response.builder()
                 .reservationId(reservation.getId())
                 .memberId(reservation.getMember().getId())
                 .storeId(reservation.getStore().getId())
@@ -177,7 +177,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional
-    public ReservationAcceptDto.Response acceptReservationByStoreOwner(ReservationAcceptDto.Request request, Authentication authentication) {
+    public ReservationAccept.Response acceptReservationByStoreOwner(ReservationAccept.Request request, Authentication authentication) {
 
         // reservation id 검증
         Reservation reservation = reservationRepository.findById(request.getReservationId())
@@ -214,7 +214,7 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation updateReservation = reservationRepository.save(
                 reservation.updateAccepted(request.getAccepted()));
 
-        return ReservationAcceptDto.Response.builder()
+        return ReservationAccept.Response.builder()
                 .reservationId(updateReservation.getId())
                 .accepted(updateReservation.getAcceptedStatus())
                 .build();

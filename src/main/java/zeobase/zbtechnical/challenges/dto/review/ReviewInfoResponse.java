@@ -13,7 +13,7 @@ import zeobase.zbtechnical.challenges.entity.Review;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewInfoDto {
+public class ReviewInfoResponse {
 
     private Long reviewId;
     private Long memberId;
@@ -22,9 +22,9 @@ public class ReviewInfoDto {
     private String reviewMessage;
 
 
-    public static ReviewInfoDto fromEntity(Review review) {
+    public static ReviewInfoResponse fromEntity(Review review) {
 
-        return ReviewInfoDto.builder()
+        return ReviewInfoResponse.builder()
                 .reviewId(review.getId())
                 .memberId(review.getMember().getId())
                 .storeId(review.getStore().getId())

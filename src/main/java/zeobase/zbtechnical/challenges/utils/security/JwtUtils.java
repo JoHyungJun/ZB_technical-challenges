@@ -1,6 +1,7 @@
 package zeobase.zbtechnical.challenges.utils.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
@@ -10,16 +11,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
+import zeobase.zbtechnical.challenges.dto.member.TokenResponse;
+import zeobase.zbtechnical.challenges.exception.JwtException;
+import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.MemberRoleType;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-
-import io.jsonwebtoken.io.Decoders;
-import org.springframework.util.ObjectUtils;
-import zeobase.zbtechnical.challenges.exception.JwtException;
-import zeobase.zbtechnical.challenges.type.MemberRoleType;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
-
 import java.security.Key;
 import java.util.Date;
 
@@ -32,8 +31,8 @@ public class JwtUtils {
 
     private final UserDetailsService userDetailsService;
 
-    // 토큰 만료 시간 - 3 DAYS
-    private static final Long TOKEN_EXPIRE_TIME = 3 * 60 * 60 * 1000L;
+    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 3 * 60 * 60 * 1000L; // 3 Hours
+    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L; // 7 Days
     private static final String TOKEN_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
 
@@ -59,20 +58,41 @@ public class JwtUtils {
      * @param memberRoleType - 이용자의 권한
      * @return 이용자 정보를 담은 토큰
      */
-    public String createToken(String memberId, MemberRoleType memberRoleType) {
+    public TokenResponse createToken(String memberId, MemberRoleType memberRoleType) {
 
-        Claims claims = Jwts.claims();
-        claims.setSubject(memberId);
-        claims.put("memberRoleType", memberRoleType);
-
+        // 만료 일자 등의 설정을 위해 현재 발급 날짜 선언
         Date date = new Date();
+        
+        // access token 제작부
+        Claims accessTokenClaims = Jwts.claims();
+        accessTokenClaims.setSubject(memberId);
+        accessTokenClaims.put("memberRoleType", memberRoleType);
 
-        return Jwts.builder()
-                .setClaims(claims)
+        String accessToken = Jwts.builder()
+                .setClaims(accessTokenClaims)
                 .setIssuedAt(date)
-                .setExpiration(new Date(date.getTime() + TOKEN_EXPIRE_TIME))
+                .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_EXPIRE_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        // refresh token 제작부
+        // refresh token 에는 되도록이면 아무 정보가 들어가지 않는 것이 좋지만, 멤버 추출을 위해 memberId만 부여
+        Claims refreshTokenClaims = Jwts.claims();
+        refreshTokenClaims.setSubject(memberId);
+
+        String refreshToken = Jwts.builder()
+                .setClaims(refreshTokenClaims)
+                .setIssuedAt(date)
+                .setExpiration(new Date(date.getTime() + REFRESH_TOKEN_EXPIRE_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return TokenResponse.builder()
+                .grantType(TOKEN_PREFIX.substring(0, TOKEN_PREFIX.length()-1))
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .expiredDate(date.getTime() + REFRESH_TOKEN_EXPIRE_TIME)
+                .build();
     }
 
     /**

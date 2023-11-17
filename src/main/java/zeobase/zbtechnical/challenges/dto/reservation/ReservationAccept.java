@@ -9,7 +9,7 @@ import zeobase.zbtechnical.challenges.type.ReservationAcceptedType;
 /**
  * 점주의 예약 승인/허용 관련 DTO 클래스
  */
-public class ReservationAcceptDto {
+public class ReservationAccept {
 
     @Builder
     @Getter

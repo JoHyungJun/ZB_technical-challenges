@@ -5,12 +5,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.member.MemberInfoDto;
-import zeobase.zbtechnical.challenges.dto.member.MemberSigninDto;
-import zeobase.zbtechnical.challenges.dto.member.MemberSignupDto;
+import zeobase.zbtechnical.challenges.dto.member.*;
 import zeobase.zbtechnical.challenges.entity.Member;
+import zeobase.zbtechnical.challenges.entity.RefreshToken;
+import zeobase.zbtechnical.challenges.exception.JwtException;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
+import zeobase.zbtechnical.challenges.repository.RefreshTokenRepository;
 import zeobase.zbtechnical.challenges.service.MemberService;
 import zeobase.zbtechnical.challenges.type.MemberStatusType;
 import zeobase.zbtechnical.challenges.utils.security.JwtUtils;
@@ -28,6 +29,7 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
 
     private final MemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     /**
@@ -40,13 +42,13 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public MemberInfoDto getMemberPublicInfoByMemberId(Long memberId) {
+    public MemberInfoResponse getMemberPublicInfoByMemberId(Long memberId) {
 
         // member id 존재 여부 검증
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_ID));
 
-        return MemberInfoDto.builder()
+        return MemberInfoResponse.builder()
                 .UID(member.getUID())
                 .role(member.getRole())
                 .status(member.getStatus())
@@ -63,7 +65,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public MemberSignupDto.Response signup(MemberSignupDto.Request request) {
+    public MemberSignup.Response signup(MemberSignup.Request request) {
 
         // UID 존재 검증 여부
         if(memberRepository.existsByUID(request.getUID())) {
@@ -85,7 +87,7 @@ public class MemberServiceImpl implements MemberService {
                     .status(MemberStatusType.ACTIVE)
                     .build());
 
-        return MemberSignupDto.Response.builder()
+        return MemberSignup.Response.builder()
                 .memberId(savedMember.getId())
                 .UID(savedMember.getUID())
                 .build();
@@ -96,12 +98,12 @@ public class MemberServiceImpl implements MemberService {
      * id, password 검증 후 토큰 발행
      *
      * @param request - id, password
-     * @return "dto/member/MemberSigninDto.Response"
+     * @return "dto/member/TokenResponse"
      * @exception MemberException
      */
     @Override
     @Transactional
-    public MemberSigninDto.Response signin(MemberSigninDto.Request request) {
+    public TokenResponse signin(MemberSigninRequest request) {
 
         // UID 로 멤버 추출
         Member member = memberRepository.findByUID(request.getUID())
@@ -115,9 +117,90 @@ public class MemberServiceImpl implements MemberService {
         // 멤버 status 검증
         validateMemberStatus(member);
 
-        return MemberSigninDto.Response.builder()
-                .token(jwtUtils.createToken(member.getUID(), member.getRole()))
+        // token response 객체 생성
+        TokenResponse tokenResponse = jwtUtils.createToken(member.getUID(), member.getRole());
+        
+        // 생성된 refresh token 은 repository 에 저장
+        RefreshToken refreshTokenInDB = refreshTokenRepository.findByMemberId(member.getId())
+                .orElse(null);
+
+        if(refreshTokenInDB == null) {
+
+            refreshTokenRepository.save(RefreshToken.builder()
+                    .refreshToken(tokenResponse.getRefreshToken())
+                    .memberId(member.getId())
+                    .build());
+        }else {
+
+            refreshTokenRepository.save(refreshTokenInDB.updateRefreshToken(tokenResponse.getRefreshToken()));
+        }
+
+        return tokenResponse;
+    }
+
+    @Override
+    @Transactional
+    public MemberSignOutResponse signout(Authentication authentication) {
+
+        // authentication 에서 멤버 추출
+        Member member = getMemberByAuthentication(authentication);
+
+        // 멤버 status 검증
+        validateMemberStatus(member);
+
+        // DB 에 저장된 refresh token 삭제
+        refreshTokenRepository.deleteByMemberId(member.getId());
+
+        return MemberSignOutResponse.builder()
+                .signoutSuccess(true)
                 .build();
+    }
+
+    /**
+     * refresh token 을 검증하고
+     * 새로운 access token 및 refresh token 을 발급
+     *
+     * @param request - refresh token
+     * @return "dto/member/TokenResponse"
+     * @exception MemberException
+     * @exception JwtException
+     */
+    @Override
+    @Transactional
+    public TokenResponse reissue(RefreshTokenReissueRequest request) {
+        
+        // refresh token 에서 member uid 추출 및 토큰 검증
+        String memberUID = jwtUtils.parseClaimsByToken(request.getRefreshToken())
+                .getSubject();
+
+        // member uid 검증
+        Member member = memberRepository.findByUID(memberUID)
+                .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_UID));
+        
+        // member status 검증
+        validateMemberStatus(member);
+
+        // DB 에서 refresh token 추출
+        RefreshToken refreshTokenInDB = refreshTokenRepository.findByMemberId(member.getId())
+                .orElseThrow(() -> new JwtException(UNSUPPORTED_JWT_EXCEPTION));
+
+        // DB 의 refresh token 과 request 로 전달 된 refresh token 비교
+        if(!refreshTokenInDB.getRefreshToken().equals(request.getRefreshToken())) {
+            throw new JwtException(SIGNATURE_EXCEPTION);
+        }
+
+        // refresh token 검증
+        if(!jwtUtils.validateToken(refreshTokenInDB.getRefreshToken())) {
+            throw new JwtException(EXPIRED_JWT_EXCEPTION);
+        }
+
+        // 새로운 token response 생성
+        TokenResponse newTokenResponse = jwtUtils.createToken(memberUID, member.getRole());
+
+        // 기존 DB 에 저장된 refresh token 업데이트
+        refreshTokenRepository.save(refreshTokenInDB.updateRefreshToken(newTokenResponse.getRefreshToken()));
+
+        return newTokenResponse;
     }
 
     /**

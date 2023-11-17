@@ -6,8 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.review.ReviewInfoDto;
-import zeobase.zbtechnical.challenges.dto.review.ReviewPostDto;
+import zeobase.zbtechnical.challenges.dto.review.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.ReviewPost;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.service.impl.ReviewServiceImpl;
 import zeobase.zbtechnical.challenges.type.ErrorCode;
@@ -33,7 +33,7 @@ public class ReviewController {
      * @return
      */
     @GetMapping("/{reviewId}")
-    public ResponseEntity<ReviewInfoDto> reviewInfo(
+    public ResponseEntity<ReviewInfoResponse> reviewInfo(
             @PathVariable Long reviewId
     ) {
 
@@ -47,7 +47,7 @@ public class ReviewController {
      * @return
      */
     @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<ReviewInfoDto>> allReviewByMember(
+    public ResponseEntity<List<ReviewInfoResponse>> allReviewByMember(
             @PathVariable Long memberId
     ) {
 
@@ -61,7 +61,7 @@ public class ReviewController {
      * @return
      */
     @GetMapping("/store/{storeId}")
-    public ResponseEntity<List<ReviewInfoDto>> allReviewByStore(
+    public ResponseEntity<List<ReviewInfoResponse>> allReviewByStore(
             @PathVariable Long storeId
     ) {
 
@@ -78,8 +78,8 @@ public class ReviewController {
      * @exception ReviewException
      */
     @PostMapping("")
-    public ResponseEntity<ReviewPostDto.Response> postReview(
-            @Valid @RequestBody ReviewPostDto.Request request,
+    public ResponseEntity<ReviewPost.Response> postReview(
+            @Valid @RequestBody ReviewPost.Request request,
             BindingResult bindingResult,
             Authentication authentication
     ) {

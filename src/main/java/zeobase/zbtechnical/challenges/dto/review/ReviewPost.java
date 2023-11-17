@@ -12,7 +12,7 @@ import javax.validation.constraints.Min;
 /**
  * 리뷰 등록 관련 DTO 클래스
  */
-public class ReviewPostDto {
+public class ReviewPost {
 
     @Builder
     @Getter
@@ -37,7 +37,7 @@ public class ReviewPostDto {
         private Long reviewId;
 
 
-        public static ReviewPostDto.Response fromEntity(Review review) {
+        public static ReviewPost.Response fromEntity(Review review) {
 
             return Response.builder()
                     .memberId(review.getMember().getId())

@@ -7,10 +7,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationAcceptDto;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationAvailableDto;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationReserveDto;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationInfoDto;
+import zeobase.zbtechnical.challenges.dto.reservation.ReservationAccept;
+import zeobase.zbtechnical.challenges.dto.reservation.ReservationAvailableResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.ReservationReserve;
+import zeobase.zbtechnical.challenges.dto.reservation.ReservationInfoResponse;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.service.ReservationService;
 import zeobase.zbtechnical.challenges.type.ErrorCode;
@@ -37,7 +37,7 @@ public class ReservationController {
      * @return
      */
     @GetMapping("/{reservationId}")
-    public ResponseEntity<ReservationInfoDto> reservationInfo(
+    public ResponseEntity<ReservationInfoResponse> reservationInfo(
             @PathVariable Long reservationId
     ) {
 
@@ -51,7 +51,7 @@ public class ReservationController {
      * @return
      */
     @GetMapping("/store/{storeId}")
-    public ResponseEntity<List<ReservationInfoDto>> reservationsInfo(
+    public ResponseEntity<List<ReservationInfoResponse>> reservationsInfo(
             @PathVariable Long storeId
     ) {
 
@@ -66,7 +66,7 @@ public class ReservationController {
      * @return
      */
     @GetMapping("/store/{storeId}/available")
-    public ResponseEntity<ReservationAvailableDto> validateReservationAvailable(
+    public ResponseEntity<ReservationAvailableResponse> validateReservationAvailable(
             @PathVariable Long storeId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime reserveTime
     ) {
@@ -82,8 +82,8 @@ public class ReservationController {
      * @return
      */
     @PostMapping("/reserve")
-    public ResponseEntity<ReservationReserveDto.Response> reserve(
-            @Valid @RequestBody ReservationReserveDto.Request request,
+    public ResponseEntity<ReservationReserve.Response> reserve(
+            @Valid @RequestBody ReservationReserve.Request request,
             BindingResult bindingResult,
             Authentication authentication
     ) {
@@ -105,8 +105,8 @@ public class ReservationController {
      * @return
      */
     @PostMapping("/accept")
-    public ResponseEntity<ReservationAcceptDto.Response> accept(
-            @RequestBody ReservationAcceptDto.Request request,
+    public ResponseEntity<ReservationAccept.Response> accept(
+            @RequestBody ReservationAccept.Request request,
             Authentication authentication
     ) {
 

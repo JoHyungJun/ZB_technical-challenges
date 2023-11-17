@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationAvailableDto {
+public class ReservationAvailableResponse {
 
     private boolean isAvailable;
 }
