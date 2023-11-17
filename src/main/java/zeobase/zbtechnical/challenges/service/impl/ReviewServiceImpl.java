@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.review.ReviewInfoDto;
-import zeobase.zbtechnical.challenges.dto.review.ReviewPostDto;
+import zeobase.zbtechnical.challenges.dto.review.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.ReviewPost;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.entity.Review;
@@ -50,13 +50,13 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ReviewInfoDto getReviewById(Long reviewId) {
+    public ReviewInfoResponse getReviewById(Long reviewId) {
         
         // review id 검증
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(NOT_FOUND_REVIEW_ID));
 
-        return ReviewInfoDto.fromEntity(review);
+        return ReviewInfoResponse.fromEntity(review);
     }
 
     /**
@@ -69,7 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewInfoDto> getAllReviewsByMemberId(Long memberId) {
+    public List<ReviewInfoResponse> getAllReviewsByMemberId(Long memberId) {
 
         // member id 검증
         Member member = memberRepository.findById(memberId)
@@ -77,7 +77,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         return member.getReviews()
                 .stream()
-                .map(review -> ReviewInfoDto.fromEntity(review))
+                .map(review -> ReviewInfoResponse.fromEntity(review))
                 .collect(Collectors.toList());
     }
 
@@ -91,7 +91,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewInfoDto> getAllReviewsByStoreId(Long storeId) {
+    public List<ReviewInfoResponse> getAllReviewsByStoreId(Long storeId) {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
@@ -99,7 +99,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         return store.getReviews()
                 .stream()
-                .map(review -> ReviewInfoDto.fromEntity(review))
+                .map(review -> ReviewInfoResponse.fromEntity(review))
                 .collect(Collectors.toList());
     }
 
@@ -115,7 +115,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional
-    public ReviewPostDto.Response postReview(ReviewPostDto.Request request, Authentication authentication) {
+    public ReviewPost.Response postReview(ReviewPost.Request request, Authentication authentication) {
 
         // store id 검증
         Store store = storeRepository.findById(request.getStoreId())
@@ -141,6 +141,6 @@ public class ReviewServiceImpl implements ReviewService {
                 .store(store)
                 .build();
 
-        return ReviewPostDto.Response.fromEntity(reviewRepository.save(review));
+        return ReviewPost.Response.fromEntity(reviewRepository.save(review));
     }
 }

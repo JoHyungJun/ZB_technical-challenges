@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationInfoDto {
+public class ReservationInfoResponse {
 
     private Long reservationId;
     private Long memberId;
@@ -26,9 +26,9 @@ public class ReservationInfoDto {
     private ReservationVisitedType visitedType;
 
 
-    public static ReservationInfoDto fromEntity(Reservation reservation) {
+    public static ReservationInfoResponse fromEntity(Reservation reservation) {
 
-        return ReservationInfoDto.builder()
+        return ReservationInfoResponse.builder()
                 .reservationId(reservation.getId())
                 .memberId(reservation.getMember().getId())
                 .reservedDate(reservation.getReservedDateTime())

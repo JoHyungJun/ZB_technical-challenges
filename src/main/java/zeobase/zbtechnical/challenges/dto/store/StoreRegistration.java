@@ -13,7 +13,7 @@ import java.time.LocalTime;
 /**
  * 이용자(점주)의 매장 등록 관련 DTO 클래스
  */
-public class StoreRegistrationDto {
+public class StoreRegistration {
 
     @Builder
     @Getter

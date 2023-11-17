@@ -15,13 +15,13 @@ import zeobase.zbtechnical.challenges.utils.Distance;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StoreDistanceInfoDto extends StoreInfoDto{
+public class StoreDistanceInfoResponse extends StoreInfoResponse {
 
     private Double distanceDiff;
 
 
     @Transactional
-    public static StoreDistanceInfoDto fromEntity(Store store, Double locationX, Double locationY) {
+    public static StoreDistanceInfoResponse fromEntity(Store store, Double locationX, Double locationY) {
 
         Double distanceDiff = null;
         if(locationX != null & locationY != null) {
@@ -30,7 +30,7 @@ public class StoreDistanceInfoDto extends StoreInfoDto{
                     store.getLatitude(), store.getLongitude());
         }
 
-        return StoreDistanceInfoDto.builder()
+        return StoreDistanceInfoResponse.builder()
                 .storeId(store.getId())
                 .name(store.getName())
                 .latitude(store.getLatitude())

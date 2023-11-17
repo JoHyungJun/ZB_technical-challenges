@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.store.StoreDistanceInfoDto;
-import zeobase.zbtechnical.challenges.dto.store.StoreInfoDto;
-import zeobase.zbtechnical.challenges.dto.store.StoreRegistrationDto;
+import zeobase.zbtechnical.challenges.dto.store.StoreDistanceInfoResponse;
+import zeobase.zbtechnical.challenges.dto.store.StoreInfoResponse;
+import zeobase.zbtechnical.challenges.dto.store.StoreRegistration;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.exception.MemberException;
@@ -48,13 +48,13 @@ public class StoreServiceImpl implements StoreService {
      */
     @Override
     @Transactional(readOnly = true)
-    public StoreInfoDto getStoreInfo(Long storeId) {
+    public StoreInfoResponse getStoreInfo(Long storeId) {
 
         // 유효한 storeId인지 검증
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
-        return StoreInfoDto.fromEntity(store);
+        return StoreInfoResponse.fromEntity(store);
     }
 
     /**
@@ -70,8 +70,8 @@ public class StoreServiceImpl implements StoreService {
      */
     @Override
     @Transactional
-    public StoreRegistrationDto.Response registerStore(
-            StoreRegistrationDto.Request request,
+    public StoreRegistration.Response registerStore(
+            StoreRegistration.Request request,
             Authentication authentication) {
         
         // 토큰(authentication)을 통해 이용자 추출
@@ -109,7 +109,7 @@ public class StoreServiceImpl implements StoreService {
                     .build()
         );
 
-        return StoreRegistrationDto.Response.builder()
+        return StoreRegistration.Response.builder()
                 .storeId(savedStore.getId())
                 .build();
     }
@@ -128,7 +128,7 @@ public class StoreServiceImpl implements StoreService {
     // TODO : 페이징
     @Override
     @Transactional(readOnly = true)
-    public List<StoreDistanceInfoDto> getAllSortedStoresInfo(String sortBy, Double latitude, Double longitude) {
+    public List<StoreDistanceInfoResponse> getAllSortedStoresInfo(String sortBy, Double latitude, Double longitude) {
 
         // 전달 받은 sortBy 인자 검증
         StoreSortedType sortedType = null;
@@ -153,10 +153,10 @@ public class StoreServiceImpl implements StoreService {
         }
 
         // 매장 정보 전부 받기
-        List<StoreDistanceInfoDto> stores
+        List<StoreDistanceInfoResponse> stores
                 = storeRepository.findAll()
                                 .stream()
-                                .map(store -> StoreDistanceInfoDto.fromEntity(store, latitude, longitude))
+                                .map(store -> StoreDistanceInfoResponse.fromEntity(store, latitude, longitude))
                                 .collect(Collectors.toList());
 
 

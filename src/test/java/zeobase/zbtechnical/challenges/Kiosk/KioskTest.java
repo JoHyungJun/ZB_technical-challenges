@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhoneDto;
+import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhone;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
@@ -40,7 +40,7 @@ class KioskTest {
         reservation = reservationRepository.save(reservation);
 
         //when
-        KioskPhoneDto.Request kioskPhoneRequest = KioskPhoneDto.Request.builder()
+        KioskPhone.Request kioskPhoneRequest = KioskPhone.Request.builder()
                 .phone("010-1234-5678")
                 .build();
 

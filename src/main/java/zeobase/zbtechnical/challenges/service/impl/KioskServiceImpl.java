@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhoneDto;
-import zeobase.zbtechnical.challenges.dto.kiosk.KioskSigninDto;
+import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhone;
+import zeobase.zbtechnical.challenges.dto.kiosk.KioskSigninRequest;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.exception.KioskException;
@@ -54,7 +54,7 @@ public class KioskServiceImpl implements KioskService {
      */
     @Override
     @Transactional
-    public KioskPhoneDto.Response checkReservationByPhone(KioskPhoneDto.Request request) {
+    public KioskPhone.Response checkReservationByPhone(KioskPhone.Request request) {
 
         // 존재하는 핸드폰 번호인지 검증
         Member member = memberRepository.findByPhone(request.getPhone())
@@ -86,7 +86,7 @@ public class KioskServiceImpl implements KioskService {
         // 해당 예약을 방문 완료 상태로 변경 후 저장
         reservationRepository.save(reservation.updateVisited(ReservationVisitedType.VISITED));
 
-        return KioskPhoneDto.Response.builder()
+        return KioskPhone.Response.builder()
                 .reservationChecked(true)
                 .build();
     }
@@ -104,7 +104,7 @@ public class KioskServiceImpl implements KioskService {
      */
     @Override
     @Transactional
-    public KioskSigninDto.Response checkReservationByMember(KioskSigninDto.Request request) {
+    public KioskSigninRequest.Response checkReservationByMember(KioskSigninRequest.Request request) {
 
         // 이용자 아이디 검증
         Member member = memberRepository.findByUID(request.getUID())
@@ -141,7 +141,7 @@ public class KioskServiceImpl implements KioskService {
         // 해당 예약을 방문 완료 상태로 변경 후 저장
         reservationRepository.save(reservation.updateVisited(ReservationVisitedType.VISITED));
 
-        return KioskSigninDto.Response.builder()
+        return KioskSigninRequest.Response.builder()
                 .reservationChecked(true)
                 .build();
     }

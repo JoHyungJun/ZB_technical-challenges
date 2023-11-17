@@ -17,7 +17,7 @@ import java.time.LocalTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StoreInfoDto {
+public class StoreInfoResponse {
 
     private Long storeId;
 
@@ -43,9 +43,9 @@ public class StoreInfoDto {
     private Double averageStarRating;
 
 
-    public static StoreInfoDto fromEntity(Store store) {
+    public static StoreInfoResponse fromEntity(Store store) {
 
-        return StoreInfoDto.builder()
+        return StoreInfoResponse.builder()
                 .storeId(store.getId())
                 .name(store.getName())
                 .latitude(store.getLatitude())
