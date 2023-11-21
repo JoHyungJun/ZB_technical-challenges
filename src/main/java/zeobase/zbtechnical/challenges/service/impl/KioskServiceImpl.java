@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhone;
-import zeobase.zbtechnical.challenges.dto.kiosk.KioskSigninRequest;
+import zeobase.zbtechnical.challenges.dto.kiosk.request.KioskSigninRequest;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.exception.KioskException;

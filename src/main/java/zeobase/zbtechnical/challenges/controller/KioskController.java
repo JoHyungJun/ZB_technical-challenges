@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhone;
-import zeobase.zbtechnical.challenges.dto.kiosk.KioskSigninRequest;
+import zeobase.zbtechnical.challenges.dto.kiosk.request.KioskSigninRequest;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.service.KioskService;
 import zeobase.zbtechnical.challenges.type.ErrorCode;

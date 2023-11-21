@@ -1,7 +1,7 @@
 package zeobase.zbtechnical.challenges.service;
 
 import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhone;
-import zeobase.zbtechnical.challenges.dto.kiosk.KioskSigninRequest;
+import zeobase.zbtechnical.challenges.dto.kiosk.request.KioskSigninRequest;
 
 /**
  * 키오스크 관련 Service 의 부모 인터페이스

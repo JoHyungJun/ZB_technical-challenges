@@ -2,9 +2,9 @@ package zeobase.zbtechnical.challenges.service;
 
 import org.springframework.security.core.Authentication;
 import zeobase.zbtechnical.challenges.dto.reservation.ReservationAccept;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationAvailableResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAvailableResponse;
 import zeobase.zbtechnical.challenges.dto.reservation.ReservationReserve;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationInfoResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationInfoResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;

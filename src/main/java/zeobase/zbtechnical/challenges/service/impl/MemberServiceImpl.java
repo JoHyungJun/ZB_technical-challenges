@@ -6,6 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.dto.member.*;
+import zeobase.zbtechnical.challenges.dto.member.request.MemberSigninRequest;
+import zeobase.zbtechnical.challenges.dto.member.request.RefreshTokenReissueRequest;
+import zeobase.zbtechnical.challenges.dto.member.response.MemberInfoResponse;
+import zeobase.zbtechnical.challenges.dto.member.response.MemberSignOutResponse;
+import zeobase.zbtechnical.challenges.dto.member.response.TokenResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.RefreshToken;
 import zeobase.zbtechnical.challenges.exception.JwtException;
@@ -48,11 +53,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_ID));
 
-        return MemberInfoResponse.builder()
-                .UID(member.getUID())
-                .role(member.getRole())
-                .status(member.getStatus())
-                .build();
+        return MemberInfoResponse.fromEntity(member);
     }
 
     /**

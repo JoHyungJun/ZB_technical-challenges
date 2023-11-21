@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-import zeobase.zbtechnical.challenges.dto.member.TokenResponse;
+import zeobase.zbtechnical.challenges.dto.member.response.TokenResponse;
 import zeobase.zbtechnical.challenges.exception.JwtException;
 import zeobase.zbtechnical.challenges.type.ErrorCode;
 import zeobase.zbtechnical.challenges.type.MemberRoleType;

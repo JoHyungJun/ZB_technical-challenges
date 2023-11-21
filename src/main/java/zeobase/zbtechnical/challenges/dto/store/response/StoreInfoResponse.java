@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.dto.store;
+package zeobase.zbtechnical.challenges.dto.store.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
 package zeobase.zbtechnical.challenges.service;
 
 import org.springframework.security.core.Authentication;
-import zeobase.zbtechnical.challenges.dto.review.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
 import zeobase.zbtechnical.challenges.dto.review.ReviewPost;
 
 import java.util.List;

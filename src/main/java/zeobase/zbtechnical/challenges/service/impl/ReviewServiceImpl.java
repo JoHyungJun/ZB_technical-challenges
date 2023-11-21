@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.review.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
 import zeobase.zbtechnical.challenges.dto.review.ReviewPost;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
