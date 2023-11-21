@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.dto.kiosk;
+package zeobase.zbtechnical.challenges.dto.kiosk.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalTime;
 
 /**
- * 키오스크의 id, password 인증 관련 DTO 클래스
+ * 키오스크의 id, password 인증 관련 request DTO 클래스
  */
 public class KioskSigninRequest {
 

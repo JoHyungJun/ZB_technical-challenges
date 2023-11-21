@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.store.StoreDistanceInfoResponse;
-import zeobase.zbtechnical.challenges.dto.store.StoreInfoResponse;
+import zeobase.zbtechnical.challenges.dto.store.response.StoreDistanceInfoResponse;
+import zeobase.zbtechnical.challenges.dto.store.response.StoreInfoResponse;
 import zeobase.zbtechnical.challenges.dto.store.StoreRegistration;
 import zeobase.zbtechnical.challenges.service.StoreService;
 

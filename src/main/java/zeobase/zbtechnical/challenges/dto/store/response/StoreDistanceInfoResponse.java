@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.dto.store;
+package zeobase.zbtechnical.challenges.dto.store.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

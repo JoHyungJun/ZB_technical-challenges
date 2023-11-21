@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.review.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
 import zeobase.zbtechnical.challenges.dto.review.ReviewPost;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.service.impl.ReviewServiceImpl;

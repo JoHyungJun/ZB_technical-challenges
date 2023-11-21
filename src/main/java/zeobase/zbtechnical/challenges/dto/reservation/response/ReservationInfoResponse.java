@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.dto.reservation;
+package zeobase.zbtechnical.challenges.dto.reservation.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import zeobase.zbtechnical.challenges.type.ReservationVisitedType;
 import java.time.LocalDateTime;
 
 /**
- * 공개된 예약의 정보 관련 DTO 클래스
+ * 공개된 예약의 정보 관련 response DTO 클래스
  */
 @Builder
 @Getter
@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 public class ReservationInfoResponse {
 
     private Long reservationId;
+    private Long storeId;
     private Long memberId;
     private LocalDateTime reservedDate;
     private ReservationAcceptedType acceptedStatus;
@@ -30,6 +31,7 @@ public class ReservationInfoResponse {
 
         return ReservationInfoResponse.builder()
                 .reservationId(reservation.getId())
+                .storeId(reservation.getStore().getId())
                 .memberId(reservation.getMember().getId())
                 .reservedDate(reservation.getReservedDateTime())
                 .acceptedStatus(reservation.getAcceptedStatus())
