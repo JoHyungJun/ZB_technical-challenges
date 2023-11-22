@@ -1,8 +1,8 @@
 package zeobase.zbtechnical.challenges.service;
 
 import org.springframework.security.core.Authentication;
-import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
-import zeobase.zbtechnical.challenges.dto.review.ReviewPost;
+import zeobase.zbtechnical.challenges.dto.review.response.*;
+import zeobase.zbtechnical.challenges.dto.review.request.*;
 
 import java.util.List;
 
@@ -14,5 +14,5 @@ public interface ReviewService {
     ReviewInfoResponse getReviewById(Long reviewId);
     List<ReviewInfoResponse> getAllReviewsByMemberId(Long memberId);
     List<ReviewInfoResponse> getAllReviewsByStoreId(Long storeId);
-    ReviewPost.Response postReview(ReviewPost.Request request, Authentication authentication);
+    ReviewPostResponse postReview(ReviewPostRequest request, Authentication authentication);
 }

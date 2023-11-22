@@ -1,10 +1,8 @@
 package zeobase.zbtechnical.challenges.service;
 
 import org.springframework.security.core.Authentication;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationAccept;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAvailableResponse;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationReserve;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationInfoResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.*;
+import zeobase.zbtechnical.challenges.dto.reservation.request.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +15,6 @@ public interface ReservationService {
     ReservationInfoResponse getReservationInfoById(Long reservationId);
     List<ReservationInfoResponse> getReservationsInfoByStoreId(Long storeId);
     ReservationAvailableResponse existsAvailableReservationTime(Long storeId, LocalDateTime reservationTime);
-    ReservationReserve.Response reserve(ReservationReserve.Request request, Authentication authentication);
-    ReservationAccept.Response acceptReservationByStoreOwner(ReservationAccept.Request request, Authentication authentication);
+    ReservationReserveResponse reserve(ReservationReserveRequest request, Authentication authentication);
+    ReservationAcceptResponse acceptReservationByStoreOwner(ReservationAcceptRequest request, Authentication authentication);
 }

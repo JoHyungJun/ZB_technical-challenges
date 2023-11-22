@@ -7,29 +7,25 @@ import lombok.NoArgsConstructor;
 import zeobase.zbtechnical.challenges.entity.Review;
 
 /**
- * 공개된 리뷰 정보 관련 response DTO 클래스
+ * 리뷰 등록 관련 response DTO 클래스
  */
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewInfoResponse {
+public class ReviewPostResponse {
 
-    private Long reviewId;
     private Long memberId;
     private Long storeId;
-    private Double starRating;
-    private String reviewMessage;
+    private Long reviewId;
 
 
-    public static ReviewInfoResponse fromEntity(Review review) {
+    public static ReviewPostResponse fromEntity(Review review) {
 
-        return ReviewInfoResponse.builder()
-                .reviewId(review.getId())
+        return ReviewPostResponse.builder()
                 .memberId(review.getMember().getId())
                 .storeId(review.getStore().getId())
-                .starRating(review.getStartRating())
-                .reviewMessage(review.getReviewMessage())
+                .reviewId(review.getId())
                 .build();
     }
 }

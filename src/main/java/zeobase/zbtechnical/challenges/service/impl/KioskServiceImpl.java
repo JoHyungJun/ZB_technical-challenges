@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhone;
-import zeobase.zbtechnical.challenges.dto.kiosk.request.KioskSigninRequest;
+import zeobase.zbtechnical.challenges.dto.kiosk.request.*;
+import zeobase.zbtechnical.challenges.dto.kiosk.response.*;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.exception.KioskException;
@@ -47,14 +47,14 @@ public class KioskServiceImpl implements KioskService {
      * 해당 예약 정보를 '이용자가 방문했음'으로 갱신
      * 
      * @param request - 핸드폰 번호, 매장 정보, 예약 정보
-     * @return "dto/kiosk/KioskPhoneDto.Response"
+     * @return "dto/kiosk/response/KioskPhoneResponse"
      * @exception KioskException
      * @exception StoreException
      * @exception MemberException
      */
     @Override
     @Transactional
-    public KioskPhone.Response checkReservationByPhone(KioskPhone.Request request) {
+    public KioskPhoneResponse checkReservationByPhone(KioskPhoneRequest request) {
 
         // 존재하는 핸드폰 번호인지 검증
         Member member = memberRepository.findByPhone(request.getPhone())
@@ -86,7 +86,7 @@ public class KioskServiceImpl implements KioskService {
         // 해당 예약을 방문 완료 상태로 변경 후 저장
         reservationRepository.save(reservation.updateVisited(ReservationVisitedType.VISITED));
 
-        return KioskPhone.Response.builder()
+        return KioskPhoneResponse.builder()
                 .reservationChecked(true)
                 .build();
     }
@@ -97,14 +97,14 @@ public class KioskServiceImpl implements KioskService {
      * 해당 예약 정보를 '이용자가 방문했음'으로 갱신
      *
      * @param request - id, password, 매장 정보, 예약 정보
-     * @return "dto/kiosk/KioskPhoneDto.Response"
+     * @return "dto/kiosk/response/KioskSigninResponse"
      * @exception KioskException
      * @exception StoreException
      * @exception MemberException
      */
     @Override
     @Transactional
-    public KioskSigninRequest.Response checkReservationByMember(KioskSigninRequest.Request request) {
+    public KioskSigninResponse checkReservationByMember(KioskSigninRequest request) {
 
         // 이용자 아이디 검증
         Member member = memberRepository.findByUID(request.getUID())
@@ -141,7 +141,7 @@ public class KioskServiceImpl implements KioskService {
         // 해당 예약을 방문 완료 상태로 변경 후 저장
         reservationRepository.save(reservation.updateVisited(ReservationVisitedType.VISITED));
 
-        return KioskSigninRequest.Response.builder()
+        return KioskSigninResponse.builder()
                 .reservationChecked(true)
                 .build();
     }

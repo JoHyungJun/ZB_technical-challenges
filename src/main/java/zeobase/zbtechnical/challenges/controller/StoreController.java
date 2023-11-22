@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.store.response.StoreDistanceInfoResponse;
-import zeobase.zbtechnical.challenges.dto.store.response.StoreInfoResponse;
-import zeobase.zbtechnical.challenges.dto.store.StoreRegistration;
+import zeobase.zbtechnical.challenges.dto.store.response.*;
+import zeobase.zbtechnical.challenges.dto.store.request.*;
 import zeobase.zbtechnical.challenges.service.StoreService;
 
 import java.util.List;
@@ -44,8 +43,8 @@ public class StoreController {
      * @return
      */
     @PostMapping("/registration")
-    public ResponseEntity<StoreRegistration.Response> registerStore(
-            @RequestBody StoreRegistration.Request request,
+    public ResponseEntity<StoreRegistrationResponse> registerStore(
+            @RequestBody StoreRegistrationRequest request,
             Authentication authentication
     ) {
 

@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import zeobase.zbtechnical.challenges.dto.kiosk.KioskPhone;
-import zeobase.zbtechnical.challenges.dto.kiosk.request.KioskSigninRequest;
+import zeobase.zbtechnical.challenges.dto.kiosk.request.*;
+import zeobase.zbtechnical.challenges.dto.kiosk.response.*;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.service.KioskService;
 import zeobase.zbtechnical.challenges.type.ErrorCode;
@@ -37,8 +37,8 @@ public class KioskController {
      * @exception ReviewException
      */
     @PostMapping("/phone")
-    public ResponseEntity<KioskPhone.Response> checkReservationByPhone(
-            @Valid @RequestBody KioskPhone.Request request,
+    public ResponseEntity<KioskPhoneResponse> checkReservationByPhone(
+            @Valid @RequestBody KioskPhoneRequest request,
             BindingResult bindingResult
     ) {
 
@@ -58,8 +58,8 @@ public class KioskController {
      * @return
      */
     @PostMapping("/signin")
-    public ResponseEntity<KioskSigninRequest.Response> checkReservationByMember(
-            @RequestBody KioskSigninRequest.Request request
+    public ResponseEntity<KioskSigninResponse> checkReservationByMember(
+            @RequestBody KioskSigninRequest request
     ) {
 
         return ResponseEntity.ok(kioskService.checkReservationByMember(request));

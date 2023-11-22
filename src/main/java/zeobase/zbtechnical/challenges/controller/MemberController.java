@@ -6,12 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.member.*;
-import zeobase.zbtechnical.challenges.dto.member.request.MemberSigninRequest;
-import zeobase.zbtechnical.challenges.dto.member.request.RefreshTokenReissueRequest;
-import zeobase.zbtechnical.challenges.dto.member.response.MemberInfoResponse;
-import zeobase.zbtechnical.challenges.dto.member.response.MemberSignOutResponse;
-import zeobase.zbtechnical.challenges.dto.member.response.TokenResponse;
+import zeobase.zbtechnical.challenges.dto.member.request.*;
+import zeobase.zbtechnical.challenges.dto.member.response.*;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.service.MemberService;
 import zeobase.zbtechnical.challenges.type.ErrorCode;
@@ -54,8 +50,8 @@ public class MemberController {
      * @exception MemberException
      */
     @PostMapping("/signup")
-    public ResponseEntity<MemberSignup.Response> signup(
-            @Valid @RequestBody MemberSignup.Request request,
+    public ResponseEntity<MemberSignupResponse> signup(
+            @Valid @RequestBody MemberSignupRequest request,
             BindingResult bindingResult
     ) {
 
