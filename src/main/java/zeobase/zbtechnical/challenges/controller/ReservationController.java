@@ -7,10 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationAccept;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAvailableResponse;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationReserve;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationInfoResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.*;
+import zeobase.zbtechnical.challenges.dto.reservation.request.*;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.service.ReservationService;
 import zeobase.zbtechnical.challenges.type.ErrorCode;
@@ -82,8 +80,8 @@ public class ReservationController {
      * @return
      */
     @PostMapping("/reserve")
-    public ResponseEntity<ReservationReserve.Response> reserve(
-            @Valid @RequestBody ReservationReserve.Request request,
+    public ResponseEntity<ReservationReserveResponse> reserve(
+            @Valid @RequestBody ReservationReserveRequest request,
             BindingResult bindingResult,
             Authentication authentication
     ) {
@@ -105,8 +103,8 @@ public class ReservationController {
      * @return
      */
     @PostMapping("/accept")
-    public ResponseEntity<ReservationAccept.Response> accept(
-            @RequestBody ReservationAccept.Request request,
+    public ResponseEntity<ReservationAcceptResponse> accept(
+            @RequestBody ReservationAcceptRequest request,
             Authentication authentication
     ) {
 

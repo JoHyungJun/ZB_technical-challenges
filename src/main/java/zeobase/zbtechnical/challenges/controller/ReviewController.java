@@ -6,8 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
-import zeobase.zbtechnical.challenges.dto.review.ReviewPost;
+import zeobase.zbtechnical.challenges.dto.review.request.*;
+import zeobase.zbtechnical.challenges.dto.review.response.*;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.service.impl.ReviewServiceImpl;
 import zeobase.zbtechnical.challenges.type.ErrorCode;
@@ -78,8 +78,8 @@ public class ReviewController {
      * @exception ReviewException
      */
     @PostMapping("")
-    public ResponseEntity<ReviewPost.Response> postReview(
-            @Valid @RequestBody ReviewPost.Request request,
+    public ResponseEntity<ReviewPostResponse> postReview(
+            @Valid @RequestBody ReviewPostRequest request,
             BindingResult bindingResult,
             Authentication authentication
     ) {

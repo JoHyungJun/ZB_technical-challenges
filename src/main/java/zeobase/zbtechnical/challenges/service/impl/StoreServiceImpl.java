@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.store.response.StoreDistanceInfoResponse;
-import zeobase.zbtechnical.challenges.dto.store.response.StoreInfoResponse;
-import zeobase.zbtechnical.challenges.dto.store.StoreRegistration;
+import zeobase.zbtechnical.challenges.dto.store.response.*;
+import zeobase.zbtechnical.challenges.dto.store.request.*;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.exception.MemberException;
@@ -31,7 +30,7 @@ import static zeobase.zbtechnical.challenges.type.ErrorCode.*;
 public class StoreServiceImpl implements StoreService {
 
     // 최소 예약 텀은 30분으로 설정 -> 추가 요구사항 때 바뀔 수 있음
-    private static final LocalTime MINIMUM_RESERVATION_TERM = LocalTime.of(0, 29);
+    private static final LocalTime MINIMUM_RESERVATION_TERM = LocalTime.of(0, 30);
 
     private final MemberServiceImpl memberService;
 
@@ -43,7 +42,7 @@ public class StoreServiceImpl implements StoreService {
      * storeId (Store 의 PK) 검증
      *
      * @param storeId
-     * @return "dto/store/StoreInfoDto.Response"
+     * @return "dto/store/response/StoreInfoResponse"
      * @exception StoreException
      */
     @Override
@@ -64,14 +63,14 @@ public class StoreServiceImpl implements StoreService {
      *
      * @param request - 매장 정보, 매장 위치, 매장 운영 시간, 매장 영업 상태
      * @param authentication - 토큰을 활용한 이용자(점주) 검증
-     * @return "dto/store/StoreRegistrationDto.Response"
+     * @return "dto/store/response/StoreRegistrationResponse"
      * @exception MemberException
      * @exception StoreException
      */
     @Override
     @Transactional
-    public StoreRegistration.Response registerStore(
-            StoreRegistration.Request request,
+    public StoreRegistrationResponse registerStore(
+            StoreRegistrationRequest request,
             Authentication authentication) {
         
         // 토큰(authentication)을 통해 이용자 추출
@@ -91,7 +90,7 @@ public class StoreServiceImpl implements StoreService {
         }
 
         // 예약 텀 시간을 너무 빠르게 설정했는지 검증
-        if(!request.getReservationTerm().isAfter(MINIMUM_RESERVATION_TERM)) {
+        if(request.getReservationTerm().isBefore(MINIMUM_RESERVATION_TERM)) {
             throw new StoreException(INVALID_RESERVATION_TERM);
         }
 
@@ -109,7 +108,7 @@ public class StoreServiceImpl implements StoreService {
                     .build()
         );
 
-        return StoreRegistration.Response.builder()
+        return StoreRegistrationResponse.builder()
                 .storeId(savedStore.getId())
                 .build();
     }
@@ -121,7 +120,7 @@ public class StoreServiceImpl implements StoreService {
      * @param sortBy - "type/StoreSortedType" 거리(DISTANCE), 이름(ALPHABET), 별점(STAR_RATING)
      * @param latitude - 위도
      * @param longitude - 경도
-     * @return List "dto/store/StoreInfoDto.Response"
+     * @return List "dto/store/response/StoreDistanceInfoResponse"
      * @exception StoreException
      */
     // TODO : 리팩토링 필요. JPA 로 정렬 방법 적용 + 지저분한 코드 정리

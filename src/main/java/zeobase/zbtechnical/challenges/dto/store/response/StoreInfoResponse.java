@@ -11,7 +11,7 @@ import zeobase.zbtechnical.challenges.type.StoreStatusType;
 import java.time.LocalTime;
 
 /**
- * 매장 정보 관련 DTO 클래스
+ * 매장 정보 관련 response DTO 클래스
  */
 @SuperBuilder
 @Getter

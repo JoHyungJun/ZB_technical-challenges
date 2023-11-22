@@ -1,9 +1,8 @@
 package zeobase.zbtechnical.challenges.service;
 
 import org.springframework.security.core.Authentication;
-import zeobase.zbtechnical.challenges.dto.store.response.StoreDistanceInfoResponse;
-import zeobase.zbtechnical.challenges.dto.store.response.StoreInfoResponse;
-import zeobase.zbtechnical.challenges.dto.store.StoreRegistration;
+import zeobase.zbtechnical.challenges.dto.store.response.*;
+import zeobase.zbtechnical.challenges.dto.store.request.*;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ import java.util.List;
  */
 public interface StoreService {
 
-    StoreRegistration.Response registerStore(StoreRegistration.Request request, Authentication authentication);
+    StoreRegistrationResponse registerStore(StoreRegistrationRequest request, Authentication authentication);
     StoreInfoResponse getStoreInfo(Long storeId);
     List<StoreDistanceInfoResponse> getAllSortedStoresInfo(String sort, Double latitude, Double longitude);
 }

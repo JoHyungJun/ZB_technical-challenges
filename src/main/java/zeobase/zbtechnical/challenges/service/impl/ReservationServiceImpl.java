@@ -5,10 +5,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationAccept;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAvailableResponse;
-import zeobase.zbtechnical.challenges.dto.reservation.ReservationReserve;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationInfoResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.*;
+import zeobase.zbtechnical.challenges.dto.reservation.request.*;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.entity.Store;
@@ -48,13 +46,14 @@ public class ReservationServiceImpl implements ReservationService {
      * reservationId (Reservation 의 PK) 검증
      *
      * @param reservationId
-     * @return
+     * @return "dto/reservation/response/ReservationInfoResponse"
      * @exception ReservationException
      */
     @Override
     @Transactional(readOnly = true)
     public ReservationInfoResponse getReservationInfoById(Long reservationId) {
 
+        // reservation id 존재 여부 검증
         return ReservationInfoResponse.fromEntity(
                 reservationRepository.findById(reservationId)
                         .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID))
@@ -66,7 +65,7 @@ public class ReservationServiceImpl implements ReservationService {
      * store 관련 검증 후, 예약 날짜 내림차순 순으로 반환
      *
      * @param storeId
-     * @return List "dto/reservation/ReservationInfoDto"
+     * @return List "dto/reservation/response/ReservationInfoResponse"
      * @exception StoreException
      */
     @Override
@@ -80,6 +79,7 @@ public class ReservationServiceImpl implements ReservationService {
         // store status 검증
         storeService.validateStoreStatus(store);
 
+        // 예약 날짜 기준 정렬
         List<Reservation> reservations = reservationRepository.findAllByStoreId(storeId, Sort.by(
                     Sort.Order.asc("reservedDate")));
 
@@ -94,7 +94,7 @@ public class ReservationServiceImpl implements ReservationService {
      * 
      * @param storeId
      * @param reservationTime - 확인할 날짜 정보
-     * @return "dto/reservation/ReservationAvailableDto"
+     * @return "dto/reservation/response/ReservationAvailableResponse"
      * @exception StoreException
      */
     @Override
@@ -118,13 +118,13 @@ public class ReservationServiceImpl implements ReservationService {
      * store, member, 예약 가능 시간 여부 검증 후 등록
      *
      * @param request - 매장 정보, 예약 희망 날짜
-     * @return "dto/reservation/ReservationReserveDto.Response"
+     * @return "dto/reservation/response/ReservationReserveResponse"
      * @exception StoreException
      * @exception MemberException
      */
     @Override
     @Transactional
-    public ReservationReserve.Response reserve(ReservationReserve.Request request, Authentication authentication) {
+    public ReservationReserveResponse reserve(ReservationReserveRequest request, Authentication authentication) {
 
         // authentication으로 member 추출
         Member member = memberService.getMemberByAuthentication(authentication);
@@ -155,7 +155,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .build()
         );
 
-        return ReservationReserve.Response.builder()
+        return ReservationReserveResponse.builder()
                 .reservationId(reservation.getId())
                 .memberId(reservation.getMember().getId())
                 .storeId(reservation.getStore().getId())
@@ -170,14 +170,14 @@ public class ReservationServiceImpl implements ReservationService {
      *
      * @param request - 예약 정보, 가게 정보, 승인/거절 정보
      * @param authentication - 토큰을 활용한 이용자(매장 주인) 검증
-     * @return "dto/reservation/ReservationAcceptDto.Response"
+     * @return "dto/reservation/response/ReservationAcceptResponse"
      * @exception StoreException
      * @exception MemberException
      * @exception ReservationException
      */
     @Override
     @Transactional
-    public ReservationAccept.Response acceptReservationByStoreOwner(ReservationAccept.Request request, Authentication authentication) {
+    public ReservationAcceptResponse acceptReservationByStoreOwner(ReservationAcceptRequest request, Authentication authentication) {
 
         // reservation id 검증
         Reservation reservation = reservationRepository.findById(request.getReservationId())
@@ -214,7 +214,7 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation updateReservation = reservationRepository.save(
                 reservation.updateAccepted(request.getAccepted()));
 
-        return ReservationAccept.Response.builder()
+        return ReservationAcceptResponse.builder()
                 .reservationId(updateReservation.getId())
                 .accepted(updateReservation.getAcceptedStatus())
                 .build();

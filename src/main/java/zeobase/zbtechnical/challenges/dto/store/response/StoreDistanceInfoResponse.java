@@ -9,7 +9,7 @@ import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.utils.Distance;
 
 /**
- * 매장 정보와 거리 정보 관련 DTO 클래스
+ * 매장 정보와 거리 정보 관련 response DTO 클래스
  */
 @SuperBuilder
 @Getter

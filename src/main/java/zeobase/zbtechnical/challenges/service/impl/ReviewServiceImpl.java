@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
-import zeobase.zbtechnical.challenges.dto.review.ReviewPost;
+import zeobase.zbtechnical.challenges.dto.review.request.*;
+import zeobase.zbtechnical.challenges.dto.review.response.*;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.entity.Review;
@@ -45,7 +45,7 @@ public class ReviewServiceImpl implements ReviewService {
      * reviewId (Review 의 PK) 검증
      *
      * @param reviewId
-     * @return "dto/review/ReviewInfoDto"
+     * @return "dto/review/response/ReviewInfoResponse"
      * @exception ReviewException
      */
     @Override
@@ -64,7 +64,7 @@ public class ReviewServiceImpl implements ReviewService {
      * 전달된 memberId 검증
      *
      * @param memberId
-     * @return List "dto/review/ReviewInfoDto"
+     * @return List "dto/review/response/ReviewInfoResponse"
      * @exception MemberException
      */
     @Override
@@ -86,7 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
      * 전달된 storeId 검증
      *
      * @param storeId
-     * @return List "dto/Review/ReviewInfoDto"
+     * @return List "dto/review/response/ReviewInfoResponse"
      * @exception StoreException
      */
     @Override
@@ -110,12 +110,12 @@ public class ReviewServiceImpl implements ReviewService {
      *
      * @param request - 매장 정보, 별점, 리뷰 내용
      * @param authentication - 토큰을 활용한 이용자(리뷰 작성자) 검증
-     * @return "dto/review/ReviewPostDto.Response"
+     * @return "dto/review/response/ReviewPostResponse"
      * @exception ReviewException
      */
     @Override
     @Transactional
-    public ReviewPost.Response postReview(ReviewPost.Request request, Authentication authentication) {
+    public ReviewPostResponse postReview(ReviewPostRequest request, Authentication authentication) {
 
         // store id 검증
         Store store = storeRepository.findById(request.getStoreId())
@@ -141,6 +141,6 @@ public class ReviewServiceImpl implements ReviewService {
                 .store(store)
                 .build();
 
-        return ReviewPost.Response.fromEntity(reviewRepository.save(review));
+        return ReviewPostResponse.fromEntity(reviewRepository.save(review));
     }
 }

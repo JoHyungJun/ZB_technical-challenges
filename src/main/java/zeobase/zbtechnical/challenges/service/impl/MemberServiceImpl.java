@@ -5,12 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.member.*;
-import zeobase.zbtechnical.challenges.dto.member.request.MemberSigninRequest;
-import zeobase.zbtechnical.challenges.dto.member.request.RefreshTokenReissueRequest;
-import zeobase.zbtechnical.challenges.dto.member.response.MemberInfoResponse;
-import zeobase.zbtechnical.challenges.dto.member.response.MemberSignOutResponse;
-import zeobase.zbtechnical.challenges.dto.member.response.TokenResponse;
+import zeobase.zbtechnical.challenges.dto.member.request.*;
+import zeobase.zbtechnical.challenges.dto.member.response.*;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.RefreshToken;
 import zeobase.zbtechnical.challenges.exception.JwtException;
@@ -42,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
      * memberId (Member 의 PK) 검증
      *
      * @param memberId
-     * @return "dto/member/MemberInfoDto"
+     * @return "dto/member/response/MemberInfoResponse"
      * @exception MemberException
      */
     @Override
@@ -61,12 +57,12 @@ public class MemberServiceImpl implements MemberService {
      * id와 핸드폰 번호에 대해 중복 검사 진행
      *
      * @param request - 가입에 필요한 회원 정보
-     * @return "dto/member/MemberSignupDto.Response"
+     * @return "dto/member/response/MemberSignupResponse"
      * @exception MemberException
      */
     @Override
     @Transactional
-    public MemberSignup.Response signup(MemberSignup.Request request) {
+    public MemberSignupResponse signup(MemberSignupRequest request) {
 
         // UID 존재 검증 여부
         if(memberRepository.existsByUID(request.getUID())) {
@@ -88,7 +84,7 @@ public class MemberServiceImpl implements MemberService {
                     .status(MemberStatusType.ACTIVE)
                     .build());
 
-        return MemberSignup.Response.builder()
+        return MemberSignupResponse.builder()
                 .memberId(savedMember.getId())
                 .UID(savedMember.getUID())
                 .build();
@@ -99,7 +95,7 @@ public class MemberServiceImpl implements MemberService {
      * id, password 검증 후 토큰 발행
      *
      * @param request - id, password
-     * @return "dto/member/TokenResponse"
+     * @return "dto/member/response/TokenResponse"
      * @exception MemberException
      */
     @Override
@@ -125,6 +121,7 @@ public class MemberServiceImpl implements MemberService {
         RefreshToken refreshTokenInDB = refreshTokenRepository.findByMemberId(member.getId())
                 .orElse(null);
 
+        // 기존에 해당 멤버의 refresh token 이 DB에 존재한다면 토큰 업데이트, 아니라면 새로 등록
         if(refreshTokenInDB == null) {
 
             refreshTokenRepository.save(RefreshToken.builder()
@@ -139,6 +136,13 @@ public class MemberServiceImpl implements MemberService {
         return tokenResponse;
     }
 
+    /**
+     * 로그 아웃을 진행하는 메서드
+     * 토큰 검증 후 해당 member 의 refresh token 삭제
+     * 
+     * @param authentication
+     * @return "dto/member/response/MemberSignOutResponse"
+     */
     @Override
     @Transactional
     public MemberSignOutResponse signout(Authentication authentication) {
@@ -162,7 +166,7 @@ public class MemberServiceImpl implements MemberService {
      * 새로운 access token 및 refresh token 을 발급
      *
      * @param request - refresh token
-     * @return "dto/member/TokenResponse"
+     * @return "dto/member/response/TokenResponse"
      * @exception MemberException
      * @exception JwtException
      */
@@ -213,6 +217,7 @@ public class MemberServiceImpl implements MemberService {
      */
     public Member getMemberByAuthentication(Authentication authentication) {
 
+        // 필터에 의해 토큰이 전달되지 않는 요청에는 authentication 이 null 로 들어감
         if(authentication == null) {
             throw new MemberException(UNAUTHORIZED_RESPONSE);
         }
