@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import static zeobase.zbtechnical.challenges.type.ErrorMessage.*;
+
 /**
  * 에러 발생 내용을 담은 에러 코드 관련 Enum 클래스
  */
@@ -31,9 +33,15 @@ public enum ErrorCode {
     NOT_FOUND_MEMBER_UID(HttpStatus.BAD_REQUEST, "이용자 아이디 정보를 찾을 수 없습니다."),
 
     INVALID_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "회원가입 정보로 잘못된 인자가 전달되었습니다."),
-    INVALID_MODIFY_REQUEST(HttpStatus.BAD_REQUEST, "회원 정보 수정 정보로 잘못된 인자가 전달되었습니다."),
-
-    ALREADY_EXISTS_MEMBER_UID(HttpStatus.BAD_REQUEST, "이미 존재하는 ID 입니다."),
+    INVALID_UID_REGEX(HttpStatus.BAD_REQUEST, "잘못된 형식의 아이디입니다."),
+    INVALID_NAME_REGEX(HttpStatus.BAD_REQUEST, "잘못된 형식의 이름입니다."),
+    INVALID_PASSWORD_REGEX(HttpStatus.BAD_REQUEST, INVALID_PASSWORD_REGEX_MSG),
+    INVALID_PASSWORD_LENGTH(HttpStatus.BAD_REQUEST, INVALID_PASSWORD_LENGTH_MSG),
+    INVALID_PHONE_REGEX(HttpStatus.BAD_REQUEST, INVALID_PHONE_REGEX_MSG),
+    INVALID_MODIFY_REQUEST(HttpStatus.BAD_REQUEST, "이용자 정보 수정 정보로 잘못된 인자가 전달되었습니다."),
+    INVALID_MODIFY_ROLE(HttpStatus.BAD_REQUEST, "이용자의 권한을 수정할 수 없습니다."),
+    
+    ALREADY_EXISTS_MEMBER_UID(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),
     ALREADY_EXISTS_PHONE(HttpStatus.BAD_REQUEST, "이미 존재하는 핸드폰 번호입니다."),
 
     MISMATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),

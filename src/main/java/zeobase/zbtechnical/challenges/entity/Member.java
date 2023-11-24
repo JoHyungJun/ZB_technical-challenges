@@ -95,4 +95,46 @@ public class Member extends BaseEntity implements UserDetails {
 
         return this.getStatus() == MemberStatusType.ACTIVE;
     }
+
+    public Member modifyUID(String UID) {
+
+        this.UID = UID;
+
+        return this;
+    }
+
+    public Member modifyPasswordByEncodedPassword(String encodedPassword) {
+
+        this.password = encodedPassword;
+
+        return this;
+    }
+
+    public Member modifyRole(MemberRoleType role) {
+
+        this.role = role;
+
+        return this;
+    }
+
+    public Member modifyName(String name) {
+
+        this.name = name;
+
+        return this;
+    }
+
+    public Member modifyPhone(String phone) {
+
+        this.phone = phone;
+
+        return this;
+    }
+
+    public Member modifyStatus(MemberStatusType status) {
+
+        this.status = status;
+
+        return this;
+    }
 }

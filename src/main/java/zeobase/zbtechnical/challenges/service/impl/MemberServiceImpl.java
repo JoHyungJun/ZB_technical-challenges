@@ -5,7 +5,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.member.request.*;
+import zeobase.zbtechnical.challenges.dto.member.request.MemberModifyRequest;
+import zeobase.zbtechnical.challenges.dto.member.request.MemberSigninRequest;
+import zeobase.zbtechnical.challenges.dto.member.request.MemberSignupRequest;
+import zeobase.zbtechnical.challenges.dto.member.request.RefreshTokenReissueRequest;
 import zeobase.zbtechnical.challenges.dto.member.response.*;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.RefreshToken;
@@ -14,10 +17,13 @@ import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
 import zeobase.zbtechnical.challenges.repository.RefreshTokenRepository;
 import zeobase.zbtechnical.challenges.service.MemberService;
+import zeobase.zbtechnical.challenges.type.MemberRoleType;
 import zeobase.zbtechnical.challenges.type.MemberStatusType;
+import zeobase.zbtechnical.challenges.utils.CustomStringUtils;
 import zeobase.zbtechnical.challenges.utils.security.JwtUtils;
 
 import static zeobase.zbtechnical.challenges.type.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.utils.ValidateUtils.*;
 
 /**
  * 이용자 관련 로직을 담는 Service 클래스
@@ -64,12 +70,12 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberSignupResponse signup(MemberSignupRequest request) {
 
-        // UID 존재 검증 여부
+        // UID 존재 여부 검증
         if(memberRepository.existsByUID(request.getUID())) {
             throw new MemberException(ALREADY_EXISTS_MEMBER_UID);
         }
 
-        // 핸드폰 존재 검증 여부
+        // 핸드폰 존재 여부 검증
         if(memberRepository.existsByPhone(request.getPhone())) {
             throw new MemberException(ALREADY_EXISTS_PHONE);
         }
@@ -142,12 +148,13 @@ public class MemberServiceImpl implements MemberService {
      * 
      * @param authentication
      * @return "dto/member/response/MemberSignOutResponse"
+     * @exception MemberException
      */
     @Override
     @Transactional
     public MemberSignOutResponse signout(Authentication authentication) {
 
-        // authentication 에서 멤버 추출
+        // authentication (토큰) 에서 멤버 추출
         Member member = getMemberByAuthentication(authentication);
 
         // 멤버 status 검증
@@ -158,6 +165,131 @@ public class MemberServiceImpl implements MemberService {
 
         return MemberSignOutResponse.builder()
                 .signoutSuccess(true)
+                .build();
+    }
+
+    /**
+     * 이용자 정보 수정을 진행하는 메서드
+     * request 중 수정을 원하지 않는 정보(필드)는 null 로 전달
+     * 프론트 쪽에서 변하지 않은 정보를 null 이 아닌 원래 값으로 넣어줄 수도 있기에, 해당 검증 추가
+     *
+     * @param authentication
+     * @return "dto/member/response/MemberModifyResponse"
+     * @exception MemberException
+     */
+    @Override
+    @Transactional
+    public MemberModifyResponse modify(MemberModifyRequest request, Authentication authentication) {
+
+        // authentication (토큰) 에서 멤버 추출
+        Member member = getMemberByAuthentication(authentication);
+        
+        // 멤버 status 검증
+        validateMemberStatus(member);
+
+        // UID 수정 요청 시 검증 및 수정
+        if(request.getUID() != null) {
+            
+            // 아이디 형식 (null 및 공백문자) 검증
+            if(!CustomStringUtils.validateEmptyAndWhitespace(request.getUID())) {
+                throw new MemberException(INVALID_UID_REGEX);
+            }
+            
+            // UID 존재 여부 검증
+            // 자신의 아이디(Unique)가 그대로 들어갔을 경우 발생하는 논리적 오류 방지
+            if(!member.getUID().equals(request.getUID()) && memberRepository.existsByUID(request.getUID())) {
+                throw new MemberException(ALREADY_EXISTS_MEMBER_UID);
+            }
+
+            member.modifyUID(request.getUID());
+        }
+
+        // 비밀번호 수정 요청 시 검증 및 수정
+        if(request.getPassword() != null) {
+
+            // 비밀번호 길이 검증
+            if(request.getPassword().length() < MIN_PHONE_LENGTH ||
+               request.getPassword().length() > MAX_PHONE_LENGTH) {
+                throw new MemberException(INVALID_PASSWORD_LENGTH);
+            }
+
+            // 비밀번호 형식 (format) 검증
+            if(!request.getPassword().matches(PASSWORD_REGEX)) {
+                throw new MemberException(INVALID_PASSWORD_REGEX);
+            }
+
+            member.modifyPasswordByEncodedPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        // 이용자 권한 수정 요청 시 검증 및 수정
+        if(request.getRole() != null) {
+
+            // 일반 이용자로 권한을 변경하고 싶을 시, 자기 소유의 매장이 존재한다면 거절
+            if(request.getRole() == MemberRoleType.MEMBER &&
+               member.getStores().size() > 0) {
+                throw new MemberException(INVALID_MODIFY_ROLE);
+            }
+
+            member.modifyRole(request.getRole());
+        }
+
+        // 이용자 이름 수정 요청 시 검증 및 수정
+        if(request.getName() != null) {
+
+            // 이름 형식 (null 및 공백문자) 검증
+            if(!CustomStringUtils.validateEmptyAndWhitespace(request.getName())) {
+                throw new MemberException(INVALID_NAME_REGEX);
+            }
+
+            member.modifyName(request.getName());
+        }
+
+        // 이용자 핸드폰 번호 수정 요청 시 검증 및 수정
+        if(request.getPhone() != null) {
+
+            // 핸드폰 번호 형식 (regex) 검증
+            if(!request.getPhone().matches(PHONE_REGEX)) {
+                throw new MemberException(INVALID_PHONE_REGEX);
+            }
+
+            // 핸드폰 번호 존재 여부 검증
+            // 자신의 핸드폰 번호(Unique)가 그대로 들어갔을 경우 발생하는 논리적 오류 방지
+            if(!member.getPhone().equals(request.getPhone()) && memberRepository.existsByPhone(request.getPhone())) {
+                throw new MemberException(ALREADY_EXISTS_PHONE);
+            }
+
+            member.modifyPhone(request.getPhone());
+        }
+
+        memberRepository.save(member);
+
+        return MemberModifyResponse.builder()
+                .memberId(member.getId())
+                .build();
+    }
+
+    /**
+     * 이용자 회원 탈퇴를 진행하는 메서드
+     * member status 를 WITHDRAW 로 수정 (soft delete)
+     *
+     * @param authentication
+     * @return "dto/member/response/MemberWithdrawResponse" - member id
+     * @exception MemberException
+     */
+    @Override
+    @Transactional
+    public MemberWithdrawResponse withdraw(Authentication authentication) {
+
+        // authentication (토큰) 에서 멤버 추출
+        Member member = getMemberByAuthentication(authentication);
+
+        // member status 검증
+        validateMemberStatus(member);
+
+        memberRepository.save(member.modifyStatus(MemberStatusType.WITHDRAW));
+
+        return MemberWithdrawResponse.builder()
+                .memberId(member.getId())
                 .build();
     }
 
