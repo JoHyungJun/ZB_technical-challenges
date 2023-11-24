@@ -78,12 +78,49 @@ public class MemberController {
         return ResponseEntity.ok().body(memberService.signin(request));
     }
 
+    /**
+     * 로그아웃을 진행하는 api
+     *
+     * @param authentication
+     * @return
+     */
     @PostMapping("/signout")
     public ResponseEntity<MemberSignOutResponse> signout(
             Authentication authentication
     ) {
 
         return ResponseEntity.ok().body(memberService.signout(authentication));
+    }
+
+    /**
+     * 이용자 정보 수정을 진행하는 api
+     * request 중 수정을 원하지 않는 정보(필드)는 null 로 전달
+     *
+     * @param request - 수정에 필요한 회원 정보
+     * @param authentication
+     * @return
+     */
+    @PatchMapping("")
+    public ResponseEntity<MemberModifyResponse> modify(
+            @RequestBody MemberModifyRequest request,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(memberService.modify(request, authentication));
+    }
+
+    /**
+     * 이용자 아이디 삭제를 진행하는 api
+     *
+     * @param authentication
+     * @return
+     */
+    @DeleteMapping("")
+    public ResponseEntity<MemberWithdrawResponse> withdraw(
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(memberService.withdraw(authentication));
     }
 
     /**
