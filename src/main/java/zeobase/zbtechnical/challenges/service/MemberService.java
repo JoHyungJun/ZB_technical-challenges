@@ -9,11 +9,18 @@ import zeobase.zbtechnical.challenges.dto.member.response.*;
  */
 public interface MemberService {
 
+    // GET
     MemberInfoResponse getMemberPublicInfoByMemberId(Long memberId);
+
+    // POST
     MemberSignupResponse signup(MemberSignupRequest request);
     TokenResponse signin(MemberSigninRequest request);
     MemberSignOutResponse signout(Authentication authentication);
-    MemberModifyResponse modify(MemberModifyRequest request, Authentication authentication);
-    MemberWithdrawResponse withdraw(Authentication authentication);
     TokenResponse reissue(RefreshTokenReissueRequest request);
+
+    // UPDATE (PATCH)
+    MemberModifyResponse modify(MemberModifyRequest request, Authentication authentication);
+
+    // DELETE
+    MemberWithdrawResponse withdraw(Authentication authentication);
 }

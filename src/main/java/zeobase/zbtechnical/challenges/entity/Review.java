@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import zeobase.zbtechnical.challenges.type.review.ReviewStatusType;
 
 import javax.persistence.*;
 
@@ -27,6 +28,9 @@ public class Review extends BaseEntity {
 
     private String reviewMessage;
 
+    @Enumerated(EnumType.STRING)
+    private ReviewStatusType status;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -34,4 +38,12 @@ public class Review extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
+
+
+    public Review modifyStatus(ReviewStatusType status) {
+
+        this.status = status;
+
+        return this;
+    }
 }

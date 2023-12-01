@@ -2,13 +2,13 @@ package zeobase.zbtechnical.challenges.dto.member.request;
 
 import lombok.Builder;
 import lombok.Getter;
-import zeobase.zbtechnical.challenges.type.MemberRoleType;
+import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import static zeobase.zbtechnical.challenges.type.ErrorMessage.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.*;
 import static zeobase.zbtechnical.challenges.utils.ValidateUtils.*;
 
 /**

@@ -22,13 +22,13 @@ class ReservationTest {
 
         //when
         Reservation reservation = Reservation.builder()
-                .reservedDateTime(reservedDate)
+                .reservationDateTime(reservedDate)
                 .build();
 
         reservation = reservationRepository.save(reservation);
 
         //then
         LocalDateTime date = LocalDateTime.of(2023, 10, 18, 12, 30);
-        Assertions.assertEquals(date, reservationRepository.findById(reservation.getId()).get().getReservedDateTime());
+        Assertions.assertEquals(date, reservationRepository.findById(reservation.getId()).get().getReservationDateTime());
     }
 }

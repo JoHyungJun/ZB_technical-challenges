@@ -2,7 +2,7 @@ package zeobase.zbtechnical.challenges.dto.member.request;
 
 import lombok.Builder;
 import lombok.Getter;
-import zeobase.zbtechnical.challenges.type.MemberRoleType;
+import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
 
 /**
  * 이용자의 정보 수정 관련 request DTO 클래스

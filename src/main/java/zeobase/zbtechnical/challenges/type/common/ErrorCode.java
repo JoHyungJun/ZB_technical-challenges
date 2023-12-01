@@ -1,10 +1,10 @@
-package zeobase.zbtechnical.challenges.type;
+package zeobase.zbtechnical.challenges.type.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static zeobase.zbtechnical.challenges.type.ErrorMessage.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.*;
 
 /**
  * 에러 발생 내용을 담은 에러 코드 관련 Enum 클래스
@@ -15,6 +15,8 @@ public enum ErrorCode {
 
     // Common
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류가 발생했습니다."),
+
+    INVALID_URL_STRING(HttpStatus.BAD_REQUEST, "url 로 잘못된 인자가 전달되었습니다."),
 
 
     // Token
@@ -32,7 +34,7 @@ public enum ErrorCode {
     NOT_FOUND_MEMBER_PHONE(HttpStatus.BAD_REQUEST, "존재하지 않는 핸드폰 번호입니다."),
     NOT_FOUND_MEMBER_UID(HttpStatus.BAD_REQUEST, "이용자 아이디 정보를 찾을 수 없습니다."),
 
-    INVALID_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "회원가입 정보로 잘못된 인자가 전달되었습니다."),
+    INVALID_MEMBER_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "회원가입 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_UID_REGEX(HttpStatus.BAD_REQUEST, "잘못된 형식의 아이디입니다."),
     INVALID_NAME_REGEX(HttpStatus.BAD_REQUEST, "잘못된 형식의 이름입니다."),
     INVALID_PASSWORD_REGEX(HttpStatus.BAD_REQUEST, INVALID_PASSWORD_REGEX_MSG),
@@ -82,6 +84,7 @@ public enum ErrorCode {
     NOT_FOUND_STORE_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 가게 ID 입니다."),
     NOT_OWNED_STORE_ID(HttpStatus.BAD_REQUEST, "이용자 소유의 가게가 아닙니다."),
 
+    INVALID_STORE_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "매장 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_SORTED_TYPE(HttpStatus.BAD_REQUEST, "정렬 방식으로 잘못된 인자가 전달되었습니다."),
     INVALID_LOCATION_TYPE(HttpStatus.BAD_REQUEST, "위치 정보로 잘못된 형식의 인자가 전달되었습니다."),
     INVALID_OPENING_HOURS(HttpStatus.BAD_REQUEST, "영업 시간 설정이 올바르지 않습니다."),
@@ -91,8 +94,10 @@ public enum ErrorCode {
 
     ALREADY_RESERVED_TIME(HttpStatus.BAD_REQUEST, "이미 예약된 시간입니다."),
 
-    STORE_SHUT_DOWN(HttpStatus.BAD_REQUEST, "영업을 종료한 가게입니다."),
-    STORE_OPEN_PREPARING(HttpStatus.BAD_REQUEST, "영업 준비 중인 가게입니다."),
+    SHUT_DOWN_STORE(HttpStatus.BAD_REQUEST, "영업을 종료한 가게입니다."),
+    OPEN_PREPARING_STORE(HttpStatus.BAD_REQUEST, "영업 준비 중인 가게입니다."),
+    WITHDRAW_STORE(HttpStatus.BAD_REQUEST, "등록을 해제한 가게입니다."),
+    BLOCKED_STORE(HttpStatus.BAD_REQUEST, "정지된 가게입니다."),
 
 
     ;

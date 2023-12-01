@@ -25,4 +25,6 @@ public class ReservationReserveResponse {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime reservedDateTime;
+
+    private Integer reservationPersonCount;
 }

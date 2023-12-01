@@ -5,17 +5,20 @@ import org.springframework.http.HttpStatus;
 import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 /**
- * 이용자 관련 CustomException 클래스
+ * 공통 사유 관련 CustomException 클래스
+ * 
+ * @param 
+ * @return 
  */
 @Getter
-public class MemberException extends RuntimeException {
+public class CommonException extends RuntimeException {
 
     private final HttpStatus httpStatus;
     private final String code;
     private final String errorMessage;
 
 
-    public MemberException(ErrorCode errorCode) {
+    public CommonException(ErrorCode errorCode) {
 
         this.httpStatus = errorCode.getHttpStatus();
         this.code = errorCode.name();

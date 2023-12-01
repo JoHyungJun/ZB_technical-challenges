@@ -8,8 +8,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import zeobase.zbtechnical.challenges.type.MemberRoleType;
-import zeobase.zbtechnical.challenges.type.MemberStatusType;
+import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
+import zeobase.zbtechnical.challenges.type.member.MemberSignedStatusType;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class Member extends BaseEntity implements UserDetails {
     private String phone;
 
     @Enumerated(value = EnumType.STRING)
-    private MemberStatusType status;
+    private MemberSignedStatusType status;
 
     @OneToMany(mappedBy = "member")
     private List<Reservation> reservations;
@@ -75,13 +75,13 @@ public class Member extends BaseEntity implements UserDetails {
     @Override
     public boolean isAccountNonExpired() {
 
-        return this.getStatus() != MemberStatusType.WITHDRAW;
+        return this.getStatus() != MemberSignedStatusType.WITHDRAW;
     }
 
     @Override
     public boolean isAccountNonLocked() {
 
-        return this.getStatus() != MemberStatusType.BLOCKED;
+        return this.getStatus() != MemberSignedStatusType.BLOCKED;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
 
-        return this.getStatus() == MemberStatusType.ACTIVE;
+        return this.getStatus() == MemberSignedStatusType.ACTIVE;
     }
 
     public Member modifyUID(String UID) {
@@ -131,7 +131,7 @@ public class Member extends BaseEntity implements UserDetails {
         return this;
     }
 
-    public Member modifyStatus(MemberStatusType status) {
+    public Member modifyStatus(MemberSignedStatusType status) {
 
         this.status = status;
 

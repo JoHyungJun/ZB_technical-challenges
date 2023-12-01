@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.type;
+package zeobase.zbtechnical.challenges.type.common;
 
 /**
  * 성공적인 응답 내용을 담은 성공 코드 관련 Enum 클래스

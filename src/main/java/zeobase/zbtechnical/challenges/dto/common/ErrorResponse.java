@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 /**
  * 공통 에러 응답 response 클래스

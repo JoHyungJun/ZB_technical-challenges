@@ -18,12 +18,12 @@ import zeobase.zbtechnical.challenges.repository.ReservationRepository;
 import zeobase.zbtechnical.challenges.repository.ReviewRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.ReviewService;
-import zeobase.zbtechnical.challenges.type.ReservationVisitedType;
+import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static zeobase.zbtechnical.challenges.type.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.*;
 
 /**
  * 리뷰 관련 로직을 담는 Service 클래스

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import zeobase.zbtechnical.challenges.type.ReservationAcceptedType;
+import zeobase.zbtechnical.challenges.type.reservation.ReservationAcceptedType;
 
 /**
  * 점주의 예약 승인/허용 관련 response DTO 클래스

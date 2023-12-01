@@ -2,7 +2,7 @@ package zeobase.zbtechnical.challenges.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 /**
  * Jwt 관련 CustomException 클래스

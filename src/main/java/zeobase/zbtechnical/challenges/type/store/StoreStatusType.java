@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.type;
+package zeobase.zbtechnical.challenges.type.store;
 
 /**
  * 매장 운영 상태 정보 관련 Enum 클래스

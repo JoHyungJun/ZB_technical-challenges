@@ -1,45 +1,45 @@
 package zeobase.zbtechnical.challenges.dto.store.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.NoArgsConstructor;
 import zeobase.zbtechnical.challenges.type.store.StoreStatusType;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
 
 /**
- * 이용자(점주)의 매장 등록 관련 request DTO 클래스
+ * 이용자(점주)의 매장 정보 수정 관련 request DTO 클래스
  */
-@Builder
 @Getter
-public class StoreRegistrationRequest {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class StoreModifyRequest {
 
-    @NotNull
+    private Long storeId;
+
     private String name;
 
-    @NotNull
     private Double latitude;
 
-    @NotNull
     private Double longitude;
 
-    @NotNull
     private String explanation;
 
-    @NotNull
     private StoreStatusType status;
 
-    @DateTimeFormat(pattern = "HH:mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
     private LocalTime openHours;
 
-    @DateTimeFormat(pattern = "HH:mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
     private LocalTime closedHours;
 
-    @DateTimeFormat(pattern = "HH:mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
     private LocalTime reservationTerm;
+
+    private Integer tableCount;
+
+    private Integer seatingCapacityPerTable;
 }

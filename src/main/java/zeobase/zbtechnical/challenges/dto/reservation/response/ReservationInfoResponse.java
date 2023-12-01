@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import zeobase.zbtechnical.challenges.entity.Reservation;
-import zeobase.zbtechnical.challenges.type.ReservationAcceptedType;
-import zeobase.zbtechnical.challenges.type.ReservationVisitedType;
+import zeobase.zbtechnical.challenges.type.reservation.ReservationAcceptedType;
+import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +22,8 @@ public class ReservationInfoResponse {
     private Long reservationId;
     private Long storeId;
     private Long memberId;
-    private LocalDateTime reservedDate;
+    private LocalDateTime reservationDateTime;
+    private Integer reservationPersonCount;
     private ReservationAcceptedType acceptedStatus;
     private ReservationVisitedType visitedType;
 
@@ -33,7 +34,8 @@ public class ReservationInfoResponse {
                 .reservationId(reservation.getId())
                 .storeId(reservation.getStore().getId())
                 .memberId(reservation.getMember().getId())
-                .reservedDate(reservation.getReservedDateTime())
+                .reservationDateTime(reservation.getReservationDateTime())
+                .reservationPersonCount(reservation.getReservationPersonCount())
                 .acceptedStatus(reservation.getAcceptedStatus())
                 .visitedType(reservation.getVisitedStatus())
                 .build();
