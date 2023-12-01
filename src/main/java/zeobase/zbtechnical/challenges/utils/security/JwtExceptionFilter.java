@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import zeobase.zbtechnical.challenges.dto.common.ErrorResponse;
 import zeobase.zbtechnical.challenges.exception.JwtException;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

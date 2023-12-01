@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.type;
+package zeobase.zbtechnical.challenges.type.member;
 
 /**
  * 이용자 권한 관련 Enum 클래스

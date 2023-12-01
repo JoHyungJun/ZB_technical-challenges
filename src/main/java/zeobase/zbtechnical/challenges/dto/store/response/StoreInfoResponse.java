@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import zeobase.zbtechnical.challenges.entity.Store;
-import zeobase.zbtechnical.challenges.type.StoreStatusType;
+import zeobase.zbtechnical.challenges.type.store.StoreStatusType;
 
 import java.time.LocalTime;
 
@@ -40,7 +40,7 @@ public class StoreInfoResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
     private LocalTime reservationTerm;
 
-    private Double averageStarRating;
+    private Double starRating;
 
 
     public static StoreInfoResponse fromEntity(Store store) {
@@ -52,10 +52,10 @@ public class StoreInfoResponse {
                 .longitude(store.getLongitude())
                 .explanation(store.getExplanation())
                 .status(store.getStatus())
-                .averageStarRating(store.getAverageStarRating())
                 .openHours(store.getOpenHours())
                 .closedHours(store.getClosedHours())
-                .reservationTerm(store.getReservationTerm())
+                .reservationTerm(store.getStoreReservationInfo().getReservationTerm())
+                .starRating(store.getAverageStarRating())
                 .build();
     }
 }

@@ -1,26 +1,40 @@
 package zeobase.zbtechnical.challenges.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import zeobase.zbtechnical.challenges.dto.store.request.StoreModifyRequest;
+import zeobase.zbtechnical.challenges.dto.store.request.StoreRegistrationRequest;
+import zeobase.zbtechnical.challenges.dto.store.request.StoreWithdrawRequest;
 import zeobase.zbtechnical.challenges.dto.store.response.*;
-import zeobase.zbtechnical.challenges.dto.store.request.*;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Store;
+import zeobase.zbtechnical.challenges.entity.StoreReservationInfo;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
+import zeobase.zbtechnical.challenges.repository.StoreReservationInfoRepository;
 import zeobase.zbtechnical.challenges.service.StoreService;
-import zeobase.zbtechnical.challenges.type.MemberRoleType;
-import zeobase.zbtechnical.challenges.type.StoreSortedType;
-import zeobase.zbtechnical.challenges.type.StoreStatusType;
+import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
+import zeobase.zbtechnical.challenges.type.reservation.ReservationAcceptedType;
+import zeobase.zbtechnical.challenges.type.review.ReviewStatusType;
+import zeobase.zbtechnical.challenges.type.store.StoreSignedStatusType;
+import zeobase.zbtechnical.challenges.type.store.StoreSortedType;
+import zeobase.zbtechnical.challenges.type.store.StoreStatusType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static zeobase.zbtechnical.challenges.type.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.service.impl.ReservationServiceImpl.validateReservationTime;
+import static zeobase.zbtechnical.challenges.service.impl.ReservationServiceImpl.validateReservationTimeMatchesTerm;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.utils.CustomStringUtils.getDecodingUrl;
 
 /**
  * 매장 관련 로직을 담는 Service 클래스
@@ -31,10 +45,15 @@ public class StoreServiceImpl implements StoreService {
 
     // 최소 예약 텀은 30분으로 설정 -> 추가 요구사항 때 바뀔 수 있음
     private static final LocalTime MINIMUM_RESERVATION_TERM = LocalTime.of(0, 30);
+    private static final Double DEFAULT_STAR_RATING = 0.0;
+    private static final StoreSignedStatusType DEFAULT_SIGNED_STATUS = StoreSignedStatusType.ACTIVE;
+    private static final Integer DEFAULT_TABLE_COUNT = 1;
+    private static final Integer DEFAULT_SEATING_CAPACITY_PER_TABLE = 4;
 
     private final MemberServiceImpl memberService;
 
     private final StoreRepository storeRepository;
+    private final StoreReservationInfoRepository storeReservationInfoRepository;
 
 
     /**
@@ -49,11 +68,100 @@ public class StoreServiceImpl implements StoreService {
     @Transactional(readOnly = true)
     public StoreInfoResponse getStoreInfo(Long storeId) {
 
-        // 유효한 storeId인지 검증
+        // store id 존재 여부 검증
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
+        // store status 검증
+        validateStoreStatus(store);
+
+        // store signed status 검증
+        validateStoreSignedStatus(store);
+
         return StoreInfoResponse.fromEntity(store);
+    }
+
+    /**
+     * 검색어가 포함된 상호명의 모든 매장 정보를 전달하는 메서드
+     * 검색어가 없다면 전체 목록을 반환
+     * 현재 운영 중인 매장을 반환
+     *
+     * @param name - 검색어
+     * @param pageable - 페이징
+     * @return List "dto/store/response/StoreInfoResponse"
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<StoreInfoResponse> getAllStoresInfoByName(String name, Pageable pageable) {
+
+        List<Store> stores = null;
+
+        // 검색어가 null 이라면 전체 매장 목록을, 아니라면 검색어가 포함된 상호명의 매장 목록을 반환
+        if(name == null) {
+
+            stores = storeRepository.findAllByStatusAndSignedStatus(StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable);
+        }else {
+            
+            stores = storeRepository.findAllByNameContainingAndStatusAndSignedStatus(getDecodingUrl(name), StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable);
+        }
+
+        return stores.stream()
+                .map(store -> StoreInfoResponse.fromEntity(store))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 모든 매장 목록을 정렬에 따라 정보를 전달하는 메서드
+     * 전달된 인자에 대한 검증 후 요청값에 따라 정렬을 다르게 하여 반환
+     * 현재 운영 중인 매장을 반환
+     *
+     * @param sortBy - "type/StoreSortedType" 거리(DISTANCE), 이름(ALPHABET), 별점(STAR_RATING)
+     * @param latitude - 위도
+     * @param longitude - 경도
+     * @param pageable - 페이징
+     * @return List "dto/store/response/StoreInfoResponse" - 전달된 정렬 방식에 따라 상속 관계의 다른 객체 전달
+     * @exception StoreException
+     */
+    // TODO : 현재는 star rating 이 store 엔티티 내부 로직으로 계산되어 response 불가능. 캐싱 후 리팩토링
+    @Override
+    @Transactional(readOnly = true)
+    public List<StoreInfoResponse> getAllSortedStoresInfo(StoreSortedType sortBy, Double latitude, Double longitude, Pageable pageable) {
+
+        // 거리순 정렬일 경우, 위도, 경도 둘 다 전달 되었는지 검증
+        if((sortBy == StoreSortedType.DISTANCE)
+                && (latitude == null || longitude == null)) {
+
+            throw new StoreException(INVALID_LOCATION_TYPE);
+        }
+
+        // 매장 정보 전부 받기
+        List<StoreInfoResponse> stores = new ArrayList<>();
+
+        // 정렬 값에 따라 다르게 받기
+        if(sortBy == StoreSortedType.DISTANCE) {
+
+            stores = storeRepository.findAllByActiveStoresAndDistanceDiffOrderByDistanceDiff(latitude, longitude, pageable)
+                    .stream()
+                    .map(dto -> StoreInfoWithDistanceDiffResponse.fromDto(dto))
+                    .collect(Collectors.toList());
+
+        }else if(sortBy == StoreSortedType.ALPHABET) {
+
+            stores = storeRepository.findAllByStatusAndSignedStatusOrderByNameAsc(StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable)
+                    .stream()
+                    .map(store -> StoreInfoResponse.fromEntity(store))
+                    .collect(Collectors.toList());
+
+        }else if(sortBy == StoreSortedType.STAR_RATING) {
+
+            stores = storeRepository.findAllByStatusAndSignedStatusOrderByStarRatingDesc(StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable)
+                    .stream()
+                    .map(store -> StoreInfoResponse.fromEntity(store))
+                    .collect(Collectors.toList());
+
+        }
+
+        return stores;
     }
 
     /**
@@ -76,10 +184,10 @@ public class StoreServiceImpl implements StoreService {
         // 토큰(authentication)을 통해 이용자 추출
         Member member = memberService.getMemberByAuthentication(authentication);
         
-        // 회원 status 검증
-        memberService.validateMemberStatus(member);
+        // 이용자 status 검증
+        memberService.validateMemberSignedStatus(member);
 
-        // 회원이 점주가 맞는지 검증
+        // 이용자가 점주가 맞는지 검증
         if(MemberRoleType.STORE_OWNER != member.getRole()) {
             throw new MemberException(MISMATCH_ROLE);
         }
@@ -94,87 +202,256 @@ public class StoreServiceImpl implements StoreService {
             throw new StoreException(INVALID_RESERVATION_TERM);
         }
 
-        Store savedStore = storeRepository.save(
+        // 영업 시간보다 예약 텀 시간이 더 긴지 검증
+        Duration duration = Duration.between(request.getOpenHours(), request.getClosedHours());
+        if(request.getReservationTerm().toSecondOfDay() > duration.getSeconds()) {
+            throw new StoreException(INVALID_RESERVATION_TERM);
+        }
+
+        StoreReservationInfo storeReservationInfo = storeReservationInfoRepository.save(
+                StoreReservationInfo.builder()
+                .reservationTerm(request.getReservationTerm())
+                .tableCount(DEFAULT_TABLE_COUNT)
+                .seatingCapacityPerTable(DEFAULT_SEATING_CAPACITY_PER_TABLE)
+                .build()
+        );
+
+        Store store = storeRepository.save(
                 Store.builder()
                     .name(request.getName())
                     .latitude(request.getLatitude())
                     .longitude(request.getLongitude())
                     .explanation(request.getExplanation())
                     .status(request.getStatus())
+                    .signedStatus(DEFAULT_SIGNED_STATUS)
                     .openHours(request.getOpenHours())
                     .closedHours(request.getClosedHours())
-                    .reservationTerm(request.getReservationTerm())
+                    .starRating(DEFAULT_STAR_RATING)
                     .member(member)
+                    .storeReservationInfo(storeReservationInfo)
                     .build()
         );
 
         return StoreRegistrationResponse.builder()
-                .storeId(savedStore.getId())
+                .storeId(store.getId())
                 .build();
     }
 
     /**
-     * 모든 매장 목록을 정렬에 따라 정보를 전달하는 메서드
-     * 전달된 인자에 대한 검증 후 요청값에 따라 정렬을 다르게 하여 반환
+     * 이용자(점주)가 등록한 매장의 정보를 수정하는 메서드
      *
-     * @param sortBy - "type/StoreSortedType" 거리(DISTANCE), 이름(ALPHABET), 별점(STAR_RATING)
-     * @param latitude - 위도
-     * @param longitude - 경도
-     * @return List "dto/store/response/StoreDistanceInfoResponse"
-     * @exception StoreException
+     * @param request - store id, store 정보, store reservation info 정보
+     * @return "dto/store/response/StoreModifyResponse" - store id
      */
-    // TODO : 리팩토링 필요. JPA 로 정렬 방법 적용 + 지저분한 코드 정리
-    // TODO : 페이징
     @Override
-    @Transactional(readOnly = true)
-    public List<StoreDistanceInfoResponse> getAllSortedStoresInfo(String sortBy, Double latitude, Double longitude) {
+    @Transactional
+    public StoreModifyResponse modify(StoreModifyRequest request, Authentication authentication) {
 
-        // 전달 받은 sortBy 인자 검증
-        StoreSortedType sortedType = null;
-        try {
-            sortedType = Enum.valueOf(StoreSortedType.class, sortBy);
-        }catch (IllegalArgumentException e) {
-            throw new StoreException(INVALID_SORTED_TYPE);
-        }catch (NullPointerException e) {
-            throw new StoreException(INVALID_SORTED_TYPE);
+        // 토큰(authentication)을 통해 이용자 추출
+        Member member = memberService.getMemberByAuthentication(authentication);
+
+        // 이용자 status 검증
+        memberService.validateMemberSignedStatus(member);
+
+        // 이용자가 점주가 맞는지 검증
+        if(MemberRoleType.STORE_OWNER != member.getRole()) {
+            throw new MemberException(MISMATCH_ROLE);
         }
 
-        // 전달 받은 위도, 경도 인자 검증 (둘 중 하나만 왔을 때 에러 발생)
-        if(latitude == null ^ longitude == null) {
-            throw new StoreException(INVALID_LOCATION_TYPE);
+        // 전달된 store id 존재 여부 검증
+        Store store = storeRepository.findById(request.getStoreId())
+                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
+
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
+
+        // 전달된 store id가 추출한 이용자(점주) 소유 매장인지 여부 검증
+        if(!member.getStores()
+                .stream()
+                .map(ownStore -> ownStore.getId())
+                .collect(Collectors.toList())
+                .contains(store.getId())) {
+            throw new StoreException(NOT_OWNED_STORE_ID);
         }
 
-        // 거리순 정렬일 때 위도, 경도 둘 다 전달 되었는지 검증 (default == 거리순)
-        if((sortedType == StoreSortedType.DISTANCE)
-            && (latitude == null || longitude == null)) {
+        // store status 검증
+        validateStoreStatus(store);
 
-            throw new StoreException(INVALID_LOCATION_TYPE);
+        // store signed status 검증
+        validateStoreSignedStatus(store);
+
+        // name 수정 요청 시 검증 및 수정
+        if(request.getName() != null) {
+
+            store.modifyName(request.getName());
         }
 
-        // 매장 정보 전부 받기
-        List<StoreDistanceInfoResponse> stores
-                = storeRepository.findAll()
-                                .stream()
-                                .map(store -> StoreDistanceInfoResponse.fromEntity(store, latitude, longitude))
-                                .collect(Collectors.toList());
+        // 위치 정보(latitude, longitude) 수정 요청 시 검증 및 수정
+        if(request.getLatitude() != null || request.getLongitude() != null) {
 
+            // 두 위치 정보 중 하나만 입력 되었는지 검증
+            if(request.getLatitude() == null || request.getLongitude() == null) {
+                throw new StoreException(INVALID_LOCATION_TYPE);
+            }
 
-        // 정렬 값에 따라 다르게 sort
-        if(sortedType == StoreSortedType.DISTANCE) {
-            stores.sort((x, y) -> x.getDistanceDiff().compareTo(y.getDistanceDiff()));
-        }else if(sortedType == StoreSortedType.ALPHABET) {
-            stores.sort((x, y) -> x.getName().compareTo(y.getName()));
-        }else if(sortedType == StoreSortedType.STAR_RATING) {
-            stores.sort((x, y) -> y.getAverageStarRating().compareTo(x.getAverageStarRating()));
+            store.modifyPosition(request.getLatitude(), request.getLongitude());
         }
 
-        return stores;
+        // explanation 수정 요청 시 검증 및 수정
+        if(request.getExplanation() != null) {
+
+            store.modifyExplanation(request.getExplanation());
+        }
+
+        // StoreStatusType 수정 요청 시 검증 및 수정
+        if(request.getStatus() != null && request.getStatus() != store.getStatus()) {
+
+            LocalDateTime now = LocalDateTime.now();
+
+            if(request.getStatus() != StoreStatusType.OPEN) {
+
+                // OPEN 상태에서 OPEN 이 아닌 상태로 바꾸면, 연관된 예약 및 리뷰 삭제(soft delete)
+                if(store.getStatus() == StoreStatusType.OPEN) {
+                    store.getReservations()
+                            .stream()
+                            .filter(reservation -> reservation.getReservationDateTime().isAfter(now))
+                            .forEach(reservation -> reservation.modifyAccepted(ReservationAcceptedType.REJECTED));
+
+                    store.getReviews()
+                            .stream()
+                            .forEach(review -> review.modifyStatus(ReviewStatusType.HIDE));
+                }
+            }
+
+            // OPEN 이 아닌 상태에서 OPEN 상태로 바꾸면, 연관된 리뷰 복구
+            if(request.getStatus() == StoreStatusType.OPEN) {
+
+                store.getReviews()
+                        .stream()
+                        .forEach(review -> review.modifyStatus(ReviewStatusType.SHOW));
+            }
+
+            store.modifyStatus(request.getStatus());
+        }
+
+        // openHours 혹은 closedHours, reservationTerm 수정 요청 시 검증 및 수정
+        if(request.getOpenHours() != null || request.getClosedHours() != null) {
+
+            LocalTime openHours =
+                    request.getOpenHours() == null ? store.getOpenHours() : request.getOpenHours();
+            LocalTime closedHours =
+                    request.getClosedHours() == null ? store.getClosedHours() : request.getClosedHours();
+
+            // 영업 종료 시간이 영업 시작 시간보다 빠른지 검증
+            if(!closedHours.isAfter(openHours)) {
+                throw new StoreException(INVALID_OPENING_HOURS);
+            }
+
+            LocalTime reservationTerm =
+                    request.getReservationTerm() == null ? store.getStoreReservationInfo().getReservationTerm() : request.getReservationTerm();
+
+            // 영업 시간보다 예약 텀 시간이 더 긴지 검증
+            if(request.getReservationTerm().toSecondOfDay() > Duration.between(openHours, closedHours).getSeconds()) {
+
+                // 에러 발생이 예약 시간 설정에서인지, reservationTerm 설정에서인지에 따라 다른 에러 발생
+                if(request.getReservationTerm() == null) {
+                    throw new StoreException(INVALID_OPENING_HOURS);
+                }else {
+                    throw new StoreException(INVALID_RESERVATION_TERM);
+                }
+            }
+
+            LocalDateTime now = LocalDateTime.now();
+
+            // 현재 시각 이후로 등록된 예약들 중, 가게 영업 시간에 맞지 않는 예약은 거절 처리 
+            store.getReservations()
+                    .stream()
+                    .filter(reservation -> reservation.getReservationDateTime().isAfter(now))
+                    .filter(reservation -> !validateReservationTime(openHours, closedHours, reservation.getReservationDateTime().toLocalTime()))
+                    .forEach(reservation -> reservation.modifyAccepted(ReservationAcceptedType.REJECTED));
+
+            store.modifyOpenHours(openHours);
+            store.modifyClosedHours(closedHours);
+
+            // reservationTerm 수정 요청 시, 수정 이후 시간으로 등록된 예약 중 맞지 않는 예약은 거절 처리
+            if(request.getReservationTerm() != null) {
+
+                store.getReservations()
+                        .stream()
+                        .filter(reservation -> reservation.getReservationDateTime().isAfter(now))
+                        .filter(reservation -> !validateReservationTimeMatchesTerm(openHours, closedHours, reservationTerm, reservation.getReservationDateTime().toLocalTime()))
+                        .forEach(reservation -> reservation.modifyAccepted(ReservationAcceptedType.REJECTED));
+
+                storeReservationInfo.modifyReservationTerm(reservationTerm);
+            }
+        }
+
+        // tableCount 혹은 seatingCapacityPerTable 수정 요청 시 검증 및 수정
+        // TODO : 명수 처리, reservation 수정 후 다시 적용 (tableCount 혹은 perCount 가 줄었을 때 이전 예약 reject?)
+        
+        storeRepository.save(store);
+        storeReservationInfoRepository.save(storeReservationInfo);
+
+        return StoreModifyResponse.builder()
+                .storeId(store.getId())
+                .build();
+    }
+
+    /**
+     * 이용자(점주)가 등록했던 매장을 해제하는 메서드
+     * store signed status 를 WITHDRAW 로 수정 (soft delete)
+     *
+     * @param request - store id
+     * @param authentication
+     * @return "dto/store/response/StoreWithdrawResponse" - store id
+     * @exception MemberException
+     */
+    @Override
+    @Transactional
+    public StoreWithdrawResponse withdraw(StoreWithdrawRequest request, Authentication authentication) {
+
+        // 토큰(authentication)을 통해 이용자 추출
+        Member member = memberService.getMemberByAuthentication(authentication);
+
+        // 이용자 status 검증
+        memberService.validateMemberSignedStatus(member);
+
+        // 이용자가 점주가 맞는지 검증
+        if(MemberRoleType.STORE_OWNER != member.getRole()) {
+            throw new MemberException(MISMATCH_ROLE);
+        }
+
+        // 전달된 store id 존재 여부 검증
+        Store store = storeRepository.findById(request.getStoreId())
+                .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
+
+        // 전달된 store id가 추출한 이용자(점주) 소유 매장인지 여부 검증
+        if(!member.getStores()
+                .stream()
+                .map(ownStore -> ownStore.getId())
+                .collect(Collectors.toList())
+                .contains(store.getId())) {
+            throw new StoreException(NOT_OWNED_STORE_ID);
+        }
+
+        // store status 검증
+        validateStoreStatus(store);
+
+        // store signed status 검증
+        validateStoreSignedStatus(store);
+
+        store = storeRepository.save(
+                store.modifySignedStatus(StoreSignedStatusType.WITHDRAW)
+        );
+
+        return StoreWithdrawResponse.builder()
+                .storeId(store.getId())
+                .build();
     }
 
     /**
      * 가게의 운영 상태를 검증하는 메서드
      *
-     * @param store - 이용자의 Entity 객체
+     * @param store
      * @return
      * @exception StoreException
      */
@@ -183,9 +460,27 @@ public class StoreServiceImpl implements StoreService {
         StoreStatusType status = store.getStatus();
 
         if(StoreStatusType.SHUT_DOWN == status) {
-            throw new StoreException(STORE_SHUT_DOWN);
+            throw new StoreException(SHUT_DOWN_STORE);
         }else if(StoreStatusType.OPEN_PREPARING == status) {
-            throw new StoreException(STORE_OPEN_PREPARING);
+            throw new StoreException(OPEN_PREPARING_STORE);
+        }
+    }
+
+    /**
+     * 가게의 등록 상태를 검증하는 메서드
+     *
+     * @param store
+     * @return
+     * @exception StoreException
+     */
+    public void validateStoreSignedStatus(Store store) {
+
+        StoreSignedStatusType signedStatus = store.getSignedStatus();
+
+        if(StoreSignedStatusType.WITHDRAW == signedStatus) {
+            throw new StoreException(WITHDRAW_STORE);
+        }else if(StoreSignedStatusType.BLOCKED == signedStatus) {
+            throw new StoreException(BLOCKED_STORE);
         }
     }
 }

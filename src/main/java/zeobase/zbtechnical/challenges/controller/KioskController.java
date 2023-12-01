@@ -12,7 +12,7 @@ import zeobase.zbtechnical.challenges.dto.kiosk.request.*;
 import zeobase.zbtechnical.challenges.dto.kiosk.response.*;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.service.KioskService;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 import javax.validation.Valid;
 import java.util.List;

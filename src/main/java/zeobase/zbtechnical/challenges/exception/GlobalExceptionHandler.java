@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import zeobase.zbtechnical.challenges.dto.common.ErrorResponse;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 /**
  * 전체 Exception 을 핸들링하는 ExceptionHandler 클래스
@@ -61,6 +61,14 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(e.getHttpStatus(), e.getCode(), e.getErrorMessage());
     }
 
+    @ExceptionHandler(CommonException.class)
+    public ErrorResponse handleCommonException(CommonException e) {
+
+        log.error("{} is occurred", e.getCode());
+
+        return new ErrorResponse(e.getHttpStatus(), e.getCode(), e.getErrorMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception e) {
 
@@ -69,6 +77,6 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus(),
                 ErrorCode.INTERNAL_SERVER_ERROR.name(),
-                ErrorCode.INTERNAL_SERVER_ERROR.getDescription());
+                e.getMessage());
     }
 }

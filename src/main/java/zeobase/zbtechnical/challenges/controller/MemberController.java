@@ -10,7 +10,7 @@ import zeobase.zbtechnical.challenges.dto.member.request.*;
 import zeobase.zbtechnical.challenges.dto.member.response.*;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.service.MemberService;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -58,7 +58,7 @@ public class MemberController {
         if(bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            throw new MemberException(ErrorCode.INVALID_SIGN_IN_REQUEST.modifyDescription(errors.get(0).getDefaultMessage()));
+            throw new MemberException(ErrorCode.INVALID_MEMBER_SIGN_IN_REQUEST.modifyDescription(errors.get(0).getDefaultMessage()));
         }
 
         return ResponseEntity.ok().body(memberService.signup(request));
@@ -93,6 +93,20 @@ public class MemberController {
     }
 
     /**
+     * 토큰 만료 시 재발급(refresh token)을 진행하는 api
+     *
+     * @param request - refresh token
+     * @return
+     */
+    @PostMapping("/reissue")
+    public ResponseEntity<TokenResponse> reissue(
+            @RequestBody RefreshTokenReissueRequest request
+    ) {
+
+        return ResponseEntity.ok().body(memberService.reissue(request));
+    }
+
+    /**
      * 이용자 정보 수정을 진행하는 api
      * request 중 수정을 원하지 않는 정보(필드)는 null 로 전달
      *
@@ -121,19 +135,5 @@ public class MemberController {
     ) {
 
         return ResponseEntity.ok().body(memberService.withdraw(authentication));
-    }
-
-    /**
-     * 토큰 만료 시 재발급(refresh token)을 진행하는 api
-     *
-     * @param request - refresh token
-     * @return
-     */
-    @PostMapping("/reissue")
-    public ResponseEntity<TokenResponse> reissue(
-            @RequestBody RefreshTokenReissueRequest request
-    ) {
-
-        return ResponseEntity.ok().body(memberService.reissue(request));
     }
 }

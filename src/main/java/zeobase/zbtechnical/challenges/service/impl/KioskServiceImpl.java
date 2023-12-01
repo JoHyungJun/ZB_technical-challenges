@@ -16,13 +16,13 @@ import zeobase.zbtechnical.challenges.repository.MemberRepository;
 import zeobase.zbtechnical.challenges.repository.ReservationRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.KioskService;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
-import zeobase.zbtechnical.challenges.type.ReservationVisitedType;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
+import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static zeobase.zbtechnical.challenges.type.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.*;
 
 /**
  * 키오스크 관련 로직을 담는 Service 클래스
@@ -61,7 +61,7 @@ public class KioskServiceImpl implements KioskService {
                 .orElseThrow(() -> new KioskException(ErrorCode.NOT_FOUND_MEMBER_PHONE));
 
         // 이용자 status 검증
-        memberService.validateMemberStatus(member);
+        memberService.validateMemberSignedStatus(member);
 
         // 존재하는 매장 id 인지 검증
         if(!storeRepository.existsById(request.getStoreId())) {
@@ -71,7 +71,7 @@ public class KioskServiceImpl implements KioskService {
         // 키오스크 도달 시점 날짜와 요청 정보인 member id, store id, 시간에 해당하는 예약 여부 검증
         LocalDateTime reservedDate = LocalDateTime.of(LocalDate.now(), request.getReservedTime());
 
-        Reservation reservation = reservationRepository.findByMemberIdAndStoreIdAndReservedDateTime(
+        Reservation reservation = reservationRepository.findByMemberIdAndStoreIdAndReservationDateTime(
                 member.getId(), request.getStoreId(), reservedDate)
                 .orElseThrow(() -> new KioskException(NOT_FOUND_RESERVED_MEMBER));
 
@@ -84,7 +84,7 @@ public class KioskServiceImpl implements KioskService {
         reservationService.validateReservationAccepted(reservation);
 
         // 해당 예약을 방문 완료 상태로 변경 후 저장
-        reservationRepository.save(reservation.updateVisited(ReservationVisitedType.VISITED));
+        reservationRepository.save(reservation.modifyVisited(ReservationVisitedType.VISITED));
 
         return KioskPhoneResponse.builder()
                 .reservationChecked(true)
@@ -116,7 +116,7 @@ public class KioskServiceImpl implements KioskService {
         }
 
         // 회원 status 검증
-        memberService.validateMemberStatus(member);
+        memberService.validateMemberSignedStatus(member);
 
         // 존재하는 매장 id 인지 검증
         if(!storeRepository.existsById(request.getStoreId())) {
@@ -126,7 +126,7 @@ public class KioskServiceImpl implements KioskService {
         // 키오스크 도달 시점 날짜와 요청 정보인 member id, store id, 시간에 해당하는 예약 여부 검증
         LocalDateTime reservedDate = LocalDateTime.of(LocalDate.now(), request.getReservedTime());
 
-        Reservation reservation = reservationRepository.findByMemberIdAndStoreIdAndReservedDateTime(
+        Reservation reservation = reservationRepository.findByMemberIdAndStoreIdAndReservationDateTime(
                         member.getId(), request.getStoreId(), reservedDate)
                 .orElseThrow(() -> new KioskException(NOT_FOUND_RESERVED_MEMBER));
 
@@ -139,7 +139,7 @@ public class KioskServiceImpl implements KioskService {
         reservationService.validateReservationAccepted(reservation);
 
         // 해당 예약을 방문 완료 상태로 변경 후 저장
-        reservationRepository.save(reservation.updateVisited(ReservationVisitedType.VISITED));
+        reservationRepository.save(reservation.modifyVisited(ReservationVisitedType.VISITED));
 
         return KioskSigninResponse.builder()
                 .reservationChecked(true)

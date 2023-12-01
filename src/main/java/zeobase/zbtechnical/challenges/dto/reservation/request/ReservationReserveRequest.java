@@ -16,5 +16,7 @@ public class ReservationReserveRequest {
     private Long storeId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    private LocalDateTime reserveDateTime;
+    private LocalDateTime reservationDateTime;
+
+    private Integer reservationPersonCount;
 }

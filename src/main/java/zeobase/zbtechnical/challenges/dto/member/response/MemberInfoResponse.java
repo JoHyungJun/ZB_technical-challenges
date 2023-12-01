@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import zeobase.zbtechnical.challenges.entity.Member;
-import zeobase.zbtechnical.challenges.type.MemberRoleType;
-import zeobase.zbtechnical.challenges.type.MemberStatusType;
+import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
+import zeobase.zbtechnical.challenges.type.member.MemberSignedStatusType;
 
 /**
  * 공개된 이용자의 정보 관련 response DTO 클래스
@@ -20,7 +20,7 @@ public class MemberInfoResponse {
     private Long memberId;
     private String UID;
     private MemberRoleType role;
-    private MemberStatusType status;
+    private MemberSignedStatusType status;
 
 
     public static MemberInfoResponse fromEntity(Member member) {

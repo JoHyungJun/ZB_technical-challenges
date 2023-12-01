@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.type;
+package zeobase.zbtechnical.challenges.type.reservation;
 
 /**
  * 이용자가 실제로 예약한 매장에 방문했는지에 대한 정보 관련 Enum 클래스

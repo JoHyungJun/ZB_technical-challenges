@@ -11,7 +11,7 @@ import zeobase.zbtechnical.challenges.dto.reservation.response.*;
 import zeobase.zbtechnical.challenges.dto.reservation.request.*;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.service.ReservationService;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

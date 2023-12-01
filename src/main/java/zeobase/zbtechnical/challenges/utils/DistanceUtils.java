@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
  * 거리 계산 관련 Util 클래스
  */
 @UtilityClass
-public class Distance {
+public class DistanceUtils {
 
     private static final Double PI = Math.PI;
     private static final Double DEGREE = 180.0;

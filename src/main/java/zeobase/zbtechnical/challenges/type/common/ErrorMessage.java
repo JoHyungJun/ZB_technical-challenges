@@ -1,4 +1,4 @@
-package zeobase.zbtechnical.challenges.type;
+package zeobase.zbtechnical.challenges.type.common;
 
 /**
  * ErrorResponse 의 description 에 해당하는 메세지

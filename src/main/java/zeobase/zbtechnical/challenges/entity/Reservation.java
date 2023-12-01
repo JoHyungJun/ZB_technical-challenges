@@ -2,8 +2,8 @@ package zeobase.zbtechnical.challenges.entity;
 
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import zeobase.zbtechnical.challenges.type.ReservationAcceptedType;
-import zeobase.zbtechnical.challenges.type.ReservationVisitedType;
+import zeobase.zbtechnical.challenges.type.reservation.ReservationAcceptedType;
+import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -19,17 +19,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-public class Reservation extends BaseEntity{
+public class Reservation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    private LocalDateTime reservedDateTime;
+    private LocalDateTime reservationDateTime;
 
     @NotNull
-    private LocalDate reservedDate;
+    private LocalDate reservationDate;
+
+    @NotNull
+    private Integer reservationPersonCount;
 
     @Enumerated(value = EnumType.STRING)
     @Builder.Default
@@ -48,14 +51,14 @@ public class Reservation extends BaseEntity{
     private Store store;
 
 
-    public Reservation updateAccepted(ReservationAcceptedType reservationAcceptedType){
+    public Reservation modifyAccepted(ReservationAcceptedType reservationAcceptedType){
 
         this.acceptedStatus = reservationAcceptedType;
 
         return this;
     }
 
-    public Reservation updateVisited(ReservationVisitedType reservationVisitedType){
+    public Reservation modifyVisited(ReservationVisitedType reservationVisitedType){
 
         this.visitedStatus = reservationVisitedType;
 

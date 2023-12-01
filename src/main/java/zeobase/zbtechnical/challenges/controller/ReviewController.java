@@ -10,7 +10,7 @@ import zeobase.zbtechnical.challenges.dto.review.request.*;
 import zeobase.zbtechnical.challenges.dto.review.response.*;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.service.impl.ReviewServiceImpl;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 import javax.validation.Valid;
 import java.util.List;

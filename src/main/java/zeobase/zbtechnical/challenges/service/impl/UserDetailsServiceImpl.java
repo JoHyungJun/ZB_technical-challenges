@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 /**
  * 시큐리티 기능 제공 관련 Service 클래스

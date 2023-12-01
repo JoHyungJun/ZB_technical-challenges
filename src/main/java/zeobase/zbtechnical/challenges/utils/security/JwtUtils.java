@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import zeobase.zbtechnical.challenges.dto.member.response.TokenResponse;
 import zeobase.zbtechnical.challenges.exception.JwtException;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
-import zeobase.zbtechnical.challenges.type.MemberRoleType;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
+import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;

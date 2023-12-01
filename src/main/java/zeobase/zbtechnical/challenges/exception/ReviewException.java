@@ -1,10 +1,8 @@
 package zeobase.zbtechnical.challenges.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 /**
  * 리뷰 관련 CustomException 클래스

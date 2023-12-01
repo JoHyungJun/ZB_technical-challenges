@@ -2,7 +2,7 @@ package zeobase.zbtechnical.challenges.exception;
 
 import lombok.*;
 import org.springframework.http.HttpStatus;
-import zeobase.zbtechnical.challenges.type.ErrorCode;
+import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
 /**
  * 키오스크 관련 CustomException 클래스
