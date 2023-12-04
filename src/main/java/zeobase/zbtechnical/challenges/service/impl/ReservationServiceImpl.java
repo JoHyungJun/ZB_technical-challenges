@@ -84,6 +84,9 @@ public class ReservationServiceImpl implements ReservationService {
         // store status 검증
         storeService.validateStoreStatus(store);
 
+        // store signed status 검증
+        storeService.validateStoreSignedStatus(store);
+
         // 예약 날짜 기준 정렬
         List<Reservation> reservations = reservationRepository.findAllByStoreId(storeId, Sort.by(
                     Sort.Order.asc("reservationDateTime")));
@@ -117,6 +120,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         // store status 검증
         storeService.validateStoreStatus(store);
+
+        // store signed status 검증
+        storeService.validateStoreSignedStatus(store);
 
         // 영업시간에 맞는 예약 시간인지 검증
         validateReservationWithinOpeningHoursAndTerm(store, reservationTime);
@@ -178,6 +184,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         // store status 검증
         storeService.validateStoreStatus(store);
+
+        // store signed status 검증
+        storeService.validateStoreSignedStatus(store);
 
         // 영업시간에 맞는 예약 시간인지 검증
         validateReservationWithinOpeningHoursAndTerm(store, request.getReservationDateTime());
