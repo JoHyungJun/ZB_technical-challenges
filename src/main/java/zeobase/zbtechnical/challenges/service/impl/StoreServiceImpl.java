@@ -1,6 +1,7 @@
 package zeobase.zbtechnical.challenges.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,6 @@ import zeobase.zbtechnical.challenges.type.store.StoreStatusType;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static zeobase.zbtechnical.challenges.service.impl.ReservationServiceImpl.validateReservationTime;
@@ -92,9 +91,9 @@ public class StoreServiceImpl implements StoreService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<StoreInfoResponse> getAllStoresInfoByName(String name, Pageable pageable) {
+    public Page<StoreInfoResponse> getAllStoresInfoByName(String name, Pageable pageable) {
 
-        List<Store> stores = null;
+        Page<Store> stores = null;
 
         // 검색어가 null 이라면 전체 매장 목록을, 아니라면 검색어가 포함된 상호명의 매장 목록을 반환
         if(name == null) {
@@ -105,9 +104,7 @@ public class StoreServiceImpl implements StoreService {
             stores = storeRepository.findAllByNameContainingAndStatusAndSignedStatus(getDecodingUrl(name), StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable);
         }
 
-        return stores.stream()
-                .map(store -> StoreInfoResponse.fromEntity(store))
-                .collect(Collectors.toList());
+        return stores.map(store -> StoreInfoResponse.fromEntity(store));
     }
 
     /**
@@ -125,7 +122,7 @@ public class StoreServiceImpl implements StoreService {
     // TODO : 현재는 star rating 이 store 엔티티 내부 로직으로 계산되어 response 불가능. 캐싱 후 리팩토링
     @Override
     @Transactional(readOnly = true)
-    public List<StoreInfoResponse> getAllSortedStoresInfo(StoreSortedType sortBy, Double latitude, Double longitude, Pageable pageable) {
+    public Page<StoreInfoResponse> getAllSortedStoresInfo(StoreSortedType sortBy, Double latitude, Double longitude, Pageable pageable) {
 
         // 거리순 정렬일 경우, 위도, 경도 둘 다 전달 되었는지 검증
         if((sortBy == StoreSortedType.DISTANCE)
@@ -135,30 +132,23 @@ public class StoreServiceImpl implements StoreService {
         }
 
         // 매장 정보 전부 받기
-        List<StoreInfoResponse> stores = new ArrayList<>();
+        Page<StoreInfoResponse> stores = null;
 
         // 정렬 값에 따라 다르게 받기
         if(sortBy == StoreSortedType.DISTANCE) {
 
             stores = storeRepository.findAllByActiveStoresAndDistanceDiffOrderByDistanceDiff(latitude, longitude, pageable)
-                    .stream()
-                    .map(dto -> StoreInfoWithDistanceDiffResponse.fromDto(dto))
-                    .collect(Collectors.toList());
+                    .map(dto -> StoreInfoWithDistanceDiffResponse.fromDto(dto));
 
         }else if(sortBy == StoreSortedType.ALPHABET) {
 
             stores = storeRepository.findAllByStatusAndSignedStatusOrderByNameAsc(StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable)
-                    .stream()
-                    .map(store -> StoreInfoResponse.fromEntity(store))
-                    .collect(Collectors.toList());
+                    .map(store -> StoreInfoResponse.fromEntity(store));
 
         }else if(sortBy == StoreSortedType.STAR_RATING) {
 
             stores = storeRepository.findAllByStatusAndSignedStatusOrderByStarRatingDesc(StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable)
-                    .stream()
-                    .map(store -> StoreInfoResponse.fromEntity(store))
-                    .collect(Collectors.toList());
-
+                    .map(store -> StoreInfoResponse.fromEntity(store));
         }
 
         return stores;

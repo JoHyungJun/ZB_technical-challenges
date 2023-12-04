@@ -1,6 +1,7 @@
 package zeobase.zbtechnical.challenges.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -56,7 +57,7 @@ public class StoreController {
      * @return
      */
     @GetMapping(value = "/search")
-    public ResponseEntity<List<StoreInfoResponse>> searchStoresByName(
+    public ResponseEntity<Page<StoreInfoResponse>> searchStoresByName(
             @RequestParam(required = false) String name,
             Pageable pageable
     ) {
@@ -73,7 +74,7 @@ public class StoreController {
      * @return
      */
     @GetMapping(value = "/search", params = "sortBy")
-    public ResponseEntity<List<StoreInfoResponse>> searchAllStores(
+    public ResponseEntity<Page<StoreInfoResponse>> searchAllStores(
             @RequestParam(defaultValue = DEFAULT_SORTED_OPTION) StoreSortedType sortBy,
             @RequestParam(required = false) Double latitude,
             @RequestParam(required = false) Double longitude,

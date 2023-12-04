@@ -1,5 +1,6 @@
 package zeobase.zbtechnical.challenges.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import zeobase.zbtechnical.challenges.dto.store.request.StoreModifyRequest;
@@ -11,8 +12,6 @@ import zeobase.zbtechnical.challenges.dto.store.response.StoreRegistrationRespon
 import zeobase.zbtechnical.challenges.dto.store.response.StoreWithdrawResponse;
 import zeobase.zbtechnical.challenges.type.store.StoreSortedType;
 
-import java.util.List;
-
 /**
  * 매장 관련 Service 의 부모 인터페이스
  */
@@ -20,8 +19,8 @@ public interface StoreService {
 
     // GET
     StoreInfoResponse getStoreInfo(Long storeId);
-    List<StoreInfoResponse> getAllStoresInfoByName(String name, Pageable pageable);
-    List<StoreInfoResponse> getAllSortedStoresInfo(StoreSortedType sort, Double latitude, Double longitude, Pageable pageable);
+    Page<StoreInfoResponse> getAllStoresInfoByName(String name, Pageable pageable);
+    Page<StoreInfoResponse> getAllSortedStoresInfo(StoreSortedType sort, Double latitude, Double longitude, Pageable pageable);
 
     // POST
     StoreRegistrationResponse registerStore(StoreRegistrationRequest request, Authentication authentication);
