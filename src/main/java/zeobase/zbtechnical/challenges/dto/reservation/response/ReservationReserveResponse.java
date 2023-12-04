@@ -27,4 +27,6 @@ public class ReservationReserveResponse {
     private LocalDateTime reservedDateTime;
 
     private Integer reservationPersonCount;
+
+    private Integer reservationTableCount;
 }
