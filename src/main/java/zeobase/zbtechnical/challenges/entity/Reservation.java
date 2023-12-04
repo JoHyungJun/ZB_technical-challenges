@@ -34,6 +34,9 @@ public class Reservation extends BaseEntity {
     @NotNull
     private Integer reservationPersonCount;
 
+    @NotNull
+    private Integer reservationTableCount;
+
     @Enumerated(value = EnumType.STRING)
     @Builder.Default
     private ReservationAcceptedType acceptedStatus = ReservationAcceptedType.WAITING;

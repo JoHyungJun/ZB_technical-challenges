@@ -77,7 +77,7 @@ public class KioskServiceImpl implements KioskService {
 
         // 이미 방문한 회원인지 검증
         if(reservation.getVisitedStatus() == ReservationVisitedType.VISITED) {
-            throw new ReservationException(ErrorCode.RESERVATION_ALREADY_CHECKED);
+            throw new ReservationException(ErrorCode.ALREADY_RESERVATION_CHECKED);
         }
 
         // 점주가 수락한 예약인지 검증
@@ -132,7 +132,7 @@ public class KioskServiceImpl implements KioskService {
 
         // 이미 방문한 회원인지 검증
         if(reservation.getVisitedStatus() == ReservationVisitedType.VISITED) {
-            throw new ReservationException(ErrorCode.RESERVATION_ALREADY_CHECKED);
+            throw new ReservationException(ErrorCode.ALREADY_RESERVATION_CHECKED);
         }
 
         // 점주가 수락한 예약인지 검증

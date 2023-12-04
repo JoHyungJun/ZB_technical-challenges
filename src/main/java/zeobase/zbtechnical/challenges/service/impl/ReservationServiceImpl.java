@@ -5,11 +5,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.reservation.response.*;
-import zeobase.zbtechnical.challenges.dto.reservation.request.*;
+import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationAcceptRequest;
+import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationReserveRequest;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAcceptResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAvailableResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationInfoResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationReserveResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.entity.Store;
+import zeobase.zbtechnical.challenges.entity.StoreReservationInfo;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.exception.ReservationException;
 import zeobase.zbtechnical.challenges.exception.StoreException;
@@ -99,7 +104,12 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ReservationAvailableResponse existsAvailableReservationTime(Long storeId, LocalDateTime reservationTime) {
+    public ReservationAvailableResponse existsAvailableReservationTime(
+            Long storeId,
+            LocalDateTime reservationTime,
+            Integer personCount,
+            Integer tableCount
+    ) {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
@@ -108,8 +118,38 @@ public class ReservationServiceImpl implements ReservationService {
         // store status 검증
         storeService.validateStoreStatus(store);
 
+        // 영업시간에 맞는 예약 시간인지 검증
+        validateReservationWithinOpeningHoursAndTerm(store, reservationTime);
+
+        // 예약 인원 수가 0 보다 작은 값인지 검증
+        if(personCount <= 0) {
+            throw new ReservationException(INVALID_PERSON_COUNT_REQUEST);
+        }
+
+        // 요청된 인원 수 및 테이블 수 검증
+        // table count 가 요청으로 전달되지 않았을 경우, (예약 인원 수 / 테이블 당 앉을 수 있는 사람 수)의 올림 값을 설정
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
+        Integer defaultTableCount = personCount / storeReservationInfo.getSeatingCapacityPerTable()
+                + (personCount % storeReservationInfo.getSeatingCapacityPerTable() != 0 ? 1 : 0);
+
+        // table count 가 요청으로 전달되었을 때 값 검증
+        if(tableCount != null) {
+
+            // 예약 테이블 수가 0 보다 큰 값인지 검증
+            if(tableCount <= 0) {
+                throw new ReservationException(INVALID_TABLE_COUNT_REQUEST);
+            }
+
+            // 예약 테이블 수가 요청 인원 대비 최소 값보다 크거나 같은 값인지 검증
+            if(tableCount < defaultTableCount) {
+                throw new ReservationException(MISMATCH_TABLE_COUNT_PER_CAPACITY);
+            }
+        }
+
+        Integer finalTableCount = tableCount != null ? tableCount : defaultTableCount;
+
         return ReservationAvailableResponse.builder()
-                .isAvailable(validateAvailableReservationTime(store, reservationTime))
+                .isAvailable(validateAvailableReservationTime(store, reservationTime, personCount, finalTableCount))
                 .build();
     }
 
@@ -139,14 +179,38 @@ public class ReservationServiceImpl implements ReservationService {
         // store status 검증
         storeService.validateStoreStatus(store);
 
-        // 가게 운영 시간에 맞는 시간인지 검증
-        if(!validateReservationTime(store.getOpenHours(), store.getClosedHours(), request.getReservationDateTime().toLocalTime())) {
-            throw new StoreException(INVALID_RESERVATION_TIME);
+        // 영업시간에 맞는 예약 시간인지 검증
+        validateReservationWithinOpeningHoursAndTerm(store, request.getReservationDateTime());
+
+        // 예약 인원 수가 0 보다 작거나 같은 값인지 검증
+        if(request.getReservationPersonCount() <= 0) {
+            throw new ReservationException(INVALID_PERSON_COUNT_REQUEST);
+        }
+        
+        // 요청된 인원 수 및 테이블 수 검증
+        // table count 가 요청으로 전달되지 않았을 경우, (예약 인원 수 / 테이블 당 앉을 수 있는 사람 수)의 올림 값을 설정
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
+        Integer defaultTableCount = request.getReservationPersonCount() / storeReservationInfo.getSeatingCapacityPerTable()
+                + (request.getReservationPersonCount() % storeReservationInfo.getSeatingCapacityPerTable() != 0 ? 1 : 0);
+
+        // table count 가 요청으로 전달되었을 때 값 검증
+        if(request.getReservationTableCount() != null) {
+            
+            // 예약 테이블 수가 0 보다 큰 값인지 검증
+            if(request.getReservationTableCount() <= 0) {
+                throw new ReservationException(INVALID_TABLE_COUNT_REQUEST);
+            }
+
+            // 예약 테이블 수가 요청 인원 대비 최소 값보다 크거나 같은 값인지 검증
+            if(request.getReservationTableCount() < defaultTableCount) {
+                throw new ReservationException(MISMATCH_TABLE_COUNT_PER_CAPACITY);
+            }
         }
 
-        // 해당 시간이 term 에 맞는 적절한 시간이며, 해당 시간에 예약이 비어 있는지 검증
-        if(!validateAvailableReservationTime(store, request.getReservationDateTime())) {
-            throw new StoreException(ALREADY_RESERVED_TIME);
+        // 해당 시간에 예약이 가능한지 검증
+        Integer finalTableCount = request.getReservationTableCount() != null ? request.getReservationTableCount() : defaultTableCount;
+        if(!validateAvailableReservationTime(store, request.getReservationDateTime(), request.getReservationPersonCount(), finalTableCount)) {
+            throw new ReservationException(ALREADY_FULL_RESERVATION_TIME);
         }
 
         // 검증을 마쳤다면 예약
@@ -155,6 +219,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .reservationDateTime(request.getReservationDateTime())
                 .reservationDate(request.getReservationDateTime().toLocalDate())
                 .reservationPersonCount(request.getReservationPersonCount())
+                .reservationTableCount(finalTableCount)
                 .acceptedStatus(ReservationAcceptedType.WAITING)
                 .visitedStatus(ReservationVisitedType.UNVISITED)
                 .member(member)
@@ -168,6 +233,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .storeId(reservation.getStore().getId())
                 .reservedDateTime(reservation.getReservationDateTime())
                 .reservationPersonCount(reservation.getReservationPersonCount())
+                .reservationTableCount(reservation.getReservationTableCount())
                 .build();
     }
 
@@ -231,56 +297,84 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     /**
+     * store 엔티티와 target time 으로 매장 운영시간 및 텀에 알맞은 예약인지 검증하는 메서드
+     *
+     * @param store
+     * @param targetDateTime - LocalDateTime
+     * @return
+     * @exception ReservationException
+     */
+    private void validateReservationWithinOpeningHoursAndTerm(Store store, LocalDateTime targetDateTime) {
+
+        // 현재 시점보다 과거 날짜 및 시간으로의 요청인지 검증
+        LocalDateTime now = LocalDateTime.now();
+        if(targetDateTime.isBefore(now)) {
+            throw new ReservationException(INVALID_RESERVATION_TIME);
+        }
+        
+        LocalTime openHours = store.getOpenHours();
+        LocalTime closedHours = store.getClosedHours();
+
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
+        LocalTime reservationTerm = storeReservationInfo.getReservationTerm();
+
+        LocalTime targetTime = targetDateTime.toLocalTime();
+
+        // 매장 운영 시간에 맞는 시간인지 검증
+        if(!validateReservationTime(openHours, closedHours, targetTime)
+            || !validateReservationTimeMatchesTerm(openHours, closedHours, reservationTerm, targetTime)) {
+            throw new ReservationException(INVALID_RESERVATION_TIME);
+        }
+    }
+
+    /**
      * 특정 매장의 특정 시간에 이미 예약이 차 있는지 검증하는 메서드
-     * 점주가 설정한 term (예약과 예약 사이의 시간) 을 통하여
-     * 매장의 open 시간부터 closed 시간까지 순회,
-     * 만약 term 과 매장 운영 시간에 맞지 않은 시간에 예약했을 경우 에러 발생
-     * 예약 시간이 검증에 성공하고, 해당 시간에 예약된 이력이 없다면 예약 등록
      *
      * @param store - 예약 확인하려는 매장
-     * @param time - 예약 확인/등록하려는 시간
+     * @param targetDateTime - 예약 확인/등록하려는 날짜, 시간
+     * @param personCount - 예약하려는 사람 수
+     * @param tableCount - 예약하려는 테이블 수
      * @return
      */
-    @Transactional
-    private Boolean validateAvailableReservationTime(Store store, LocalDateTime time) {
+    @Transactional(readOnly = true)
+    private Boolean validateAvailableReservationTime(Store store, LocalDateTime targetDateTime, Integer personCount, Integer tableCount) {
 
-        // 특정 store id의 특정 날짜의 모든 예약 시간을 가져옴
+        // 특정 store id의 특정 날짜의 모든 예약을 가져오고 각 시간을 추출
         // 단, 점주가 거절한 예약의 경우 필터링
-        List<LocalTime> reservedTimes = reservationRepository.findAllReservationByStoreIdAndReservationDate(store.getId(), time.toLocalDate())
+        LocalTime targetTime = targetDateTime.toLocalTime();
+
+        List<Reservation> reservations = reservationRepository.findAllReservationByStoreIdAndReservationDate(store.getId(), targetDateTime.toLocalDate())
                 .stream()
-                .filter(reservation -> reservation.getAcceptedStatus() == ReservationAcceptedType.ACCEPTED)
-                .map(reservation -> reservation.getReservationDateTime().toLocalTime())
+                .filter(reservation -> reservation.getAcceptedStatus() == ReservationAcceptedType.ACCEPTED
+                                        && reservation.getReservationDateTime().toLocalTime().equals(targetTime))
                 .collect(Collectors.toList());
+        
+        // 원하는 날짜와 시간에 점장이 허용한 예약으로 가득 찼다면 false 반환
+        // max 로 가능한 테이블 수 및 예약 사람 수 계산 (테이블 수 * 테이블 당 앉을 수 있는 사람 수)
+        StoreReservationInfo reservationInfo = store.getStoreReservationInfo();
+        Integer maxAvailableTableCount = reservationInfo.getTableCount();
+        Integer maxAvailablePersonCount = maxAvailableTableCount * reservationInfo.getSeatingCapacityPerTable();
 
-        LocalTime targetTime = time.toLocalTime();
+        // 예약 완료된 사람 수 계산
+        Integer alreadyReservedPersonCount = 0;
+        Integer alreadyReservedTableCount = 0;
+        for(Reservation reservation : reservations) {
 
-        LocalTime term = store.getStoreReservationInfo().getReservationTerm();
-        LocalTime closed = store.getClosedHours();
-        LocalTime open = store.getOpenHours();
-
-        // 점주가 설정한 운영 시간 및 term 에 맞게 예약 시간을 요청한 것인지 검증
-        if(!validateReservationTimeMatchesTerm(open, closed, term, targetTime)) {
-            return false;
+            alreadyReservedPersonCount += reservation.getReservationPersonCount();
+            alreadyReservedTableCount += reservation.getReservationTableCount();
         }
 
-        // 당일에 예약이 하나도 없다면 true (예약 가능) 반환
-        if(reservedTimes.isEmpty()) {
-            return true;
-        }
-
-        // 원하는 예약 시간이 예약된 시간들 중 포함돼 있다면 false 반환
-        if(reservedTimes.contains(targetTime)) {
-            return false;
-        }
-
-        return true;
+        // 요청한 값이 매장에서 설정한 최대 테이블 수 및 테이블 수에 맞는 최대 인원 수보다 작거나 같은지 검증
+        return alreadyReservedPersonCount + personCount <= maxAvailablePersonCount
+                && alreadyReservedTableCount + tableCount <= maxAvailableTableCount;
     }
 
     /**
      * 특정 매장의 운영 시간에 맞는 시간으로 예약 요청을 한 것인지 검증하는 메서드
+     * open 전 (open 시간에는 예약 가능) 혹은 closed 후의 예약인지 검증
      *
-     * @param open - 가게 오픈 시간
-     * @param closed - 가게 종료 시간
+     * @param open - 매장 오픈 시간
+     * @param closed - 매장 종료 시간
      * @param target - 검증하고자 하는 시간
      * @return
      */
@@ -298,7 +392,7 @@ public class ReservationServiceImpl implements ReservationService {
      * @param target - 예약하려는 시간
      * @return 해당 target 시간이 알맞은 시간인지 여부
      */
-    public static boolean validateReservationTimeMatchesTerm(LocalTime open, LocalTime closed, LocalTime term, LocalTime target) {
+    public static Boolean validateReservationTimeMatchesTerm(LocalTime open, LocalTime closed, LocalTime term, LocalTime target) {
 
         LocalTime cur = open;
         while(cur.isBefore(closed)) {
@@ -320,6 +414,7 @@ public class ReservationServiceImpl implements ReservationService {
      *
      * @param reservation
      * @return
+     * @exception ReservationException
      */
     public void validateReservationAccepted(Reservation reservation) {
 

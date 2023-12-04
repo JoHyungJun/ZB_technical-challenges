@@ -14,7 +14,7 @@ public interface ReservationService {
 
     ReservationInfoResponse getReservationInfoById(Long reservationId);
     List<ReservationInfoResponse> getReservationsInfoByStoreId(Long storeId);
-    ReservationAvailableResponse existsAvailableReservationTime(Long storeId, LocalDateTime reservationTime);
+    ReservationAvailableResponse existsAvailableReservationTime(Long storeId, LocalDateTime reservationTime, Integer personCount, Integer tableCount);
     ReservationReserveResponse reserve(ReservationReserveRequest request, Authentication authentication);
     ReservationAcceptResponse acceptReservationByStoreOwner(ReservationAcceptRequest request, Authentication authentication);
 }

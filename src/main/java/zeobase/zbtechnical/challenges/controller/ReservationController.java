@@ -66,10 +66,12 @@ public class ReservationController {
     @GetMapping("/store/{storeId}/available")
     public ResponseEntity<ReservationAvailableResponse> validateReservationAvailable(
             @PathVariable Long storeId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime reserveTime
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime reserveTime,
+            @RequestParam Integer personCount,
+            @RequestParam(required = false) Integer tableCount
     ) {
 
-        return ResponseEntity.ok().body(reservationService.existsAvailableReservationTime(storeId, reserveTime));
+        return ResponseEntity.ok().body(reservationService.existsAvailableReservationTime(storeId, reserveTime, personCount, tableCount));
     }
 
     /**

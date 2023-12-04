@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import zeobase.zbtechnical.challenges.entity.Store;
+import zeobase.zbtechnical.challenges.entity.StoreReservationInfo;
 import zeobase.zbtechnical.challenges.type.store.StoreStatusType;
 
 import java.time.LocalTime;
@@ -40,10 +41,16 @@ public class StoreInfoResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
     private LocalTime reservationTerm;
 
+    private Integer tableCount;
+
+    private Integer seatingCapacityPerTable;
+
     private Double starRating;
 
 
     public static StoreInfoResponse fromEntity(Store store) {
+
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
 
         return StoreInfoResponse.builder()
                 .storeId(store.getId())
@@ -54,7 +61,9 @@ public class StoreInfoResponse {
                 .status(store.getStatus())
                 .openHours(store.getOpenHours())
                 .closedHours(store.getClosedHours())
-                .reservationTerm(store.getStoreReservationInfo().getReservationTerm())
+                .reservationTerm(storeReservationInfo.getReservationTerm())
+                .tableCount(storeReservationInfo.getTableCount())
+                .seatingCapacityPerTable(storeReservationInfo.getSeatingCapacityPerTable())
                 .starRating(store.getAverageStarRating())
                 .build();
     }
