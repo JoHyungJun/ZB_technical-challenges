@@ -1,5 +1,6 @@
 package zeobase.zbtechnical.challenges.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -7,8 +8,6 @@ import zeobase.zbtechnical.challenges.dto.store.StoreInfoWithDistanceDiffDto;
 import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.type.store.StoreSignedStatusType;
 import zeobase.zbtechnical.challenges.type.store.StoreStatusType;
-
-import java.util.List;
 
 /**
  * 매장 관련 JpaRepository 인터페이스
@@ -30,11 +29,11 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "ORDER BY `distanceDiff` ",
     countQuery = "SELECT signed_status FROM store WHERE signed_status = 'ACTIVE';"
     )
-    List<StoreInfoWithDistanceDiffDto> findAllByActiveStoresAndDistanceDiffOrderByDistanceDiff(Double latitude, Double longitude, Pageable pageable);
-    List<Store> findAllByStatusAndSignedStatusOrderByNameAsc(StoreStatusType status, StoreSignedStatusType signedStatus, Pageable pageable);
-    List<Store> findAllByStatusAndSignedStatusOrderByStarRatingDesc(StoreStatusType status, StoreSignedStatusType signedStatus,Pageable pageable);
-    List<Store> findAllByStatusAndSignedStatus(StoreStatusType status, StoreSignedStatusType signedStatus, Pageable pageable);
-    List<Store> findAllByNameContainingAndStatusAndSignedStatus(String name, StoreStatusType status, StoreSignedStatusType signedStatus, Pageable pageable);
+    Page<StoreInfoWithDistanceDiffDto> findAllByActiveStoresAndDistanceDiffOrderByDistanceDiff(Double latitude, Double longitude, Pageable pageable);
+    Page<Store> findAllByStatusAndSignedStatusOrderByNameAsc(StoreStatusType status, StoreSignedStatusType signedStatus, Pageable pageable);
+    Page<Store> findAllByStatusAndSignedStatusOrderByStarRatingDesc(StoreStatusType status, StoreSignedStatusType signedStatus,Pageable pageable);
+    Page<Store> findAllByStatusAndSignedStatus(StoreStatusType status, StoreSignedStatusType signedStatus, Pageable pageable);
+    Page<Store> findAllByNameContainingAndStatusAndSignedStatus(String name, StoreStatusType status, StoreSignedStatusType signedStatus, Pageable pageable);
 }
 
 
