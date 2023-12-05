@@ -67,10 +67,12 @@ public enum ErrorCode {
 
     INVALID_PERSON_COUNT_REQUEST(HttpStatus.BAD_REQUEST, "예약 인원 수 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_TABLE_COUNT_REQUEST(HttpStatus.BAD_REQUEST, "예약 테이블 수 정보로 잘못된 인자가 전달되었습니다."),
+    INVALID_RESERVATION_CANCELED_TIME(HttpStatus.BAD_REQUEST, "지난 예약은 취소하실 수 없습니다."),
 
     MISMATCH_TABLE_COUNT_PER_CAPACITY(HttpStatus.BAD_REQUEST, "매장에서 설정한 테이블 당 앉을 수 있는 최대 인원수에 맞지 않는 테이블 수 요청입니다."),
 
     ALREADY_RESERVATION_CHECKED(HttpStatus.BAD_REQUEST, "이미 방문한 고객입니다."),
+    ALREADY_RESERVATION_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소한 예약입니다."),
 
     RESERVATION_ACCEPTED_REJECTED(HttpStatus.BAD_REQUEST, "점주에 의해 거절된 예약입니다."),
     RESERVATION_ACCEPTED_WAITING(HttpStatus.BAD_REQUEST, "점주가 아직 승인하지 않은 예약입니다."),

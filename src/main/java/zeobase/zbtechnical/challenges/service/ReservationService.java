@@ -12,9 +12,17 @@ import java.util.List;
  */
 public interface ReservationService {
 
+    // GET
     ReservationInfoResponse getReservationInfoById(Long reservationId);
     List<ReservationInfoResponse> getReservationsInfoByStoreId(Long storeId);
-    ReservationAvailableResponse existsAvailableReservationTime(Long storeId, LocalDateTime reservationTime, Integer personCount, Integer tableCount);
+    ReservationAvailableResponse checkAvailableReservationTime(Long storeId, LocalDateTime reservationTime, Integer personCount, Integer tableCount);
+
+    // POST
     ReservationReserveResponse reserve(ReservationReserveRequest request, Authentication authentication);
     ReservationAcceptResponse acceptReservationByStoreOwner(ReservationAcceptRequest request, Authentication authentication);
+
+    // UPDATE
+
+    // DELETE
+    ReservationCanceledResponse cancelReservationByMember(Long reservationId, Authentication authentication);
 }
