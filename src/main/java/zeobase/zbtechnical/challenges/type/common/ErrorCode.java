@@ -64,6 +64,7 @@ public enum ErrorCode {
 
     // Reservation
     NOT_FOUND_RESERVATION_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 예약 ID 입니다."),
+    NOT_OWNED_RESERVATION_ID(HttpStatus.BAD_REQUEST, "본인이 등록한 예약이 아닙니다."),
 
     INVALID_PERSON_COUNT_REQUEST(HttpStatus.BAD_REQUEST, "예약 인원 수 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_TABLE_COUNT_REQUEST(HttpStatus.BAD_REQUEST, "예약 테이블 수 정보로 잘못된 인자가 전달되었습니다."),

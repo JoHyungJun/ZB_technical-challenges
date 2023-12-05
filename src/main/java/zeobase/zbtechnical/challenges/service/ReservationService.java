@@ -15,6 +15,7 @@ public interface ReservationService {
     // GET
     ReservationInfoResponse getReservationInfoById(Long reservationId);
     List<ReservationInfoResponse> getReservationsInfoByStoreId(Long storeId);
+    List<ReservationInfoResponse> getReservationsInfoByMember(Authentication authentication);
     ReservationAvailableResponse checkAvailableReservationTime(Long storeId, LocalDateTime reservationTime, Integer personCount, Integer tableCount);
 
     // POST
@@ -22,6 +23,7 @@ public interface ReservationService {
     ReservationAcceptResponse acceptReservationByStoreOwner(ReservationAcceptRequest request, Authentication authentication);
 
     // UPDATE
+    ReservationModifyResponse modify(Long reservationId, ReservationModifyRequest request, Authentication authentication);
 
     // DELETE
     ReservationCanceledResponse cancelReservationByMember(Long reservationId, Authentication authentication);
