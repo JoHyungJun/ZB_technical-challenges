@@ -40,8 +40,8 @@ public enum ErrorCode {
     INVALID_PASSWORD_REGEX(HttpStatus.BAD_REQUEST, INVALID_PASSWORD_REGEX_MSG),
     INVALID_PASSWORD_LENGTH(HttpStatus.BAD_REQUEST, INVALID_PASSWORD_LENGTH_MSG),
     INVALID_PHONE_REGEX(HttpStatus.BAD_REQUEST, INVALID_PHONE_REGEX_MSG),
-    INVALID_MODIFY_REQUEST(HttpStatus.BAD_REQUEST, "이용자 정보 수정 정보로 잘못된 인자가 전달되었습니다."),
-    INVALID_MODIFY_ROLE(HttpStatus.BAD_REQUEST, "이용자의 권한을 수정할 수 없습니다."),
+    INVALID_MEMBER_MODIFY_REQUEST(HttpStatus.BAD_REQUEST, "이용자 정보 수정 정보로 잘못된 인자가 전달되었습니다."),
+    INVALID_MEMBER_MODIFY_ROLE(HttpStatus.BAD_REQUEST, "이용자의 권한을 수정할 수 없습니다."),
     
     ALREADY_EXISTS_MEMBER_UID(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),
     ALREADY_EXISTS_PHONE(HttpStatus.BAD_REQUEST, "이미 존재하는 핸드폰 번호입니다."),

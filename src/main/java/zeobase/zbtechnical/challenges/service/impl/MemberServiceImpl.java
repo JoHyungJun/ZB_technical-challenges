@@ -274,7 +274,7 @@ public class MemberServiceImpl implements MemberService {
             // 일반 이용자로 권한을 변경하고 싶을 시, 자기 소유의 매장이 존재한다면 거절
             if(request.getRole() == MemberRoleType.MEMBER &&
                member.getStores().size() > 0) {
-                throw new MemberException(INVALID_MODIFY_ROLE);
+                throw new MemberException(INVALID_MEMBER_MODIFY_ROLE);
             }
 
             member.modifyRole(request.getRole());
