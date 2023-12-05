@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationAcceptRequest;
 import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationReserveRequest;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAcceptResponse;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAvailableResponse;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationInfoResponse;
-import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationReserveResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.*;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.entity.Store;
@@ -107,7 +104,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ReservationAvailableResponse existsAvailableReservationTime(
+    public ReservationAvailableResponse checkAvailableReservationTime(
             Long storeId,
             LocalDateTime reservationTime,
             Integer personCount,
@@ -270,7 +267,7 @@ public class ReservationServiceImpl implements ReservationService {
         Store store = storeRepository.findById(reservation.getStore().getId())
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
-        // member (authentication) 검증
+        // authentication (토큰) 으로 member 추출
         Member member = memberService.getMemberByAuthentication(authentication);
         
         // member status 검증
@@ -302,6 +299,49 @@ public class ReservationServiceImpl implements ReservationService {
         return ReservationAcceptResponse.builder()
                 .reservationId(updateReservation.getId())
                 .accepted(updateReservation.getAcceptedStatus())
+                .build();
+    }
+
+    /**
+     * 이용자가 등록했던 예약을 취소하는 메서드
+     *
+     * @param reservationId
+     * @param authentication - 예약을 진행한 이용자
+     * @return "dto/reservation/response/ReservationCanceledResponse"
+     * @exception ReservationException
+     */
+    @Override
+    @Transactional
+    public ReservationCanceledResponse cancelReservationByMember(Long reservationId, Authentication authentication) {
+
+        // reservation id 검증
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID));
+
+        // authentication (토큰) 으로 member 추출
+        Member member = memberService.getMemberByAuthentication(authentication);
+
+        // 지난 예약은 취소 불가
+        if(reservation.getReservationDateTime().isBefore(LocalDateTime.now())) {
+            throw new ReservationException(INVALID_RESERVATION_CANCELED_TIME);
+        }
+
+        // 이미 취소한 예약은 취소 불가
+        if(reservation.getAcceptedStatus() == ReservationAcceptedType.CANCELED) {
+            throw new ReservationException(ALREADY_RESERVATION_CANCELED);
+        }
+
+        // 방문한 예약은 취소 불가
+        if(reservation.getVisitedStatus() == ReservationVisitedType.VISITED) {
+            throw new ReservationException(ALREADY_RESERVATION_CHECKED);
+        }
+
+        reservationRepository.save(
+                reservation.modifyAccepted(ReservationAcceptedType.CANCELED)
+        );
+
+        return ReservationCanceledResponse.builder()
+                .reservationId(reservation.getId())
                 .build();
     }
 

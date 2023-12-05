@@ -64,14 +64,14 @@ public class ReservationController {
      * @return
      */
     @GetMapping("/store/{storeId}/available")
-    public ResponseEntity<ReservationAvailableResponse> validateReservationAvailable(
+    public ResponseEntity<ReservationAvailableResponse> validateAvailableReservation(
             @PathVariable Long storeId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime reserveTime,
             @RequestParam Integer personCount,
             @RequestParam(required = false) Integer tableCount
     ) {
 
-        return ResponseEntity.ok().body(reservationService.existsAvailableReservationTime(storeId, reserveTime, personCount, tableCount));
+        return ResponseEntity.ok().body(reservationService.checkAvailableReservationTime(storeId, reserveTime, personCount, tableCount));
     }
 
     /**
@@ -111,5 +111,20 @@ public class ReservationController {
     ) {
 
         return ResponseEntity.ok().body(reservationService.acceptReservationByStoreOwner(request, authentication));
+    }
+
+    /**
+     * 이용자가 특정 예약에 대해 취소하는 api
+     *
+     * @param authentication
+     * @return
+     */
+    @DeleteMapping("/{reservationId}")
+    public ResponseEntity<ReservationCanceledResponse> cancel(
+            @PathVariable Long reservationId,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(reservationService.cancelReservationByMember(reservationId, authentication));
     }
 }
