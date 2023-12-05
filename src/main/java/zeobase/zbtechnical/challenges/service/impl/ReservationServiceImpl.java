@@ -244,9 +244,10 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     /**
-     * 매장 점주가 특정 예약에 대해 승인/거절하는 메서드
+     * 매장 점주가 특정 예약에 대해 승인/거절하는 메서드 (cancel 은 불가능, 예약을 등록한 당사자 회원만 가능)
      * store, reservation, member 에 대한 검증 후,
      * 기존 reservation 의 accepted 정보를 request 로 전달된 정보로 갱신
+     * 승인할 예약이라면 해당 시간에 예약이 가능한지 검증 후 진행
      *
      * @param request - 예약 정보, 가게 정보, 승인/거절 정보
      * @param authentication - 토큰을 활용한 이용자(매장 주인) 검증
@@ -292,6 +293,21 @@ public class ReservationServiceImpl implements ReservationService {
 
         // store signed status 검증
         storeService.validateStoreSignedStatus(store);
+        
+        // 예약 취소 검증 (점주는 예약 취소 불가능)
+        if(request.getAccepted() == ReservationAcceptedType.CANCELED) {
+            throw new MemberException(MISMATCH_ROLE);
+        }
+
+        // 해당 예약을 승인했을 시, 해당 시간에 자리가 남아 있는지 검증
+        if(request.getAccepted() != ReservationAcceptedType.ACCEPTED) {
+            validateAvailableReservationTime(
+                    store,
+                    reservation.getReservationDateTime(),
+                    reservation.getReservationPersonCount(),
+                    reservation.getReservationTableCount()
+            );
+        }
 
         Reservation updateReservation = reservationRepository.save(
                 reservation.modifyAccepted(request.getAccepted()));
