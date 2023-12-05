@@ -68,4 +68,25 @@ public class Reservation extends BaseEntity {
         return this;
     }
 
+    public Reservation modifyReservationDateTime(LocalDateTime reservationDateTime) {
+
+        this.reservationDateTime = reservationDateTime;
+        this.reservationDate = reservationDateTime.toLocalDate();
+
+        return this;
+    }
+
+    public Reservation modifyReservationPersonCount(Integer reservationPersonCount) {
+
+        this.reservationPersonCount = reservationPersonCount;
+
+        return this;
+    }
+
+    public Reservation modifyReservationTableCount(Integer reservationTableCount) {
+
+        this.reservationTableCount = reservationTableCount;
+
+        return this;
+    }
 }

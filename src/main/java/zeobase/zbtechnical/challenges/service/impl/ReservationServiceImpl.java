@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationAcceptRequest;
+import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationModifyRequest;
 import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationReserveRequest;
 import zeobase.zbtechnical.challenges.dto.reservation.response.*;
 import zeobase.zbtechnical.challenges.entity.Member;
@@ -46,6 +47,7 @@ public class ReservationServiceImpl implements ReservationService {
     /**
      * 개별 예약의 정보를 전달하는 api
      * reservationId (Reservation 의 PK) 검증
+     * 반환되는 예약 정보와 연계된 엔티티의 검증 (member/store status) 은 별도로 진행하지 않음
      *
      * @param reservationId
      * @return "dto/reservation/response/ReservationInfoResponse"
@@ -65,6 +67,7 @@ public class ReservationServiceImpl implements ReservationService {
     /**
      * 특정 매장의 모든 예약 정보를 전달하는 메서드
      * store 관련 검증 후, 예약 날짜 내림차순 순으로 반환
+     * 반환되는 예약 정보와 연계된 엔티티의 검증 (member/store status) 은 별도로 진행하지 않음
      *
      * @param storeId
      * @return List "dto/reservation/response/ReservationInfoResponse"
@@ -89,6 +92,31 @@ public class ReservationServiceImpl implements ReservationService {
                     Sort.Order.asc("reservationDateTime")));
 
         return reservations.stream()
+                .map(reservation -> ReservationInfoResponse.fromEntity(reservation))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 특정 이용자의 모든 예약 정보를 전달하는 메서드
+     * member 관련 검증 후 반환
+     * 반환되는 예약 정보와 연계된 엔티티의 검증 (member/store status) 은 별도로 진행하지 않음
+     *
+     * @param authentication
+     * @return List "dto/reservation/response/ReservationInfoResponse"
+     * @exception MemberException
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationInfoResponse> getReservationsInfoByMember(Authentication authentication) {
+
+        // authentication 으로 member 추출
+        Member member = memberService.getMemberByAuthentication(authentication);
+
+        // member 의 status 검증
+        memberService.validateMemberSignedStatus(member);
+
+        return member.getReservations()
+                .stream()
                 .map(reservation -> ReservationInfoResponse.fromEntity(reservation))
                 .collect(Collectors.toList());
     }
@@ -195,6 +223,7 @@ public class ReservationServiceImpl implements ReservationService {
         
         // 요청된 인원 수 및 테이블 수 검증
         // table count 가 요청으로 전달되지 않았을 경우, (예약 인원 수 / 테이블 당 앉을 수 있는 사람 수)의 올림 값을 설정
+        // TODO : modify 부와 중복되는 로직이므로 추후 private 메서드로 extract
         StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
         Integer defaultTableCount = request.getReservationPersonCount() / storeReservationInfo.getSeatingCapacityPerTable()
                 + (request.getReservationPersonCount() % storeReservationInfo.getSeatingCapacityPerTable() != 0 ? 1 : 0);
@@ -319,6 +348,98 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     /**
+     * 이용자가 본인이 등록한 예약에 대해 수정하는 메서드
+     * 
+     * @param reservationId
+     * @param request - 수정할 예약 날짜, 사람 수, 테이블 수
+     * @param authentication
+     * @return "dto/reservation/response/ReservationAcceptResponse"
+     */
+    // TODO : reserve 와 modify 겹치는 로직 및 메서드 리팩토링
+    @Override
+    @Transactional
+    public ReservationModifyResponse modify(Long reservationId, ReservationModifyRequest request, Authentication authentication) {
+
+        // reservation id 검증
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID));
+
+        // authentication (토큰) 으로 member 추출
+        Member member = memberService.getMemberByAuthentication(authentication);
+
+        // 예약을 등록한 당사자가 맞는지 검증
+        if(!member.getReservations()
+                .stream()
+                .map(reservationByMember -> reservationByMember.getId())
+                .collect(Collectors.toList())
+                .contains(reservationId)) {
+            throw new ReservationException(NOT_OWNED_RESERVATION_ID);
+        }
+
+        // 수정할 필드들을 기존의 필드로 먼저 초기화하고,
+        // request 의 값이 null 이 아니라면 (수정 요청이 왔다면) 로직 내에서 검증 후 해당 요청 값으로 수정 필드들을 변경
+        LocalDateTime targetReservationDateTime = reservation.getReservationDateTime();
+        Integer targetReservationPersonCount = reservation.getReservationPersonCount();
+        Integer targetReservationTableCount = reservation.getReservationTableCount();
+        
+        // reservation date time 수정 요청 시 검증
+        if(request.getReservationDateTime() != null) {
+
+            targetReservationDateTime = request.getReservationDateTime();
+
+            // 운영 시간에 맞는 시간인지 검증
+            validateReservationWithinOpeningHoursAndTerm(reservation.getStore(), targetReservationDateTime);
+        }
+
+        // reservation person count 수정 요청 시 검증
+        if(request.getReservationPersonCount() != null) {
+
+            targetReservationPersonCount = request.getReservationPersonCount();
+
+            // 예약 인원 수가 0 보다 작거나 같은 값인지 검증
+            if(targetReservationPersonCount <= 0) {
+                throw new ReservationException(INVALID_PERSON_COUNT_REQUEST);
+            }
+        }
+
+        // reservation table count 수정 요청 시 검증
+        if(request.getReservationTableCount() != null) {
+
+            targetReservationTableCount = reservation.getReservationTableCount();
+
+            // 예약 테이블 수가 0 보다 큰 값인지 검증
+            if(targetReservationTableCount <= 0) {
+                throw new ReservationException(INVALID_TABLE_COUNT_REQUEST);
+            }
+
+            Integer seatingCapacityPerTable = reservation.getStore().getStoreReservationInfo().getSeatingCapacityPerTable();
+            Integer minimumTableCount = targetReservationPersonCount / seatingCapacityPerTable
+                    + (targetReservationPersonCount % seatingCapacityPerTable != 0 ? 1 : 0);
+
+            // 예약 테이블 수가 요청 인원 대비 최소 값보다 크거나 같은 값인지 검증
+            if(request.getReservationTableCount() < minimumTableCount) {
+                throw new ReservationException(MISMATCH_TABLE_COUNT_PER_CAPACITY);
+            }
+        }
+
+        // 해당 날짜, 인원 수, 테이블 수가 예약 가능한지 검증
+        if(!validateAvailableReservationTime(reservation.getStore(), targetReservationDateTime, targetReservationPersonCount, targetReservationTableCount)) {
+            throw new ReservationException(ALREADY_FULL_RESERVATION_TIME);
+        }
+
+        // 검증 후 최종 값으로 수정
+        reservation.modifyReservationDateTime(targetReservationDateTime);
+        reservation.modifyReservationPersonCount(targetReservationPersonCount);
+        reservation.modifyReservationTableCount(targetReservationTableCount);
+
+        reservation = reservationRepository.save(reservation);
+
+        return ReservationModifyResponse.builder()
+                .reservationId(reservation.getId())
+                .build();
+    }
+
+    /**
      * 이용자가 등록했던 예약을 취소하는 메서드
      *
      * @param reservationId
@@ -336,6 +457,15 @@ public class ReservationServiceImpl implements ReservationService {
 
         // authentication (토큰) 으로 member 추출
         Member member = memberService.getMemberByAuthentication(authentication);
+
+        // 예약을 등록한 당사자가 맞는지 검증
+        if(!member.getReservations()
+                .stream()
+                .map(reservationByMember -> reservationByMember.getId())
+                .collect(Collectors.toList())
+                .contains(reservationId)) {
+            throw new ReservationException(NOT_OWNED_RESERVATION_ID);
+        }
 
         // 지난 예약은 취소 불가
         if(reservation.getReservationDateTime().isBefore(LocalDateTime.now())) {

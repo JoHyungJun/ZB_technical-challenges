@@ -7,9 +7,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationAcceptRequest;
+import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationModifyRequest;
+import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationReserveRequest;
 import zeobase.zbtechnical.challenges.dto.reservation.response.*;
-import zeobase.zbtechnical.challenges.dto.reservation.request.*;
-import zeobase.zbtechnical.challenges.exception.StoreException;
+import zeobase.zbtechnical.challenges.exception.ReservationException;
 import zeobase.zbtechnical.challenges.service.ReservationService;
 import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 
@@ -49,11 +51,25 @@ public class ReservationController {
      * @return
      */
     @GetMapping("/store/{storeId}")
-    public ResponseEntity<List<ReservationInfoResponse>> reservationsInfo(
+    public ResponseEntity<List<ReservationInfoResponse>> reservationsInfoByStore(
             @PathVariable Long storeId
     ) {
 
         return ResponseEntity.ok().body(reservationService.getReservationsInfoByStoreId(storeId));
+    }
+
+    /**
+     * 특정 이용자의 모든 예약 정보를 전달하는 api
+     *
+     * @param authentication
+     * @return
+     */
+    @GetMapping("/member")
+    public ResponseEntity<List<ReservationInfoResponse>> reservationsInfoByMember(
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(reservationService.getReservationsInfoByMember(authentication));
     }
 
     /**
@@ -80,6 +96,7 @@ public class ReservationController {
      *
      * @param request - 매장 정보, 예약 희망 날짜
      * @return
+     * @exception ReservationException
      */
     @PostMapping("/reserve")
     public ResponseEntity<ReservationReserveResponse> reserve(
@@ -91,7 +108,7 @@ public class ReservationController {
         if(bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            throw new StoreException(ErrorCode.INVALID_RESERVATION_REQUEST.modifyDescription(errors.get(0).getDefaultMessage()));
+            throw new ReservationException(ErrorCode.INVALID_RESERVATION_REQUEST.modifyDescription(errors.get(0).getDefaultMessage()));
         }
 
         return ResponseEntity.ok().body(reservationService.reserve(request, authentication));
@@ -114,8 +131,26 @@ public class ReservationController {
     }
 
     /**
-     * 이용자가 특정 예약에 대해 취소하는 api
+     * 이용자가 본인이 등록한 예약에 대해 수정하는 api
      *
+     * @param reservationId
+     * @param request - 수정할 예약 날짜, 사람 수, 테이블 수
+     * @return
+     */
+    @PatchMapping("/{reservationId}")
+    ResponseEntity<ReservationModifyResponse> modify(
+            @PathVariable Long reservationId,
+            @RequestBody ReservationModifyRequest request,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(reservationService.modify(reservationId, request, authentication));
+    }
+
+    /**
+     * 이용자가 본인이 등록한 예약에 대해 취소하는 api
+     *
+     * @param reservationId
      * @param authentication
      * @return
      */
