@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.*;
-import static zeobase.zbtechnical.challenges.utils.ValidateUtils.*;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.*;
 
 /**
  * 이용자의 회원 가입 관련 request DTO 클래스

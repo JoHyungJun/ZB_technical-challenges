@@ -1,6 +1,6 @@
 package zeobase.zbtechnical.challenges.utils;
 
-public class ValidateUtils {
+public class ValidateConstants {
 
     public static final int MIN_PHONE_LENGTH = 8;
     public static final int MAX_PHONE_LENGTH = 16;

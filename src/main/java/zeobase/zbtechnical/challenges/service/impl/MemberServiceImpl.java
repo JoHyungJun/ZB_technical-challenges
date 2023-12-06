@@ -23,7 +23,7 @@ import zeobase.zbtechnical.challenges.utils.CustomStringUtils;
 import zeobase.zbtechnical.challenges.utils.security.JwtUtils;
 
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.*;
-import static zeobase.zbtechnical.challenges.utils.ValidateUtils.*;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.*;
 
 /**
  * 이용자 관련 로직을 담는 Service 클래스
@@ -343,7 +343,7 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * Authentication 을 통해 이용자 Entity 클래스를 추출하는 메서드
-     * 
+     *
      * @param authentication
      * @return Member Entity 클래스
      * @exception MemberException
