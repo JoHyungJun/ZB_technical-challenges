@@ -13,22 +13,12 @@ public class CustomStringUtils extends StringUtils {
     /**
      * 해당 문자열이 null 이거나, 값이 없거나, 공백이 있는지 검증하는 메서드
      * 
-     * @param targetString - 타겟 문자열
+     * @param targetString - 타겟 문자열 (null 허용)
      * @return 
      */
     public static boolean validateEmptyAndWhitespace(@Nullable String targetString) {
 
-        if(!hasLength(targetString)) {
-            return false;
-        }
-
-        for(char ch : targetString.toCharArray()) {
-            if(Character.isWhitespace(ch)) {
-                return false;
-            }
-        }
-
-        return true;
+        return StringUtils.hasLength(targetString) && !StringUtils.containsWhitespace(targetString);
     }
 
     /**
