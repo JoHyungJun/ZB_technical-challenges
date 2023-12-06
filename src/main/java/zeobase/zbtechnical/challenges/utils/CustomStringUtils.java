@@ -28,7 +28,7 @@ public class CustomStringUtils extends StringUtils {
      * @param
      * @return
      */
-    public static String getDecodingUrl(String urlString) {
+    public static String decodeUtf8Url(String urlString) {
 
         try {
             return URLDecoder.decode(urlString, "UTF-8");
