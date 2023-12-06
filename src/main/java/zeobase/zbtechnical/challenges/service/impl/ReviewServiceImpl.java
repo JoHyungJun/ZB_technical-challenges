@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.dto.review.request.ReviewPostRequest;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewHideResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewPostResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
@@ -21,16 +22,21 @@ import zeobase.zbtechnical.challenges.repository.ReservationRepository;
 import zeobase.zbtechnical.challenges.repository.ReviewRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.ReviewService;
+import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
 import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
 import zeobase.zbtechnical.challenges.type.review.ReviewStatusType;
 
+import java.util.stream.Collectors;
+
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.BLOCKED_REVIEW;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.HIDE_REVIEW;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.MISMATCH_ROLE;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_REVIEW_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_RESERVED_RECORD;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_VISITED_RECORD;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STORE_ID;
 
 
 /**
@@ -157,6 +163,67 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
 
         return ReviewPostResponse.fromEntity(reviewRepository.save(review));
+    }
+
+    /**
+     * 개별 리뷰를 조회할 수 없도록 숨기는 메서드
+     * 현재는 리뷰가 등록된 매장 점주가 요청 가능
+     *
+     * @param reviewId
+     * @param authentication
+     * @return "dto/review/response/ReviewHideResponse"
+     * @exception MemberException
+     * @exception StoreException
+     * @exception ReviewException
+     */
+    @Override
+    @Transactional
+    public ReviewHideResponse hideReview(Long reviewId, Authentication authentication) {
+
+        // review id 검증
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(NOT_FOUND_REVIEW_ID));
+
+        // review status 검증
+        validateReviewStatus(review);
+
+        // member 추출
+        Member member = memberService.getMemberByAuthentication(authentication);
+
+        // member status 검증
+        memberService.validateMemberSignedStatus(member);
+
+        // member role (가게 점장이 맞는지 여부) 검증
+        if(member.getRole() != MemberRoleType.STORE_OWNER) {
+            throw new MemberException(MISMATCH_ROLE);
+        }
+
+        // 해당 review 가 등록된 store 추출
+        Store store = review.getStore();
+
+        // store status 검증
+        storeService.validateStoreStatus(store);
+
+        // store signed status 검증
+        storeService.validateStoreSignedStatus(store);
+
+        // 전달된 store id가 추출한 이용자(점주) 소유 매장인지 여부 검증
+        if(!member.getStores()
+                .stream()
+                .map(ownStore -> ownStore.getId())
+                .collect(Collectors.toList())
+                .contains(store.getId())) {
+            throw new StoreException(NOT_OWNED_STORE_ID);
+        }
+
+        // review 의 status 를 HIDE 로 변경 (soft delete)
+        review = reviewRepository.save(
+                review.modifyStatus(ReviewStatusType.HIDE)
+        );
+
+        return ReviewHideResponse.builder()
+                .reviewId(review.getId())
+                .build();
     }
 
     /**

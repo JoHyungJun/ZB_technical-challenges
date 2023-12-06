@@ -98,4 +98,22 @@ public class ReviewController {
 
         return ResponseEntity.ok().body(reviewService.postReview(request, authentication));
     }
+
+    /**
+     * 개별 리뷰를 조회할 수 없도록 숨기는 api
+     * 현재는 리뷰가 등록된 매장 점주가 요청 가능하며,
+     * 추가 요구사항을 통해 관리자의 승인 하에 요청할 수 있도록 변경 가능
+     *
+     * @param reviewId
+     * @param authentication - 리뷰가 등록된 가게의 점주 token
+     * @return
+     */
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<ReviewHideResponse> hide(
+            @PathVariable Long reviewId,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(reviewService.hideReview(reviewId, authentication));
+    }
 }
