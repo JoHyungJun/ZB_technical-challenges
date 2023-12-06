@@ -29,7 +29,8 @@ public class Review extends BaseEntity {
     private String reviewMessage;
 
     @Enumerated(EnumType.STRING)
-    private ReviewStatusType status;
+    @Builder.Default
+    private ReviewStatusType status = ReviewStatusType.SHOW;
 
     @ManyToOne
     @JoinColumn(name = "member_id")

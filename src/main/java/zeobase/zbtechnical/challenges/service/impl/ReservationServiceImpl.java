@@ -46,9 +46,9 @@ import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_RES
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_RESERVATION_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STORE_ID;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.RESERVATION_ACCEPTED_REJECTED;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.RESERVATION_ACCEPTED_WAITING;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.RESERVATION_CANCELED;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.REJECTED_RESERVATION;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.WAITING_RESERVATION;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.CANCELED_RESERVATION;
 
 
 /**
@@ -639,11 +639,11 @@ public class ReservationServiceImpl implements ReservationService {
         ReservationAcceptedType reservationStatus = reservation.getAcceptedStatus();
 
         if(ReservationAcceptedType.REJECTED == reservationStatus) {
-            throw new ReservationException(RESERVATION_ACCEPTED_REJECTED);
+            throw new ReservationException(REJECTED_RESERVATION);
         }else if(ReservationAcceptedType.WAITING == reservationStatus) {
-            throw new ReservationException(RESERVATION_ACCEPTED_WAITING);
+            throw new ReservationException(WAITING_RESERVATION);
         }else if(ReservationAcceptedType.CANCELED == reservationStatus) {
-            throw new ReservationException(RESERVATION_CANCELED);
+            throw new ReservationException(CANCELED_RESERVATION);
         }
     }
 }

@@ -1,10 +1,11 @@
 package zeobase.zbtechnical.challenges.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
-import zeobase.zbtechnical.challenges.dto.review.response.*;
-import zeobase.zbtechnical.challenges.dto.review.request.*;
-
-import java.util.List;
+import zeobase.zbtechnical.challenges.dto.review.request.ReviewPostRequest;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewPostResponse;
 
 /**
  * 리뷰 관련 Service 의 부모 인터페이스
@@ -12,7 +13,7 @@ import java.util.List;
 public interface ReviewService {
 
     ReviewInfoResponse getReviewById(Long reviewId);
-    List<ReviewInfoResponse> getAllReviewsByMemberId(Long memberId);
-    List<ReviewInfoResponse> getAllReviewsByStoreId(Long storeId);
+    Page<ReviewInfoResponse> getAllReviewsByMemberId(Long memberId, Pageable pageable);
+    Page<ReviewInfoResponse> getAllReviewsByStoreId(Long storeId, Pageable pageable);
     ReviewPostResponse postReview(ReviewPostRequest request, Authentication authentication);
 }

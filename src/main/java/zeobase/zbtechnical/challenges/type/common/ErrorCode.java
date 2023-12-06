@@ -75,9 +75,9 @@ public enum ErrorCode {
     ALREADY_RESERVATION_CHECKED(HttpStatus.BAD_REQUEST, "이미 방문한 고객입니다."),
     ALREADY_RESERVATION_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소한 예약입니다."),
 
-    RESERVATION_ACCEPTED_REJECTED(HttpStatus.BAD_REQUEST, "점주에 의해 거절된 예약입니다."),
-    RESERVATION_ACCEPTED_WAITING(HttpStatus.BAD_REQUEST, "점주가 아직 승인하지 않은 예약입니다."),
-    RESERVATION_CANCELED(HttpStatus.BAD_REQUEST, "이용자가 취소한 예약입니다."),
+    REJECTED_RESERVATION(HttpStatus.BAD_REQUEST, "점주에 의해 거절된 예약입니다."),
+    WAITING_RESERVATION(HttpStatus.BAD_REQUEST, "점주가 아직 승인하지 않은 예약입니다."),
+    CANCELED_RESERVATION(HttpStatus.BAD_REQUEST, "이용자가 취소한 예약입니다."),
 
 
     // Review
@@ -87,6 +87,8 @@ public enum ErrorCode {
     
     INVALID_REVIEW_REQUEST(HttpStatus.BAD_REQUEST, "리뷰 정보로 잘못된 인자가 전달되었습니다."),
 
+    HIDE_REVIEW(HttpStatus.BAD_REQUEST, "볼 수 없는 리뷰입니다."),
+    BLOCKED_REVIEW(HttpStatus.BAD_REQUEST, "운영자에 의해 차단된 리뷰입니다."),
 
     // Store
     NOT_FOUND_STORE_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 가게 ID 입니다."),

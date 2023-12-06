@@ -6,5 +6,6 @@ package zeobase.zbtechnical.challenges.type.review;
 public enum ReviewStatusType {
 
     SHOW,
-    HIDE
+    HIDE,
+    BLOCKED
 }
