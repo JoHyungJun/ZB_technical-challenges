@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.kiosk.request.*;
-import zeobase.zbtechnical.challenges.dto.kiosk.response.*;
+import zeobase.zbtechnical.challenges.dto.kiosk.request.KioskPhoneRequest;
+import zeobase.zbtechnical.challenges.dto.kiosk.request.KioskSigninRequest;
+import zeobase.zbtechnical.challenges.dto.kiosk.response.KioskPhoneResponse;
+import zeobase.zbtechnical.challenges.dto.kiosk.response.KioskSigninResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.exception.KioskException;
@@ -16,13 +18,18 @@ import zeobase.zbtechnical.challenges.repository.MemberRepository;
 import zeobase.zbtechnical.challenges.repository.ReservationRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.KioskService;
-import zeobase.zbtechnical.challenges.type.common.ErrorCode;
 import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_RESERVATION_CHECKED;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.MISMATCH_PASSWORD;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_PHONE;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_UID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_RESERVED_MEMBER;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
+
 
 /**
  * 키오스크 관련 로직을 담는 Service 클래스
@@ -58,7 +65,7 @@ public class KioskServiceImpl implements KioskService {
 
         // 존재하는 핸드폰 번호인지 검증
         Member member = memberRepository.findByPhone(request.getPhone())
-                .orElseThrow(() -> new KioskException(ErrorCode.NOT_FOUND_MEMBER_PHONE));
+                .orElseThrow(() -> new KioskException(NOT_FOUND_MEMBER_PHONE));
 
         // 이용자 status 검증
         memberService.validateMemberSignedStatus(member);
@@ -77,7 +84,7 @@ public class KioskServiceImpl implements KioskService {
 
         // 이미 방문한 회원인지 검증
         if(reservation.getVisitedStatus() == ReservationVisitedType.VISITED) {
-            throw new ReservationException(ErrorCode.ALREADY_RESERVATION_CHECKED);
+            throw new ReservationException(ALREADY_RESERVATION_CHECKED);
         }
 
         // 점주가 수락한 예약인지 검증
@@ -132,7 +139,7 @@ public class KioskServiceImpl implements KioskService {
 
         // 이미 방문한 회원인지 검증
         if(reservation.getVisitedStatus() == ReservationVisitedType.VISITED) {
-            throw new ReservationException(ErrorCode.ALREADY_RESERVATION_CHECKED);
+            throw new ReservationException(ALREADY_RESERVATION_CHECKED);
         }
 
         // 점주가 수락한 예약인지 검증

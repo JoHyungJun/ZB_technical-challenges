@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zeobase.zbtechnical.challenges.dto.review.request.*;
-import zeobase.zbtechnical.challenges.dto.review.response.*;
+import zeobase.zbtechnical.challenges.dto.review.request.ReviewPostRequest;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewPostResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.entity.Review;
@@ -23,7 +24,12 @@ import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_REVIEW_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_RESERVED_RECORD;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_VISITED_RECORD;
+
 
 /**
  * 리뷰 관련 로직을 담는 Service 클래스
