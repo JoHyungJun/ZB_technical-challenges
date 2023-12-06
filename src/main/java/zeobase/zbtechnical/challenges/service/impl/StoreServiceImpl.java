@@ -229,6 +229,8 @@ public class StoreServiceImpl implements StoreService {
 
     /**
      * 이용자(점주)가 등록한 매장의 정보를 수정하는 메서드
+     * tableCount 혹은 seatingCapacityPerTable 수정 요청의 경우, 값이 이전보다 줄었다면 수정 일자 이후의 모든 예약을 취소시킴
+     * (비즈니스 논리 상 해당 정책 선택)
      *
      * @param request - store id, store 정보, store reservation info 정보
      * @return "dto/store/response/StoreModifyResponse" - store id
@@ -376,8 +378,29 @@ public class StoreServiceImpl implements StoreService {
         }
 
         // tableCount 혹은 seatingCapacityPerTable 수정 요청 시 검증 및 수정
-        // TODO : 명수 처리, reservation 수정 후 다시 적용 (tableCount 혹은 perCount 가 줄었을 때 이전 예약 reject?)
-        
+        if(request.getTableCount() != null || request.getSeatingCapacityPerTable() != null) {
+
+            Integer finalTableCount =
+                    request.getTableCount() != null ? request.getTableCount() : storeReservationInfo.getTableCount();
+            Integer finalSeatingCapacityPerTable =
+                    request.getSeatingCapacityPerTable() != null ? request.getSeatingCapacityPerTable() : storeReservationInfo.getSeatingCapacityPerTable();
+
+            // 두 필드 중 하나라도 이전 설정한 값보다 작아졌다면, 수정 일자 이후의 모든 예약을 거절시킴
+            if(finalTableCount < storeReservationInfo.getTableCount()
+                || finalSeatingCapacityPerTable < storeReservationInfo.getSeatingCapacityPerTable()) {
+
+                LocalDateTime now = LocalDateTime.now();
+
+                store.getReservations()
+                        .stream()
+                        .filter(reservation -> reservation.getReservationDateTime().isAfter(now))
+                        .forEach(reservation -> reservation.modifyAccepted(ReservationAcceptedType.REJECTED));
+            }
+
+            storeReservationInfo.modifyTableCount(finalTableCount);
+            storeReservationInfo.modifySeatingCapacityPerTable(finalSeatingCapacityPerTable);
+        }
+
         storeRepository.save(store);
         storeReservationInfoRepository.save(storeReservationInfo);
 
