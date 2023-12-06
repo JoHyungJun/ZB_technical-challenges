@@ -1,6 +1,8 @@
 package zeobase.zbtechnical.challenges.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -43,29 +45,33 @@ public class ReviewController {
     /**
      * 특정 이용자가 작성한 모든 리뷰를 전달하는 api
      *
-     * @param memberId - memberId
+     * @param memberId
+     * @param pageable
      * @return
      */
     @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<ReviewInfoResponse>> allReviewByMember(
-            @PathVariable Long memberId
+    public ResponseEntity<Page<ReviewInfoResponse>> reviewsInfoByMember(
+            @PathVariable Long memberId,
+            Pageable pageable
     ) {
 
-        return ResponseEntity.ok().body(reviewService.getAllReviewsByMemberId(memberId));
+        return ResponseEntity.ok().body(reviewService.getAllReviewsByMemberId(memberId, pageable));
     }
 
     /**
      * 특정 매장에 작성된 모든 리뷰를 전달하는 api
      *
-     * @param storeId - storeId
+     * @param storeId
+     * @param pageable
      * @return
      */
     @GetMapping("/store/{storeId}")
-    public ResponseEntity<List<ReviewInfoResponse>> allReviewByStore(
-            @PathVariable Long storeId
+    public ResponseEntity<Page<ReviewInfoResponse>> reviewsInfoByStore(
+            @PathVariable Long storeId,
+            Pageable pageable
     ) {
 
-        return ResponseEntity.ok().body(reviewService.getAllReviewsByStoreId(storeId));
+        return ResponseEntity.ok().body(reviewService.getAllReviewsByStoreId(storeId, pageable));
     }
 
     /**
@@ -78,7 +84,7 @@ public class ReviewController {
      * @exception ReviewException
      */
     @PostMapping("")
-    public ResponseEntity<ReviewPostResponse> postReview(
+    public ResponseEntity<ReviewPostResponse> write(
             @Valid @RequestBody ReviewPostRequest request,
             BindingResult bindingResult,
             Authentication authentication

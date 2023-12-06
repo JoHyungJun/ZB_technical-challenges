@@ -25,13 +25,13 @@ public class CustomStringUtils extends StringUtils {
      * URL 로 전달된 문자를 UTF-8 형식으로 디코딩 해주는 메서드
      * GET 형식으로 한글이 전달될 때 올바른 디코딩을 도와줌
      *
-     * @param
-     * @return
+     * @param targetUrlString - 타겟 문자열
+     * @return UTF-8 형식으로 decode 된 문자열
      */
-    public static String decodeUtf8Url(String urlString) {
+    public static String decodeUtf8Url(String targetUrlString) {
 
         try {
-            return URLDecoder.decode(urlString, "UTF-8");
+            return URLDecoder.decode(targetUrlString, "UTF-8");
         }catch (Exception e) {
             throw new CommonException(INVALID_URL_STRING);
         }

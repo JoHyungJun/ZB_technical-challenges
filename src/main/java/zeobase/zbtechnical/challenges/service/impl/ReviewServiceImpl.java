@@ -1,6 +1,8 @@
 package zeobase.zbtechnical.challenges.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +22,10 @@ import zeobase.zbtechnical.challenges.repository.ReviewRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.ReviewService;
 import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
+import zeobase.zbtechnical.challenges.type.review.ReviewStatusType;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.BLOCKED_REVIEW;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.HIDE_REVIEW;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_REVIEW_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
@@ -39,6 +41,7 @@ import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STO
 public class ReviewServiceImpl implements ReviewService {
 
     private final MemberServiceImpl memberService;
+    private final StoreServiceImpl storeService;
 
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
@@ -62,6 +65,9 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(NOT_FOUND_REVIEW_ID));
 
+        // review status 검증
+        validateReviewStatus(review);
+
         return ReviewInfoResponse.fromEntity(review);
     }
 
@@ -75,16 +81,17 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewInfoResponse> getAllReviewsByMemberId(Long memberId) {
+    public Page<ReviewInfoResponse> getAllReviewsByMemberId(Long memberId, Pageable pageable) {
 
         // member id 검증
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER_ID));
 
-        return member.getReviews()
-                .stream()
-                .map(review -> ReviewInfoResponse.fromEntity(review))
-                .collect(Collectors.toList());
+        // member status 검증
+        memberService.validateMemberSignedStatus(member);
+
+        return reviewRepository.findAllByMemberIdAndStatusOrderByCreatedAtDesc(memberId, ReviewStatusType.SHOW, pageable)
+                .map(review -> ReviewInfoResponse.fromEntity(review));
     }
 
     /**
@@ -97,16 +104,17 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewInfoResponse> getAllReviewsByStoreId(Long storeId) {
+    public Page<ReviewInfoResponse> getAllReviewsByStoreId(Long storeId, Pageable pageable) {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
-        return store.getReviews()
-                .stream()
-                .map(review -> ReviewInfoResponse.fromEntity(review))
-                .collect(Collectors.toList());
+        // store status 검증
+        storeService.validateStoreStatus(store);
+
+        return reviewRepository.findAllByStoreIdAndStatusOrderByCreatedAtDesc(storeId, ReviewStatusType.SHOW, pageable)
+                .map(review -> ReviewInfoResponse.fromEntity(review));
     }
 
     /**
@@ -143,10 +151,27 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = Review.builder()
                 .startRating(request.getStarRating())
                 .reviewMessage(request.getReviewMessage())
+                .status(ReviewStatusType.SHOW)
                 .member(member)
                 .store(store)
                 .build();
 
         return ReviewPostResponse.fromEntity(reviewRepository.save(review));
+    }
+
+    /**
+     * 리뷰의 조회 가능 여부를 검증하는 메서드
+     * 
+     * @param review
+     * @return
+     * @exception ReviewException
+     */
+    private void validateReviewStatus(Review review) {
+
+        if(ReviewStatusType.HIDE == review.getStatus()) {
+            throw new ReviewException(HIDE_REVIEW);
+        }else if(ReviewStatusType.BLOCKED == review.getStatus()) {
+            throw new ReviewException(BLOCKED_REVIEW);
+        }
     }
 }
