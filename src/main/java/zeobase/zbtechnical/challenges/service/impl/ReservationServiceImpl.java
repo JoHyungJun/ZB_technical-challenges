@@ -349,6 +349,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     /**
      * 이용자가 본인이 등록한 예약에 대해 수정하는 메서드
+     * request 중 수정을 원하지 않는 정보(필드)는 null 로 전달
+     * (프론트 쪽에서 변하지 않은 정보를 null 이 아닌 원래 값으로 넣어줄 수도 있기에, 해당 검증 추가)
      * 
      * @param reservationId
      * @param request - 수정할 예약 날짜, 사람 수, 테이블 수

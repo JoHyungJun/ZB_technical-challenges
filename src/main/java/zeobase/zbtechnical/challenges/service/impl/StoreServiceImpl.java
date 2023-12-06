@@ -229,6 +229,8 @@ public class StoreServiceImpl implements StoreService {
 
     /**
      * 이용자(점주)가 등록한 매장의 정보를 수정하는 메서드
+     * request 중 수정을 원하지 않는 정보(필드)는 null 로 전달
+     * (프론트 쪽에서 변하지 않은 정보를 null 이 아닌 원래 값으로 넣어줄 수도 있기에, 해당 검증 추가)
      * tableCount 혹은 seatingCapacityPerTable 수정 요청의 경우, 값이 이전보다 줄었다면 수정 일자 이후의 모든 예약을 취소시킴
      * (비즈니스 논리 상 해당 정책 선택)
      *
