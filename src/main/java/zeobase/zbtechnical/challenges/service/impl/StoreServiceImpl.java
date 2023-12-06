@@ -46,7 +46,7 @@ import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STO
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.OPEN_PREPARING_STORE;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.SHUT_DOWN_STORE;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.WITHDRAW_STORE;
-import static zeobase.zbtechnical.challenges.utils.CustomStringUtils.getDecodingUrl;
+import static zeobase.zbtechnical.challenges.utils.CustomStringUtils.decodeUtf8Url;
 
 /**
  * 매장 관련 로직을 담는 Service 클래스
@@ -114,7 +114,7 @@ public class StoreServiceImpl implements StoreService {
             stores = storeRepository.findAllByStatusAndSignedStatus(StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable);
         }else {
             
-            stores = storeRepository.findAllByNameContainingAndStatusAndSignedStatus(getDecodingUrl(name), StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable);
+            stores = storeRepository.findAllByNameContainingAndStatusAndSignedStatus(decodeUtf8Url(name), StoreStatusType.OPEN, StoreSignedStatusType.ACTIVE, pageable);
         }
 
         return stores.map(store -> StoreInfoResponse.fromEntity(store));
