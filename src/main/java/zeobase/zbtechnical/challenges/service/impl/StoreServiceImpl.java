@@ -9,7 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.dto.store.request.StoreModifyRequest;
 import zeobase.zbtechnical.challenges.dto.store.request.StoreRegistrationRequest;
 import zeobase.zbtechnical.challenges.dto.store.request.StoreWithdrawRequest;
-import zeobase.zbtechnical.challenges.dto.store.response.*;
+import zeobase.zbtechnical.challenges.dto.store.response.StoreInfoResponse;
+import zeobase.zbtechnical.challenges.dto.store.response.StoreInfoWithDistanceDiffResponse;
+import zeobase.zbtechnical.challenges.dto.store.response.StoreModifyResponse;
+import zeobase.zbtechnical.challenges.dto.store.response.StoreRegistrationResponse;
+import zeobase.zbtechnical.challenges.dto.store.response.StoreWithdrawResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.entity.StoreReservationInfo;
@@ -32,7 +36,16 @@ import java.util.stream.Collectors;
 
 import static zeobase.zbtechnical.challenges.service.impl.ReservationServiceImpl.validateReservationTime;
 import static zeobase.zbtechnical.challenges.service.impl.ReservationServiceImpl.validateReservationTimeMatchesTerm;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.BLOCKED_STORE;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_LOCATION_TYPE;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_OPENING_HOURS;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_RESERVATION_TERM;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.MISMATCH_ROLE;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STORE_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.OPEN_PREPARING_STORE;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.SHUT_DOWN_STORE;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.WITHDRAW_STORE;
 import static zeobase.zbtechnical.challenges.utils.CustomStringUtils.getDecodingUrl;
 
 /**

@@ -8,7 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationAcceptRequest;
 import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationModifyRequest;
 import zeobase.zbtechnical.challenges.dto.reservation.request.ReservationReserveRequest;
-import zeobase.zbtechnical.challenges.dto.reservation.response.*;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAcceptResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationAvailableResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationCanceledResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationInfoResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationModifyResponse;
+import zeobase.zbtechnical.challenges.dto.reservation.response.ReservationReserveResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
 import zeobase.zbtechnical.challenges.entity.Store;
@@ -28,7 +33,23 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_FULL_RESERVATION_TIME;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_RESERVATION_CANCELED;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_RESERVATION_CHECKED;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_PERSON_COUNT_REQUEST;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_RESERVATION_CANCELED_TIME;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_RESERVATION_TIME;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_TABLE_COUNT_REQUEST;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.MISMATCH_ROLE;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.MISMATCH_TABLE_COUNT_PER_CAPACITY;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_RESERVATION_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_RESERVATION_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STORE_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.RESERVATION_ACCEPTED_REJECTED;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.RESERVATION_ACCEPTED_WAITING;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.RESERVATION_CANCELED;
+
 
 /**
  * 예약 관련 로직을 담는 Service 클래스
