@@ -41,7 +41,7 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 개별 이용자의 공개 가능한 정보를 전달하는 메서드
-     * memberId (Member 의 PK) 검증
+     * member id 검증
      *
      * @param memberId
      * @return "dto/member/response/MemberInfoResponse"
@@ -218,8 +218,9 @@ public class MemberServiceImpl implements MemberService {
     /**
      * 이용자 정보 수정을 진행하는 메서드
      * request 중 수정을 원하지 않는 정보(필드)는 null 로 전달
-     * 프론트 쪽에서 변하지 않은 정보를 null 이 아닌 원래 값으로 넣어줄 수도 있기에, 해당 검증 추가
+     * (프론트 쪽에서 변하지 않은 정보를 null 이 아닌 원래 값으로 넣어줄 수도 있기에, 해당 검증 추가)
      *
+     * @param request - UID, password, role, name, phone
      * @param authentication
      * @return "dto/member/response/MemberModifyResponse"
      * @exception MemberException
