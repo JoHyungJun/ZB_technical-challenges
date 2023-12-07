@@ -8,8 +8,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.*;
-import static zeobase.zbtechnical.challenges.utils.ValidateConstants.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.INVALID_PASSWORD_LENGTH_MSG;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.INVALID_PASSWORD_REGEX_MSG;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.INVALID_PHONE_REGEX_MSG;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MAX_PHONE_LENGTH;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MIN_PHONE_LENGTH;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.PASSWORD_REGEX;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.PHONE_REGEX;
 
 /**
  * 이용자의 회원 가입 관련 request DTO 클래스
@@ -23,7 +28,8 @@ public class MemberSignupRequest {
 
     @Pattern(regexp = PASSWORD_REGEX,
             message = INVALID_PASSWORD_REGEX_MSG)
-    @Size(min = MIN_PHONE_LENGTH, max = MAX_PHONE_LENGTH, message = INVALID_PASSWORD_LENGTH_MSG)
+    @Size(min = MIN_PHONE_LENGTH, max = MAX_PHONE_LENGTH,
+            message = INVALID_PASSWORD_LENGTH_MSG)
     private String password;
 
     @NotNull(message = "사용자의 권한이 누락되었습니다.")

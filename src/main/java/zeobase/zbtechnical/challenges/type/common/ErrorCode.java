@@ -4,7 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.*;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.INVALID_PASSWORD_LENGTH_MSG;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.INVALID_PASSWORD_REGEX_MSG;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.INVALID_PHONE_REGEX_MSG;
+import static zeobase.zbtechnical.challenges.type.common.ErrorMessage.INVALID_STAR_RATING_MSG;
+
 
 /**
  * 에러 발생 내용을 담은 에러 코드 관련 Enum 클래스
