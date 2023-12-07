@@ -1,5 +1,8 @@
 package zeobase.zbtechnical.challenges.utils;
 
+/**
+ * 정책 관련 Constants 클래스
+ */
 public class ValidateConstants {
 
     // Member

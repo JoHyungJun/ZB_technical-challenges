@@ -8,6 +8,9 @@ import java.net.URLDecoder;
 
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_URL_STRING;
 
+/**
+ * 문자열 관련 Util 클래스
+ */
 public class CustomStringUtils extends StringUtils {
 
     /**
