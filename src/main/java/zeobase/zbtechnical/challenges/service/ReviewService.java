@@ -3,9 +3,11 @@ package zeobase.zbtechnical.challenges.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import zeobase.zbtechnical.challenges.dto.review.request.ReviewModifyRequest;
 import zeobase.zbtechnical.challenges.dto.review.request.ReviewPostRequest;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewHideResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewModifyResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewPostResponse;
 
 /**
@@ -14,15 +16,16 @@ import zeobase.zbtechnical.challenges.dto.review.response.ReviewPostResponse;
 public interface ReviewService {
 
     // GET
-    ReviewInfoResponse getReviewById(Long reviewId);
-    Page<ReviewInfoResponse> getAllReviewsByMemberId(Long memberId, Pageable pageable);
-    Page<ReviewInfoResponse> getAllReviewsByStoreId(Long storeId, Pageable pageable);
+    ReviewInfoResponse getReviewInfoById(Long reviewId);
+    Page<ReviewInfoResponse> getReviewsInfoByMember(Long memberId, Pageable pageable);
+    Page<ReviewInfoResponse> getReviewsInfoByStore(Long storeId, Pageable pageable);
 
     // POST
-    ReviewPostResponse postReview(ReviewPostRequest request, Authentication authentication);
+    ReviewPostResponse writeReview(ReviewPostRequest request, Authentication authentication);
 
     // UPDATE
+    ReviewModifyResponse modifyReview(Long reviewId, ReviewModifyRequest request, Authentication authentication);
 
     // DELETE
-    ReviewHideResponse hideReview(Long reviewId, Authentication authentication);
+    ReviewHideResponse hideReviewByStoreOwner(Long reviewId, Authentication authentication);
 }

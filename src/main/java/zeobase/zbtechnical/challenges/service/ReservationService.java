@@ -14,16 +14,16 @@ public interface ReservationService {
 
     // GET
     ReservationInfoResponse getReservationInfoById(Long reservationId);
-    List<ReservationInfoResponse> getReservationsInfoByStoreId(Long storeId);
+    List<ReservationInfoResponse> getReservationsInfoByStore(Long storeId);
     List<ReservationInfoResponse> getReservationsInfoByMember(Authentication authentication);
     ReservationAvailableResponse checkAvailableReservationTime(Long storeId, LocalDateTime reservationTime, Integer personCount, Integer tableCount);
 
     // POST
-    ReservationReserveResponse reserve(ReservationReserveRequest request, Authentication authentication);
+    ReservationReserveResponse registerReservation(ReservationReserveRequest request, Authentication authentication);
     ReservationAcceptResponse acceptReservationByStoreOwner(ReservationAcceptRequest request, Authentication authentication);
 
     // UPDATE
-    ReservationModifyResponse modify(Long reservationId, ReservationModifyRequest request, Authentication authentication);
+    ReservationModifyResponse modifyReservation(Long reservationId, ReservationModifyRequest request, Authentication authentication);
 
     // DELETE
     ReservationCanceledResponse cancelReservationByMember(Long reservationId, Authentication authentication);

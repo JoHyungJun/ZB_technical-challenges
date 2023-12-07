@@ -10,4 +10,7 @@ public class ErrorMessage {
     public static final String INVALID_PASSWORD_REGEX_MSG = "비밀번호는 영어와 숫자를 혼용해야 하며 공백은 사용할 수 없습니다.";
     public static final String INVALID_PASSWORD_LENGTH_MSG = "비밀번호는 최소 8글자 이상 최대 16글자 이하로 작성해야 합니다.";
     public static final String INVALID_PHONE_REGEX_MSG = "사용자의 핸드폰 번호 형식이 부적합합니다.";
+
+    // Review
+    public static final String INVALID_STAR_RATING_MSG = "별점은 0 이상, 5 이하의 실수값으로 이루어져야 합니다.";
 }

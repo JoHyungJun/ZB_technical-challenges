@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 리뷰 노출 숨김 관련 response DTO 클래스
+ * 리뷰 수정 관련 response DTO 클래스
  */
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewHideResponse {
+public class ReviewModifyResponse {
 
-    private Long reviewId;
+    public Long reviewId;
 }

@@ -6,9 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import zeobase.zbtechnical.challenges.dto.review.request.ReviewModifyRequest;
 import zeobase.zbtechnical.challenges.dto.review.request.ReviewPostRequest;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewHideResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewModifyResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewPostResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
@@ -30,13 +32,17 @@ import java.util.stream.Collectors;
 
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.BLOCKED_REVIEW;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.HIDE_REVIEW;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_STAR_RATING_VALUE;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.MISMATCH_ROLE;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_REVIEW_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_RESERVED_RECORD;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_VISITED_RECORD;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_REVIEW_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STORE_ID;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MAX_STAR_RATING;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MIN_STAR_RATING;
 
 
 /**
@@ -65,7 +71,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ReviewInfoResponse getReviewById(Long reviewId) {
+    public ReviewInfoResponse getReviewInfoById(Long reviewId) {
         
         // review id 검증
         Review review = reviewRepository.findById(reviewId)
@@ -87,7 +93,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<ReviewInfoResponse> getAllReviewsByMemberId(Long memberId, Pageable pageable) {
+    public Page<ReviewInfoResponse> getReviewsInfoByMember(Long memberId, Pageable pageable) {
 
         // member id 검증
         Member member = memberRepository.findById(memberId)
@@ -110,7 +116,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<ReviewInfoResponse> getAllReviewsByStoreId(Long storeId, Pageable pageable) {
+    public Page<ReviewInfoResponse> getReviewsInfoByStore(Long storeId, Pageable pageable) {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
@@ -135,7 +141,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional
-    public ReviewPostResponse postReview(ReviewPostRequest request, Authentication authentication) {
+    public ReviewPostResponse writeReview(ReviewPostRequest request, Authentication authentication) {
 
         // store id 검증
         Store store = storeRepository.findById(request.getStoreId())
@@ -166,6 +172,58 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     /**
+     * 리뷰를 수정하는 메서드
+     *
+     * @param reviewId
+     * @param request - star rating, review message
+     * @return
+     * @exception MemberException
+     * @exception ReviewException
+     */
+    // TODO : 현재는 미구현 상태이지만 일주일 내의 예약만 가능하도록 로직 수정 후, 별도의 validate 추가해주어야 함
+    @Override
+    @Transactional
+    public ReviewModifyResponse modifyReview(Long reviewId, ReviewModifyRequest request, Authentication authentication) {
+
+        // review id 검증
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(NOT_FOUND_REVIEW_ID));
+
+        // review status 검증
+        validateReviewStatus(review);
+
+        // member 추출
+        Member member = memberService.getMemberByAuthentication(authentication);
+
+        // member status 검증
+        memberService.validateMemberSignedStatus(member);
+
+        // 본인이 작성한 리뷰가 맞는지 검증
+        validateReviewOwner(review, member);
+
+        // star rating 수정 요청 시 검증 및 수정
+        if(request.getStarRating() != null) {
+
+            // 0.0 이상, 5.0 이하의 값인지 검증
+            validateStarRating(request.getStarRating());
+
+            review.modifyStarRating(request.getStarRating());
+        }
+
+        // review message 수정 요청 시 검증 및 수정
+        if(request.getReviewMessage() != null) {
+
+            review.modifyReviewMessage(review.getReviewMessage());
+        }
+
+        review = reviewRepository.save(review);
+
+        return ReviewModifyResponse.builder()
+                .reviewId(review.getId())
+                .build();
+    }
+
+    /**
      * 개별 리뷰를 조회할 수 없도록 숨기는 메서드
      * 현재는 리뷰가 등록된 매장 점주가 요청 가능
      *
@@ -178,7 +236,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     @Override
     @Transactional
-    public ReviewHideResponse hideReview(Long reviewId, Authentication authentication) {
+    public ReviewHideResponse hideReviewByStoreOwner(Long reviewId, Authentication authentication) {
 
         // review id 검증
         Review review = reviewRepository.findById(reviewId)
@@ -224,6 +282,39 @@ public class ReviewServiceImpl implements ReviewService {
         return ReviewHideResponse.builder()
                 .reviewId(review.getId())
                 .build();
+    }
+
+    /**
+     * 요청 받은 별점 값이 0 이상, 5 이하의 값이 맞는지 검증하는 메서드
+     *
+     * @param starRating
+     * @return
+     * @exception ReviewException
+     */
+    private void validateStarRating(Double starRating) {
+
+        if(starRating < MIN_STAR_RATING || starRating > MAX_STAR_RATING) {
+            throw new ReviewException(INVALID_STAR_RATING_VALUE);
+        }
+    }
+
+    /**
+     * 해당 리뷰가 요청 받은 이용자가 작성한 리뷰가 맞는지 검증하는 메서드
+     *
+     * @param review - id, status 등이 검증된 인자이어야 함
+     * @param member - id, status 등이 검증된 인자이어야 함
+     * @return
+     * @exception ReviewException
+     */
+    public void validateReviewOwner(Review review, Member member) {
+
+        if(!member.getReviews()
+                .stream()
+                .map(ownedReview -> ownedReview.getId())
+                .collect(Collectors.toList())
+                .contains(review.getId())) {
+            throw new ReviewException(NOT_OWNED_REVIEW_ID);
+        }
     }
 
     /**

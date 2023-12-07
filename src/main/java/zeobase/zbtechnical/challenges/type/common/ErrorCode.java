@@ -82,10 +82,12 @@ public enum ErrorCode {
 
     // Review
     NOT_FOUND_REVIEW_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 리뷰 ID 입니다."),
+    NOT_OWNED_REVIEW_ID(HttpStatus.BAD_REQUEST, "본인이 등록한 리뷰가 아닙니다."),
     NOT_FOUND_STORE_VISITED_RECORD(HttpStatus.BAD_REQUEST, "매장을 이용하지 않은 이용자는 리뷰를 남길 수 없습니다."),
     NOT_FOUND_STORE_RESERVED_RECORD(HttpStatus.BAD_REQUEST, "매장을 예약하지 않은 이용자는 리뷰를 남길 수 없습니다."),
-    
+
     INVALID_REVIEW_REQUEST(HttpStatus.BAD_REQUEST, "리뷰 정보로 잘못된 인자가 전달되었습니다."),
+    INVALID_STAR_RATING_VALUE(HttpStatus.BAD_REQUEST, INVALID_STAR_RATING_MSG),
 
     HIDE_REVIEW(HttpStatus.BAD_REQUEST, "볼 수 없는 리뷰입니다."),
     BLOCKED_REVIEW(HttpStatus.BAD_REQUEST, "운영자에 의해 차단된 리뷰입니다."),

@@ -39,7 +39,7 @@ public class ReviewController {
             @PathVariable Long reviewId
     ) {
 
-        return ResponseEntity.ok().body(reviewService.getReviewById(reviewId));
+        return ResponseEntity.ok().body(reviewService.getReviewInfoById(reviewId));
     }
 
     /**
@@ -55,7 +55,7 @@ public class ReviewController {
             Pageable pageable
     ) {
 
-        return ResponseEntity.ok().body(reviewService.getAllReviewsByMemberId(memberId, pageable));
+        return ResponseEntity.ok().body(reviewService.getReviewsInfoByMember(memberId, pageable));
     }
 
     /**
@@ -71,7 +71,7 @@ public class ReviewController {
             Pageable pageable
     ) {
 
-        return ResponseEntity.ok().body(reviewService.getAllReviewsByStoreId(storeId, pageable));
+        return ResponseEntity.ok().body(reviewService.getReviewsInfoByStore(storeId, pageable));
     }
 
     /**
@@ -96,7 +96,23 @@ public class ReviewController {
             throw new ReviewException(ErrorCode.INVALID_REVIEW_REQUEST.modifyDescription(errors.get(0).getDefaultMessage()));
         }
 
-        return ResponseEntity.ok().body(reviewService.postReview(request, authentication));
+        return ResponseEntity.ok().body(reviewService.writeReview(request, authentication));
+    }
+
+    /**
+     * 리뷰를 수정하는 api
+     *
+     * @param
+     * @return
+     */
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<ReviewModifyResponse> modify(
+            @PathVariable Long reviewId,
+            @RequestBody ReviewModifyRequest request,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok().body(reviewService.modifyReview(reviewId, request, authentication));
     }
 
     /**
@@ -108,12 +124,12 @@ public class ReviewController {
      * @param authentication - 리뷰가 등록된 가게의 점주 token
      * @return
      */
-    @PatchMapping("/{reviewId}")
+    @DeleteMapping("/{reviewId}")
     public ResponseEntity<ReviewHideResponse> hide(
             @PathVariable Long reviewId,
             Authentication authentication
     ) {
 
-        return ResponseEntity.ok().body(reviewService.hideReview(reviewId, authentication));
+        return ResponseEntity.ok().body(reviewService.hideReviewByStoreOwner(reviewId, authentication));
     }
 }
