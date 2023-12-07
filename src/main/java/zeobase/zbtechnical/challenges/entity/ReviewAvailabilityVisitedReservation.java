@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-public class ReviewAvailabilityReservation extends BaseEntity {
+public class ReviewAvailabilityVisitedReservation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +31,9 @@ public class ReviewAvailabilityReservation extends BaseEntity {
     private Long memberId;
 
     @NotNull
+    private String phone;
+
+    @NotNull
     private Long storeId;
 
     @NotNull
@@ -37,4 +41,7 @@ public class ReviewAvailabilityReservation extends BaseEntity {
 
     @NotNull
     private LocalDateTime visitedDateTime;
+
+    @NotNull
+    private LocalDate visitedDate;
 }
