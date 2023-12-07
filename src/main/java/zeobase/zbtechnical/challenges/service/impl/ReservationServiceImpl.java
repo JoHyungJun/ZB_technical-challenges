@@ -643,8 +643,6 @@ public class ReservationServiceImpl implements ReservationService {
                 throw new ReservationException(WAITING_RESERVATION);
             case CANCELED:
                 throw new ReservationException(CANCELED_RESERVATION);
-            default:
-                break;
         }
     }
 }

@@ -331,8 +331,6 @@ public class ReviewServiceImpl implements ReviewService {
                 throw new ReviewException(HIDE_REVIEW);
             case BLOCKED:
                 throw new ReviewException(BLOCKED_REVIEW);
-            default:
-                break;
         }
     }
 }
