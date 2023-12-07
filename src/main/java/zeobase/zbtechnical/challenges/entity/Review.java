@@ -47,4 +47,18 @@ public class Review extends BaseEntity {
 
         return this;
     }
+
+    public Review modifyStarRating(Double startRating) {
+
+        this.startRating = startRating;
+
+        return this;
+    }
+
+    public Review modifyReviewMessage(String reviewMessage) {
+
+        this.reviewMessage = reviewMessage;
+
+        return this;
+    }
 }

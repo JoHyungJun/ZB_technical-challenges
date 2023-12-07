@@ -55,7 +55,7 @@ public class ReservationController {
             @PathVariable Long storeId
     ) {
 
-        return ResponseEntity.ok().body(reservationService.getReservationsInfoByStoreId(storeId));
+        return ResponseEntity.ok().body(reservationService.getReservationsInfoByStore(storeId));
     }
 
     /**
@@ -111,7 +111,7 @@ public class ReservationController {
             throw new ReservationException(ErrorCode.INVALID_RESERVATION_REQUEST.modifyDescription(errors.get(0).getDefaultMessage()));
         }
 
-        return ResponseEntity.ok().body(reservationService.reserve(request, authentication));
+        return ResponseEntity.ok().body(reservationService.registerReservation(request, authentication));
     }
 
     /**
@@ -144,7 +144,7 @@ public class ReservationController {
             Authentication authentication
     ) {
 
-        return ResponseEntity.ok().body(reservationService.modify(reservationId, request, authentication));
+        return ResponseEntity.ok().body(reservationService.modifyReservation(reservationId, request, authentication));
     }
 
     /**

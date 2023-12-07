@@ -96,7 +96,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ReservationInfoResponse> getReservationsInfoByStoreId(Long storeId) {
+    public List<ReservationInfoResponse> getReservationsInfoByStore(Long storeId) {
 
         // store id 검증
         Store store = storeRepository.findById(storeId)
@@ -216,7 +216,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional
-    public ReservationReserveResponse reserve(ReservationReserveRequest request, Authentication authentication) {
+    public ReservationReserveResponse registerReservation(ReservationReserveRequest request, Authentication authentication) {
 
         // authentication 으로 member 추출
         Member member = memberService.getMemberByAuthentication(authentication);
@@ -381,7 +381,7 @@ public class ReservationServiceImpl implements ReservationService {
     // TODO : reserve 와 modify 겹치는 로직 및 메서드 리팩토링
     @Override
     @Transactional
-    public ReservationModifyResponse modify(Long reservationId, ReservationModifyRequest request, Authentication authentication) {
+    public ReservationModifyResponse modifyReservation(Long reservationId, ReservationModifyRequest request, Authentication authentication) {
 
         // reservation id 검증
         Reservation reservation = reservationRepository.findById(reservationId)
