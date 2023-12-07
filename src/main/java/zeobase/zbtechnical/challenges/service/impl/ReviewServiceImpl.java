@@ -320,16 +320,19 @@ public class ReviewServiceImpl implements ReviewService {
     /**
      * 리뷰의 조회 가능 여부를 검증하는 메서드
      * 
-     * @param review
+     * @param review - review 의 ReviewStatusType 검증
      * @return
      * @exception ReviewException
      */
     private void validateReviewStatus(Review review) {
 
-        if(ReviewStatusType.HIDE == review.getStatus()) {
-            throw new ReviewException(HIDE_REVIEW);
-        }else if(ReviewStatusType.BLOCKED == review.getStatus()) {
-            throw new ReviewException(BLOCKED_REVIEW);
+        switch(review.getStatus()) {
+            case HIDE :
+                throw new ReviewException(HIDE_REVIEW);
+            case BLOCKED:
+                throw new ReviewException(BLOCKED_REVIEW);
+            default:
+                break;
         }
     }
 }
