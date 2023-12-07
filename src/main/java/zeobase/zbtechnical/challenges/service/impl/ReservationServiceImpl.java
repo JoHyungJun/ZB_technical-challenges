@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_FULL_RESERVATION_TIME;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_RESERVATION_CANCELED;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_RESERVATION_CHECKED;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.CANCELED_RESERVATION;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_PERSON_COUNT_REQUEST;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_RESERVATION_CANCELED_TIME;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_RESERVATION_TIME;
@@ -48,7 +49,6 @@ import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_RES
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STORE_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.REJECTED_RESERVATION;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.WAITING_RESERVATION;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.CANCELED_RESERVATION;
 
 
 /**
@@ -630,20 +630,21 @@ public class ReservationServiceImpl implements ReservationService {
     /**
      * 예약의 승인/거절 상태를 검증하는 메서드
      *
-     * @param reservation
+     * @param reservation - reservation 의 ReservationAcceptedType 검증
      * @return
      * @exception ReservationException
      */
     public void validateReservationAccepted(Reservation reservation) {
 
-        ReservationAcceptedType reservationStatus = reservation.getAcceptedStatus();
-
-        if(ReservationAcceptedType.REJECTED == reservationStatus) {
-            throw new ReservationException(REJECTED_RESERVATION);
-        }else if(ReservationAcceptedType.WAITING == reservationStatus) {
-            throw new ReservationException(WAITING_RESERVATION);
-        }else if(ReservationAcceptedType.CANCELED == reservationStatus) {
-            throw new ReservationException(CANCELED_RESERVATION);
+        switch(reservation.getAcceptedStatus()) {
+            case REJECTED:
+                throw new ReservationException(REJECTED_RESERVATION);
+            case WAITING:
+                throw new ReservationException(WAITING_RESERVATION);
+            case CANCELED:
+                throw new ReservationException(CANCELED_RESERVATION);
+            default:
+                break;
         }
     }
 }

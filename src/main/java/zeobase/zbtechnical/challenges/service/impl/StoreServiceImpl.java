@@ -479,36 +479,38 @@ public class StoreServiceImpl implements StoreService {
     /**
      * 가게의 운영 상태를 검증하는 메서드
      *
-     * @param store
+     * @param store - store 의 StoreStatusType 검증
      * @return
      * @exception StoreException
      */
     public void validateStoreStatus(Store store) {
 
-        StoreStatusType status = store.getStatus();
-
-        if(StoreStatusType.SHUT_DOWN == status) {
-            throw new StoreException(SHUT_DOWN_STORE);
-        }else if(StoreStatusType.OPEN_PREPARING == status) {
-            throw new StoreException(OPEN_PREPARING_STORE);
+        switch(store.getStatus()) {
+            case SHUT_DOWN:
+                throw new StoreException(SHUT_DOWN_STORE);
+            case OPEN_PREPARING:
+                throw new StoreException(OPEN_PREPARING_STORE);
+            default:
+                break;
         }
     }
 
     /**
      * 가게의 등록 상태를 검증하는 메서드
      *
-     * @param store
+     * @param store - store 의 StoreSignedStatusType 검증
      * @return
      * @exception StoreException
      */
     public void validateStoreSignedStatus(Store store) {
 
-        StoreSignedStatusType signedStatus = store.getSignedStatus();
-
-        if(StoreSignedStatusType.WITHDRAW == signedStatus) {
-            throw new StoreException(WITHDRAW_STORE);
-        }else if(StoreSignedStatusType.BLOCKED == signedStatus) {
-            throw new StoreException(BLOCKED_STORE);
+        switch(store.getSignedStatus()) {
+            case WITHDRAW:
+                throw new StoreException(WITHDRAW_STORE);
+            case BLOCKED:
+                throw new StoreException(BLOCKED_STORE);
+            default:
+                break;
         }
     }
 }
