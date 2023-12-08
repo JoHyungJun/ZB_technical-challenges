@@ -7,38 +7,44 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.dto.review.request.ReviewModifyRequest;
-import zeobase.zbtechnical.challenges.dto.review.request.ReviewPostRequest;
+import zeobase.zbtechnical.challenges.dto.review.request.ReviewWriteRequest;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewHideResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewInfoResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewModifyResponse;
-import zeobase.zbtechnical.challenges.dto.review.response.ReviewPostResponse;
+import zeobase.zbtechnical.challenges.dto.review.response.ReviewWriteResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
+import zeobase.zbtechnical.challenges.entity.ReservationStillAvailableReviewing;
 import zeobase.zbtechnical.challenges.entity.Review;
 import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.exception.MemberException;
+import zeobase.zbtechnical.challenges.exception.ReservationException;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
 import zeobase.zbtechnical.challenges.repository.ReservationRepository;
+import zeobase.zbtechnical.challenges.repository.ReservationStillAvailableReviewingRepository;
 import zeobase.zbtechnical.challenges.repository.ReviewRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.ReviewService;
 import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
-import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
 import zeobase.zbtechnical.challenges.type.review.ReviewStatusType;
+import zeobase.zbtechnical.challenges.type.review.availability.ReviewWrittenStatusType;
 
 import java.util.stream.Collectors;
 
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_REVIEW_WRITTEN;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.BLOCKED_REVIEW;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.HIDE_REVIEW;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_REVIEW_REQUEST;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_STAR_RATING_VALUE;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.MISMATCH_ROLE;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_AVAILABLE_MODIFY_RESERVATION_RECORD;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_RESERVATION_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_AVAILABLE_REVIEWING_RESERVATION_RECORD;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_REVIEW_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_RESERVED_RECORD;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_VISITED_RECORD;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_REVIEW_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STORE_ID;
 import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MAX_STAR_RATING;
@@ -59,6 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final ReservationRepository reservationRepository;
+    private final ReservationStillAvailableReviewingRepository reservationStillAvailableReviewingRepository;
 
 
     /**
@@ -133,32 +140,48 @@ public class ReviewServiceImpl implements ReviewService {
      * 리뷰를 작성하는 메서드
      * store, member 관련 검증 후
      * 해당 이용자의 예약 기록을 추출하여, 해당 매장을 방문하지 않았다면 리뷰 작성 금지 처리
+     * 정책 상 방문 기록 일주일 내에 리뷰를 작성할 수 있음 (다음 주 동일 방문 요일까지)
      *
      * @param request - 매장 정보, 별점, 리뷰 내용
      * @param authentication - 토큰을 활용한 이용자(리뷰 작성자) 검증
-     * @return "dto/review/response/ReviewPostResponse"
+     * @return "dto/review/response/ReviewWriteResponse"
      * @exception ReviewException
+     * @exception StoreException
+     * @exception ReservationException
      */
     @Override
     @Transactional
-    public ReviewPostResponse writeReview(ReviewPostRequest request, Authentication authentication) {
+    public ReviewWriteResponse writeReview(ReviewWriteRequest request, Authentication authentication) {
 
         // store id 검증
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
+        // reservation id 검증
+        Reservation reservation = reservationRepository.findById(request.getReservationId())
+                .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID));
+
         // member 추출
         Member member = memberService.getMemberByAuthentication(authentication);
 
-        // member 의 예약(이용) 기록 검증 및 기록 추출
-        Reservation reservation = reservationRepository.findByMemberIdAndStoreId(member.getId(), store.getId())
-                .orElseThrow(() -> new ReviewException(NOT_FOUND_STORE_RESERVED_RECORD));
-
-        // 매장을 이용하지 않은 member 는 리뷰 작성 불가능.
-        // 단, 추가적인 요구사항에 따라 바뀔 수 있음. (예약만 한 손님도 리뷰 작성 가능)
-        if(reservation.getVisitedStatus() == ReservationVisitedType.UNVISITED) {
-            throw new ReviewException(NOT_FOUND_STORE_VISITED_RECORD);
+        // reservation 내에 저장된 member, store 의 정보가 일치하는지 검증
+        if(reservation.getMember().getId() != member.getId()
+            || reservation.getStore().getId() != store.getId()) {
+            throw new ReservationException(INVALID_REVIEW_REQUEST);
         }
+
+        // member 의 예약(이용) 기록 검증 및 기록 추출
+        ReservationStillAvailableReviewing visitedReservation
+                = reservationStillAvailableReviewingRepository.findByReservationId(request.getReservationId())
+                .orElseThrow(() -> new ReviewException(NOT_FOUND_AVAILABLE_REVIEWING_RESERVATION_RECORD));
+
+        // 같은 기록으로 또 다른 리뷰를 추가로 남기려 했을 때 에러 발생
+        if(visitedReservation.getStatus() == ReviewWrittenStatusType.WRITTEN) {
+            throw new ReviewException(ALREADY_REVIEW_WRITTEN);
+        }
+
+        // 리뷰를 작성했다면 status 를 변경하여 같은 기록으로 여러 리뷰를 남길 수 없도록 제한
+        reservationStillAvailableReviewingRepository.save(visitedReservation.modifyStatus(ReviewWrittenStatusType.WRITTEN));
 
         Review review = Review.builder()
                 .startRating(request.getStarRating())
@@ -168,11 +191,12 @@ public class ReviewServiceImpl implements ReviewService {
                 .store(store)
                 .build();
 
-        return ReviewPostResponse.fromEntity(reviewRepository.save(review));
+        return ReviewWriteResponse.fromEntity(reviewRepository.save(review));
     }
 
     /**
      * 리뷰를 수정하는 메서드
+     * 정책 상 방문 기록 일주일 내에 리뷰를 수정할 수 있음 (다음 주 동일 방문 요일까지)
      *
      * @param reviewId
      * @param request - star rating, review message
@@ -180,7 +204,6 @@ public class ReviewServiceImpl implements ReviewService {
      * @exception MemberException
      * @exception ReviewException
      */
-    // TODO : 현재는 미구현 상태이지만 일주일 내의 예약만 가능하도록 로직 수정 후, 별도의 validate 추가해주어야 함
     @Override
     @Transactional
     public ReviewModifyResponse modifyReview(Long reviewId, ReviewModifyRequest request, Authentication authentication) {
@@ -200,6 +223,11 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 본인이 작성한 리뷰가 맞는지 검증
         validateReviewOwner(review, member);
+
+        // 방문 후 일주일 이내의 수정 요청인지 검증
+        ReservationStillAvailableReviewing visitedReservation
+                = reservationStillAvailableReviewingRepository.findByReservationId(request.getReservationId())
+                .orElseThrow(() -> new ReviewException(NOT_FOUND_AVAILABLE_MODIFY_RESERVATION_RECORD));
 
         // star rating 수정 요청 시 검증 및 수정
         if(request.getStarRating() != null) {
@@ -308,11 +336,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     public void validateReviewOwner(Review review, Member member) {
 
-        if(!member.getReviews()
-                .stream()
-                .map(ownedReview -> ownedReview.getId())
-                .collect(Collectors.toList())
-                .contains(review.getId())) {
+        if(review.getMember().getId() != member.getId()) {
             throw new ReviewException(NOT_OWNED_REVIEW_ID);
         }
     }

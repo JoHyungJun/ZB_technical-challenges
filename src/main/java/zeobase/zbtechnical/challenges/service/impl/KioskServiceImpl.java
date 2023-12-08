@@ -10,16 +10,17 @@ import zeobase.zbtechnical.challenges.dto.kiosk.response.KioskPhoneResponse;
 import zeobase.zbtechnical.challenges.dto.kiosk.response.KioskSigninResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
-import zeobase.zbtechnical.challenges.entity.ReviewAvailabilityVisitedReservation;
+import zeobase.zbtechnical.challenges.entity.ReservationStillAvailableReviewing;
 import zeobase.zbtechnical.challenges.exception.KioskException;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
 import zeobase.zbtechnical.challenges.repository.ReservationRepository;
-import zeobase.zbtechnical.challenges.repository.ReviewAvailabilityVisitedReservationRepository;
+import zeobase.zbtechnical.challenges.repository.ReservationStillAvailableReviewingRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.KioskService;
 import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
+import zeobase.zbtechnical.challenges.type.review.availability.ReviewWrittenStatusType;
 
 import java.time.LocalDateTime;
 
@@ -45,14 +46,14 @@ public class KioskServiceImpl implements KioskService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final ReservationRepository reservationRepository;
-    private final ReviewAvailabilityVisitedReservationRepository reviewAvailabilityVisitedReservationRepository;
+    private final ReservationStillAvailableReviewingRepository reservationStillAvailableReviewingRepository;
 
 
     /**
      * 핸드폰 번호로 키오스크에서 방문 확인을 진행하는 메서드
      * request 로 전달된 정보와, 매장, 예약, 이용자에 대한 검증 후
      * 해당 예약 정보를 '이용자가 방문했음'으로 갱신
-     * 이후 방문 시간, 날짜를 ReviewAvailabilityVisitedReservationRepository 에 저장
+     * 이후 방문 시간, 날짜를 ReservationStillAvailableReviewingRepository 에 저장
      * 
      * @param request - 핸드폰 번호, 매장 정보, 예약 정보
      * @return "dto/kiosk/response/KioskPhoneResponse"
@@ -91,14 +92,13 @@ public class KioskServiceImpl implements KioskService {
         reservationRepository.save(reservation.modifyVisited(ReservationVisitedType.VISITED));
         
         // 방문 완료된 예약 및 이용자 정보를 review availability reservation 엔티티에 저장
-        reviewAvailabilityVisitedReservationRepository.save(
-                ReviewAvailabilityVisitedReservation.builder()
+        reservationStillAvailableReviewingRepository.save(
+                ReservationStillAvailableReviewing.builder()
                         .memberId(member.getId())
-                        .phone(member.getPhone())
                         .storeId(request.getStoreId())
                         .reservationId(reservation.getId())
-                        .visitedDateTime(nowDateTime)
                         .visitedDate(nowDateTime.toLocalDate())
+                        .status(ReviewWrittenStatusType.NOT_WRITTEN)
                         .build()
         );
 
@@ -111,7 +111,7 @@ public class KioskServiceImpl implements KioskService {
      * 이용자 id, password 로 키오스크에서 방문 확인을 진행하는 메서드
      * request 로 전달된 정보와, 매장, 예약, 이용자에 대한 검증 후
      * 해당 예약 정보를 '이용자가 방문했음'으로 갱신
-     * 이후 방문 시간, 날짜를 ReviewAvailabilityVisitedReservationRepository 에 저장
+     * 이후 방문 시간, 날짜를 ReservationStillAvailableReviewingRepository 에 저장
      *
      * @param request - id, password, 매장 정보, 예약 정보
      * @return "dto/kiosk/response/KioskSigninResponse"
@@ -155,14 +155,13 @@ public class KioskServiceImpl implements KioskService {
         reservationRepository.save(reservation.modifyVisited(ReservationVisitedType.VISITED));
 
         // 방문 완료된 예약 및 이용자 정보를 review availability reservation 엔티티에 저장
-        reviewAvailabilityVisitedReservationRepository.save(
-                ReviewAvailabilityVisitedReservation.builder()
+        reservationStillAvailableReviewingRepository.save(
+                ReservationStillAvailableReviewing.builder()
                         .memberId(member.getId())
-                        .phone(member.getPhone())
                         .storeId(request.getStoreId())
                         .reservationId(reservation.getId())
-                        .visitedDateTime(nowDateTime)
                         .visitedDate(nowDateTime.toLocalDate())
+                        .status(ReviewWrittenStatusType.NOT_WRITTEN)
                         .build()
         );
 

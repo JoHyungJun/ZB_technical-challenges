@@ -15,7 +15,9 @@ import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MIN_STAR_RA
  */
 @Builder
 @Getter
-public class ReviewPostRequest {
+public class ReviewWriteRequest {
+
+    private Long reservationId;
 
     private Long storeId;
 

@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReviewModifyRequest {
 
+    private Long reservationId;
+
     private Double starRating;
 
     private String reviewMessage;
