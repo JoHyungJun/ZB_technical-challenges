@@ -84,8 +84,8 @@ public class ReviewController {
      * @exception ReviewException
      */
     @PostMapping("")
-    public ResponseEntity<ReviewPostResponse> write(
-            @Valid @RequestBody ReviewPostRequest request,
+    public ResponseEntity<ReviewWriteResponse> write(
+            @Valid @RequestBody ReviewWriteRequest request,
             BindingResult bindingResult,
             Authentication authentication
     ) {

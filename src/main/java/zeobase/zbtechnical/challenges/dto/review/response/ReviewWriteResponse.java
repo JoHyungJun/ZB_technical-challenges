@@ -13,16 +13,16 @@ import zeobase.zbtechnical.challenges.entity.Review;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewPostResponse {
+public class ReviewWriteResponse {
 
     private Long memberId;
     private Long storeId;
     private Long reviewId;
 
 
-    public static ReviewPostResponse fromEntity(Review review) {
+    public static ReviewWriteResponse fromEntity(Review review) {
 
-        return ReviewPostResponse.builder()
+        return ReviewWriteResponse.builder()
                 .memberId(review.getMember().getId())
                 .storeId(review.getStore().getId())
                 .reviewId(review.getId())
