@@ -180,7 +180,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         // 요청된 인원 수 및 테이블 수 검증
         // table count 가 요청으로 전달되지 않았을 경우, (예약 인원 수 / 테이블 당 앉을 수 있는 사람 수)의 올림 값을 설정
-        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
+        // TODO : modify 부와 중복되는 로직이므로 추후 private 메서드로 extract (Util? 내부?)
+        // TODO : 디미터의 법칙?
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfoByValidate();
         Integer defaultTableCount = personCount / storeReservationInfo.getSeatingCapacityPerTable()
                 + (personCount % storeReservationInfo.getSeatingCapacityPerTable() != 0 ? 1 : 0);
 
@@ -244,8 +246,9 @@ public class ReservationServiceImpl implements ReservationService {
         
         // 요청된 인원 수 및 테이블 수 검증
         // table count 가 요청으로 전달되지 않았을 경우, (예약 인원 수 / 테이블 당 앉을 수 있는 사람 수)의 올림 값을 설정
-        // TODO : modify 부와 중복되는 로직이므로 추후 private 메서드로 extract
-        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
+        // TODO : modify 부와 중복되는 로직이므로 추후 private 메서드로 extract (Util? 내부?)
+        // TODO : 디미터의 법칙?
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfoByValidate();
         Integer defaultTableCount = request.getReservationPersonCount() / storeReservationInfo.getSeatingCapacityPerTable()
                 + (request.getReservationPersonCount() % storeReservationInfo.getSeatingCapacityPerTable() != 0 ? 1 : 0);
 
@@ -285,8 +288,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         return ReservationReserveResponse.builder()
                 .reservationId(reservation.getId())
-                .memberId(reservation.getMember().getId())
-                .storeId(reservation.getStore().getId())
+                .memberId(reservation.getMemberId())
+                .storeId(reservation.getStoreId())
                 .reservedDateTime(reservation.getReservationDateTime())
                 .reservationPersonCount(reservation.getReservationPersonCount())
                 .reservationTableCount(reservation.getReservationTableCount())
@@ -315,7 +318,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID));
 
         // store id 검증
-        Store store = storeRepository.findById(reservation.getStore().getId())
+        Store store = storeRepository.findById(reservation.getStoreId())
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
         // authentication (토큰) 으로 member 추출
@@ -343,6 +346,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         // store signed status 검증
         storeService.validateStoreSignedStatus(store);
+
+        // 전달된 예약 정보가 해당 매장의 예약인지 검증
         
         // 예약 취소 검증 (점주는 예약 취소 불가능)
         if(request.getAccepted() == ReservationAcceptedType.CANCELED) {
@@ -411,7 +416,7 @@ public class ReservationServiceImpl implements ReservationService {
             targetReservationDateTime = request.getReservationDateTime();
 
             // 운영 시간에 맞는 시간인지 검증
-            validateReservationWithinOpeningHoursAndTerm(reservation.getStore(), targetReservationDateTime);
+            validateReservationWithinOpeningHoursAndTerm(reservation.getStoreByValidate(), targetReservationDateTime);
         }
 
         // reservation person count 수정 요청 시 검증
@@ -435,7 +440,7 @@ public class ReservationServiceImpl implements ReservationService {
                 throw new ReservationException(INVALID_TABLE_COUNT_REQUEST);
             }
 
-            Integer seatingCapacityPerTable = reservation.getStore().getStoreReservationInfo().getSeatingCapacityPerTable();
+            Integer seatingCapacityPerTable = reservation.getStoreByValidate().getStoreReservationInfoByValidate().getSeatingCapacityPerTable();
             Integer minimumTableCount = targetReservationPersonCount / seatingCapacityPerTable
                     + (targetReservationPersonCount % seatingCapacityPerTable != 0 ? 1 : 0);
 
@@ -446,7 +451,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // 해당 날짜, 인원 수, 테이블 수가 예약 가능한지 검증
-        if(!validateAvailableReservationTime(reservation.getStore(), targetReservationDateTime, targetReservationPersonCount, targetReservationTableCount)) {
+        if(!validateAvailableReservationTime(reservation.getStoreByValidate(), targetReservationDateTime, targetReservationPersonCount, targetReservationTableCount)) {
             throw new ReservationException(ALREADY_FULL_RESERVATION_TIME);
         }
 
@@ -533,7 +538,7 @@ public class ReservationServiceImpl implements ReservationService {
         LocalTime openHours = store.getOpenHours();
         LocalTime closedHours = store.getClosedHours();
 
-        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfoByValidate();
         LocalTime reservationTerm = storeReservationInfo.getReservationTerm();
 
         LocalTime targetTime = targetDateTime.toLocalTime();
@@ -569,7 +574,7 @@ public class ReservationServiceImpl implements ReservationService {
         
         // 원하는 날짜와 시간에 점장이 허용한 예약으로 가득 찼다면 false 반환
         // max 로 가능한 테이블 수 및 예약 사람 수 계산 (테이블 수 * 테이블 당 앉을 수 있는 사람 수)
-        StoreReservationInfo reservationInfo = store.getStoreReservationInfo();
+        StoreReservationInfo reservationInfo = store.getStoreReservationInfoByValidate();
         Integer maxAvailableTableCount = reservationInfo.getTableCount();
         Integer maxAvailablePersonCount = maxAvailableTableCount * reservationInfo.getSeatingCapacityPerTable();
 

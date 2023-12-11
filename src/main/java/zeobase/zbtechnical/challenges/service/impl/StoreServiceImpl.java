@@ -269,8 +269,6 @@ public class StoreServiceImpl implements StoreService {
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
-        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfo();
-
         // 전달된 store id가 추출한 이용자(점주) 소유 매장인지 여부 검증
         if(!member.getStores()
                 .stream()
@@ -340,7 +338,9 @@ public class StoreServiceImpl implements StoreService {
             store.modifyStatus(request.getStatus());
         }
 
-        // openHours 혹은 closedHours, reservationTerm 수정 요청 시 검증 및 수정
+        // openHours 혹은 closedHours, reservationTerm 수정 요청 시 검증 및 수정-
+        StoreReservationInfo storeReservationInfo = store.getStoreReservationInfoByValidate();
+
         if(request.getOpenHours() != null || request.getClosedHours() != null) {
 
             LocalTime openHours =
@@ -354,7 +354,7 @@ public class StoreServiceImpl implements StoreService {
             }
 
             LocalTime reservationTerm =
-                    request.getReservationTerm() == null ? store.getStoreReservationInfo().getReservationTerm() : request.getReservationTerm();
+                    request.getReservationTerm() == null ? storeReservationInfo.getReservationTerm() : request.getReservationTerm();
 
             // 영업 시간보다 예약 텀 시간이 더 긴지 검증
             if(request.getReservationTerm().toSecondOfDay() > Duration.between(openHours, closedHours).getSeconds()) {

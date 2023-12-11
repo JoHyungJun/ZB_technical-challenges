@@ -22,6 +22,8 @@ public enum ErrorCode {
 
     INVALID_URL_STRING(HttpStatus.BAD_REQUEST, "url 로 잘못된 인자가 전달되었습니다."),
 
+    NULL_POINT_PRIMARY_KEY(HttpStatus.BAD_REQUEST, "id 를 추출하는 과정에서 null 값이 전달되었습니다."),
+
 
     // Token
     EXPIRED_JWT_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
@@ -54,7 +56,7 @@ public enum ErrorCode {
     MISMATCH_ROLE(HttpStatus.BAD_REQUEST, "이용자의 권한이 적절하지 않습니다."),
 
     WITHDRAWAL_MEMBER(HttpStatus.BAD_REQUEST, "탈퇴한 이용자입니다."),
-    BLOCKED_MEMBER(HttpStatus.BAD_REQUEST, "정지된 이용자입니다."),
+    BLOCKED_MEMBER(HttpStatus.BAD_REQUEST, "운영자에 의해 이용지 정지된 이용자입니다."),
     INACTIVE_MEMBER(HttpStatus.BAD_REQUEST, "비활성화된 이용자입니다."),
 
     EXPIRED_CREDENTIAL(HttpStatus.BAD_REQUEST, "비밀번호가 만료되었습니다."),
@@ -69,6 +71,9 @@ public enum ErrorCode {
     // Reservation
     NOT_FOUND_RESERVATION_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 예약 ID 입니다."),
     NOT_OWNED_RESERVATION_ID(HttpStatus.BAD_REQUEST, "본인이 등록한 예약이 아닙니다."),
+
+    NOT_FOUND_MEMBER_OWNED_RESERVATION(HttpStatus.BAD_REQUEST, "해당 예약에 등록된 이용자를 찾을 수 없습니다."),
+    NOT_FOUND_STORE_OWNED_RESERVATION(HttpStatus.BAD_REQUEST, "해당 예약에 등록된 매장을 찾을 수 없습니다."),
 
     INVALID_PERSON_COUNT_REQUEST(HttpStatus.BAD_REQUEST, "예약 인원 수 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_TABLE_COUNT_REQUEST(HttpStatus.BAD_REQUEST, "예약 테이블 수 정보로 잘못된 인자가 전달되었습니다."),
@@ -92,6 +97,9 @@ public enum ErrorCode {
     NOT_FOUND_STORE_VISITED_RECORD(HttpStatus.BAD_REQUEST, "매장을 이용하지 않은 이용자는 리뷰를 남길 수 없습니다."),
     NOT_FOUND_STORE_RESERVED_RECORD(HttpStatus.BAD_REQUEST, "매장을 예약하지 않은 이용자는 리뷰를 남길 수 없습니다."),
 
+    NOT_FOUND_MEMBER_OWNED_REVIEW(HttpStatus.BAD_REQUEST, "해당 리뷰에 등록된 이용자를 찾을 수 없습니다."),
+    NOT_FOUND_STORE_OWNED_REVIEW(HttpStatus.BAD_REQUEST, "해당 리뷰에 등록된 매장을 찾을 수 없습니다."),
+
     INVALID_REVIEW_REQUEST(HttpStatus.BAD_REQUEST, "리뷰 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_STAR_RATING_VALUE(HttpStatus.BAD_REQUEST, INVALID_STAR_RATING_MSG),
 
@@ -100,10 +108,13 @@ public enum ErrorCode {
     HIDE_REVIEW(HttpStatus.BAD_REQUEST, "볼 수 없는 리뷰입니다."),
     BLOCKED_REVIEW(HttpStatus.BAD_REQUEST, "운영자에 의해 차단된 리뷰입니다."),
 
-    // Store
-    NOT_FOUND_STORE_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 가게 ID 입니다."),
-    NOT_OWNED_STORE_ID(HttpStatus.BAD_REQUEST, "이용자 소유의 가게가 아닙니다."),
 
+    // Store
+    NOT_FOUND_STORE_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 매장 ID 입니다."),
+    NOT_OWNED_STORE_ID(HttpStatus.BAD_REQUEST, "이용자 소유의 매장이 아닙니다."),
+
+    NOT_FOUND_MEMBER_OWNED_STORE(HttpStatus.BAD_REQUEST, "해당 매장에 등록된 이용자(점주)를 찾을 수 없습니다."),
+    
     INVALID_STORE_SIGN_IN_REQUEST(HttpStatus.BAD_REQUEST, "매장 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_SORTED_TYPE(HttpStatus.BAD_REQUEST, "정렬 방식으로 잘못된 인자가 전달되었습니다."),
     INVALID_LOCATION_TYPE(HttpStatus.BAD_REQUEST, "위치 정보로 잘못된 형식의 인자가 전달되었습니다."),
@@ -114,10 +125,15 @@ public enum ErrorCode {
 
     ALREADY_FULL_RESERVATION_TIME(HttpStatus.BAD_REQUEST, "이미 예약이 가득 찬 시간입니다."),
 
-    SHUT_DOWN_STORE(HttpStatus.BAD_REQUEST, "영업을 종료한 가게입니다."),
-    OPEN_PREPARING_STORE(HttpStatus.BAD_REQUEST, "영업 준비 중인 가게입니다."),
-    WITHDRAW_STORE(HttpStatus.BAD_REQUEST, "등록을 해제한 가게입니다."),
-    BLOCKED_STORE(HttpStatus.BAD_REQUEST, "정지된 가게입니다."),
+    SHUT_DOWN_STORE(HttpStatus.BAD_REQUEST, "영업을 종료한 매장입니다."),
+    OPEN_PREPARING_STORE(HttpStatus.BAD_REQUEST, "영업 준비 중인 매장입니다."),
+    WITHDRAW_STORE(HttpStatus.BAD_REQUEST, "등록을 해제한 매장입니다."),
+    BLOCKED_STORE(HttpStatus.BAD_REQUEST, "운영자에 의해 이용이 정지된 매장입니다."),
+
+
+    // StoreReservationInfo
+    NOT_FOUND_STORE_OWNED_STORE_RESERVATION_INFO(HttpStatus.BAD_REQUEST, "해당 매장 예약 정보에 등록된 매장을 찾을 수 없습니다.")
+
 
 
     ;

@@ -11,7 +11,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
 import zeobase.zbtechnical.challenges.type.member.MemberSignedStatusType;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,16 +55,20 @@ public class Member extends BaseEntity implements UserDetails {
     private String phone;
 
     @Enumerated(value = EnumType.STRING)
-    private MemberSignedStatusType status;
+    @Builder.Default
+    private MemberSignedStatusType status = MemberSignedStatusType.ACTIVE;
 
     @OneToMany(mappedBy = "member")
-    private List<Reservation> reservations;
+    @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Store> stores;
+    @Builder.Default
+    private List<Store> stores = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<Review> reviews;
+    @Builder.Default
+    private List<Review> reviews = new ArrayList<>();
 
 
     @Override
