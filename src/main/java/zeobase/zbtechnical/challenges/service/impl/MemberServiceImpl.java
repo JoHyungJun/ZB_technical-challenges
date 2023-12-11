@@ -283,8 +283,8 @@ public class MemberServiceImpl implements MemberService {
         if(request.getPassword() != null) {
 
             // 비밀번호 길이 검증
-            if(request.getPassword().length() < MIN_PHONE_LENGTH ||
-               request.getPassword().length() > MAX_PHONE_LENGTH) {
+            if(request.getPassword().length() < MIN_PHONE_LENGTH
+               || request.getPassword().length() > MAX_PHONE_LENGTH) {
                 throw new MemberException(INVALID_PASSWORD_LENGTH);
             }
 
@@ -300,8 +300,8 @@ public class MemberServiceImpl implements MemberService {
         if(request.getRole() != null) {
 
             // 일반 이용자로 권한을 변경하고 싶을 시, 자기 소유의 매장이 존재한다면 거절
-            if(request.getRole() == MemberRoleType.MEMBER &&
-               member.getStores().size() > 0) {
+            if(request.getRole() == MemberRoleType.MEMBER
+               && member.getStores().size() > 0) {
                 throw new MemberException(INVALID_MEMBER_MODIFY_ROLE);
             }
 
@@ -389,7 +389,6 @@ public class MemberServiceImpl implements MemberService {
      * 이용자의 아이디 상태를 검증하는 메서드
      *
      * @param member - 이용자의 Entity 객체
-     * @return
      * @exception MemberException
      */
     public void validateMemberSignedStatus(Member member) {

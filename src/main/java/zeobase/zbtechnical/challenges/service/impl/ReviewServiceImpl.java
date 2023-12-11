@@ -165,8 +165,8 @@ public class ReviewServiceImpl implements ReviewService {
         Member member = memberService.getMemberByAuthentication(authentication);
 
         // reservation 내에 저장된 member, store 의 정보가 일치하는지 검증
-        if(reservation.getMember().getId() != member.getId()
-            || reservation.getStore().getId() != store.getId()) {
+        if(reservation.getMemberId() != member.getId()
+            || reservation.getStoreId() != store.getId()) {
             throw new ReservationException(INVALID_REVIEW_REQUEST);
         }
 
@@ -285,7 +285,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         // 해당 review 가 등록된 store 추출
-        Store store = review.getStore();
+        Store store = review.getStoreByValidate();
 
         // store status 검증
         storeService.validateStoreStatus(store);
@@ -336,7 +336,7 @@ public class ReviewServiceImpl implements ReviewService {
      */
     public void validateReviewOwner(Review review, Member member) {
 
-        if(review.getMember().getId() != member.getId()) {
+        if(review.getMemberId() != member.getId()) {
             throw new ReviewException(NOT_OWNED_REVIEW_ID);
         }
     }
