@@ -17,5 +17,5 @@ spring:
     secret: ZeRoBaSeTeChNiCaLChAlLeNgEsByHyUnGJuN950912
 
   scheduler:
-    reviewAvailabilityVisitedReservation:
+    reservationStillAvailableReviewing:
       cron: "0 0 0 * * *"

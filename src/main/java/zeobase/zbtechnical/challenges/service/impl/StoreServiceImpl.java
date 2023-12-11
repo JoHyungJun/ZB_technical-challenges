@@ -490,8 +490,6 @@ public class StoreServiceImpl implements StoreService {
                 throw new StoreException(SHUT_DOWN_STORE);
             case OPEN_PREPARING:
                 throw new StoreException(OPEN_PREPARING_STORE);
-            default:
-                break;
         }
     }
 
@@ -509,8 +507,6 @@ public class StoreServiceImpl implements StoreService {
                 throw new StoreException(WITHDRAW_STORE);
             case BLOCKED:
                 throw new StoreException(BLOCKED_STORE);
-            default:
-                break;
         }
     }
 }
