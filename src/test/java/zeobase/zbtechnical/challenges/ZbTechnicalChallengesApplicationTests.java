@@ -8,7 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ZbTechnicalChallengesApplicationTests {
 
 	@Test
-	void ymlTest(@Value("${spring.scheduler.reviewAvailabilityVisitedReservation.cron}") String cron) {
+	void ymlCronTest(@Value("${spring.scheduler.reviewAvailabilityVisitedReservation.cron}") String cron) {
 		System.out.println(cron);
+	}
+
+	@Test
+	void ymlRedisTest(@Value("${spring.redis.host}") String redisHost,
+				 	  @Value("${spring.redis.port}") Integer redisPort) {
+		System.out.println("redis host : " + redisHost + ", port : " + redisPort);
 	}
 }

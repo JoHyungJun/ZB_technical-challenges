@@ -288,8 +288,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         return ReservationReserveResponse.builder()
                 .reservationId(reservation.getId())
-                .memberId(reservation.getMemberId())
-                .storeId(reservation.getStoreId())
+                .memberId(reservation.getMemberIdByValidate())
+                .storeId(reservation.getStoreIdByValidate())
                 .reservedDateTime(reservation.getReservationDateTime())
                 .reservationPersonCount(reservation.getReservationPersonCount())
                 .reservationTableCount(reservation.getReservationTableCount())
@@ -318,7 +318,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID));
 
         // store id 검증
-        Store store = storeRepository.findById(reservation.getStoreId())
+        Store store = storeRepository.findById(reservation.getStoreIdByValidate())
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
 
         // authentication (토큰) 으로 member 추출

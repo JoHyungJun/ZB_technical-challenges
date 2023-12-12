@@ -79,10 +79,10 @@ public class KioskServiceImpl implements KioskService {
 
         // 키오스크 도달 시점 날짜와 요청 정보인 member id, store id, 시간에 해당하는 예약 여부 검증
         LocalDateTime nowDateTime = LocalDateTime.now();
-        LocalDateTime reservedDate = LocalDateTime.of(nowDateTime.toLocalDate(), request.getReservedTime());
+        LocalDateTime reservationDateTime = LocalDateTime.of(nowDateTime.toLocalDate(), request.getReservedTime());
 
-        Reservation reservation = reservationRepository.findTopByMemberIdAndStoreIdAndReservationDateTimeAndVisitedStatus(
-                member.getId(), request.getStoreId(), reservedDate, ReservationVisitedType.UNVISITED)
+        Reservation reservation = reservationRepository.findFirstByMemberIdAndStoreIdAndReservationDateTimeAndVisitedStatus(
+                member.getId(), request.getStoreId(), reservationDateTime, ReservationVisitedType.UNVISITED)
                 .orElseThrow(() -> new KioskException(NOT_FOUND_RESERVED_MEMBER));
 
         // 점주가 수락한 예약인지 검증
@@ -142,10 +142,10 @@ public class KioskServiceImpl implements KioskService {
 
         // 키오스크 도달 시점 날짜와 요청 정보인 member id, store id, 시간에 해당하는 예약 여부 검증
         LocalDateTime nowDateTime = LocalDateTime.now();
-        LocalDateTime reservedDate = LocalDateTime.of(nowDateTime.toLocalDate(), request.getReservedTime());
+        LocalDateTime reservationDateTime = LocalDateTime.of(nowDateTime.toLocalDate(), request.getReservedTime());
 
-        Reservation reservation = reservationRepository.findTopByMemberIdAndStoreIdAndReservationDateTimeAndVisitedStatus(
-                        member.getId(), request.getStoreId(), reservedDate, ReservationVisitedType.UNVISITED)
+        Reservation reservation = reservationRepository.findFirstByMemberIdAndStoreIdAndReservationDateTimeAndVisitedStatus(
+                        member.getId(), request.getStoreId(), reservationDateTime, ReservationVisitedType.UNVISITED)
                 .orElseThrow(() -> new KioskException(NOT_FOUND_RESERVED_MEMBER));
 
         // 점주가 수락한 예약인지 검증

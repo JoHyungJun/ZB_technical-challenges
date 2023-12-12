@@ -114,7 +114,7 @@ public class Reservation extends BaseEntity {
      * @return member id
      * @exception ReservationException
      */
-    public Long getMemberId() {
+    public Long getMemberIdByValidate() {
 
         Long validatedId = getMemberByValidate().getId();
 
@@ -149,7 +149,7 @@ public class Reservation extends BaseEntity {
      * @return store id
      * @exception ReservationException
      */
-    public Long getStoreId() {
+    public Long getStoreIdByValidate() {
 
         Long validatedId = getStoreByValidate().getId();
 
