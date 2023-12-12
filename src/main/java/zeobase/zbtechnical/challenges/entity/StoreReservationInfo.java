@@ -71,7 +71,7 @@ public class StoreReservationInfo extends BaseEntity {
      * @return store id
      * @exception StoreException
      */
-    public Long getStoreId() {
+    public Long getStoreIdByValidate() {
 
         Long validatedId = getStoreByValidate().getId();
 

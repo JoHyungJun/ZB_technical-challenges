@@ -83,7 +83,7 @@ public class Review extends BaseEntity {
      * @return member id
      * @exception ReviewException
      */
-    public Long getMemberId() {
+    public Long getMemberIdByValidate() {
 
         Long validatedId = getMemberByValidate().getId();
 
@@ -118,7 +118,7 @@ public class Review extends BaseEntity {
      * @return store id
      * @exception ReviewException
      */
-    public Long getStoreId() {
+    public Long getStoreIdByValidate() {
 
         Long validatedId = getStoreByValidate().getId();
 
