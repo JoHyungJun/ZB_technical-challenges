@@ -58,6 +58,7 @@ public class StoreServiceImpl implements StoreService {
     // 최소 예약 텀은 30분으로 설정 -> 추가 요구사항 때 바뀔 수 있음
     private static final LocalTime MINIMUM_RESERVATION_TERM = LocalTime.of(0, 30);
     private static final Double DEFAULT_STAR_RATING = 0.0;
+    private static final Long DEFAULT_REVIEW_PARTICIPANT_COUNT = 0l;
     private static final StoreSignedStatusType DEFAULT_SIGNED_STATUS = StoreSignedStatusType.ACTIVE;
     private static final Integer DEFAULT_TABLE_COUNT = 1;
     private static final Integer DEFAULT_SEATING_CAPACITY_PER_TABLE = 4;
@@ -230,6 +231,7 @@ public class StoreServiceImpl implements StoreService {
                     .openHours(request.getOpenHours())
                     .closedHours(request.getClosedHours())
                     .starRating(DEFAULT_STAR_RATING)
+                    .reviewParticipantCount(DEFAULT_REVIEW_PARTICIPANT_COUNT)
                     .member(member)
                     .storeReservationInfo(storeReservationInfo)
                     .build()

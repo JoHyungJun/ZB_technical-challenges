@@ -65,6 +65,8 @@ public class Store extends BaseEntity {
 
     private Double starRating;
 
+    private Long reviewParticipantCount;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
