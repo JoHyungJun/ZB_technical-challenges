@@ -15,6 +15,6 @@ public interface StoreInfoWithDistanceDiffDto {
     LocalTime getOpenHours();
     LocalTime getClosedHours();
     Double getStarRating();
+    Long getReviewParticipantCount();
     Double getDistanceDiff();
-    // TODO : star rating 캐싱 이후 구현
 }

@@ -47,6 +47,8 @@ public class StoreInfoResponse {
 
     private Double starRating;
 
+    private Long reviewParticipantCount;
+
 
     public static StoreInfoResponse fromEntity(Store store) {
 
@@ -65,6 +67,7 @@ public class StoreInfoResponse {
                 .tableCount(storeReservationInfo.getTableCount())
                 .seatingCapacityPerTable(storeReservationInfo.getSeatingCapacityPerTable())
                 .starRating(store.getAverageStarRating())
+                .reviewParticipantCount(store.getReviewParticipantCount())
                 .build();
     }
 }

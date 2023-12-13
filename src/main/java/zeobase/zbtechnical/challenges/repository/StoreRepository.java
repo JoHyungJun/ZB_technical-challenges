@@ -19,7 +19,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query(
     nativeQuery = true,
     value = "SELECT id AS storeId, name, explanation, status, latitude, longitude, " +
-            "       open_hours AS openHours, closed_hours AS closedHours, star_rating AS starRating, " +
+            "       open_hours AS openHours, closed_hours AS closedHours, " +
+            "       star_rating AS starRating, review_participant_count AS reviewParticipantCount, " +
             "       (6371 * ACOS(cos(RADIANS(:latitude))" +
             "           * COS(RADIANS(latitude))" +
             "           * COS(RADIANS(longitude) - RADIANS(:longitude))" +

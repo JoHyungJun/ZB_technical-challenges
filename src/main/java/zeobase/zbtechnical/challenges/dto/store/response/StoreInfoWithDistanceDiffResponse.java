@@ -39,6 +39,7 @@ public class StoreInfoWithDistanceDiffResponse extends StoreInfoResponse {
                 .explanation(store.getExplanation())
                 .status(store.getStatus())
                 .starRating(store.getAverageStarRating())
+                .reviewParticipantCount(store.getReviewParticipantCount())
                 .openHours(store.getOpenHours())
                 .closedHours(store.getClosedHours())
                 .distanceDiff(distanceDiff)
@@ -64,6 +65,7 @@ public class StoreInfoWithDistanceDiffResponse extends StoreInfoResponse {
                 .openHours(dto.getOpenHours())
                 .closedHours(dto.getClosedHours())
                 .starRating(dto.getStarRating())
+                .reviewParticipantCount(dto.getReviewParticipantCount())
                 .distanceDiff(dto.getDistanceDiff())
                 .build();
     }
