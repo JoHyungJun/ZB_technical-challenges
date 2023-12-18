@@ -117,6 +117,7 @@
     - 리뷰 등록
         - 이용자가 특정 매장의 리뷰를 등록할 수 있다. 매장 pk, 별점, 리뷰 메세지, 사진을 입력 받는다.
             - 해당 이용자가 해당 매장을 예약 했는지, 방문했는지 여부에 따라 결정된다.
+            - 방문 이후 일주일 이내에 (다음 주의 동일 요일까지) 리뷰 작성 및 수정이 가능하다.
             
     - 리뷰 수정
         - 이용자가 리뷰 등록에 사용된 정보 중 리뷰 메세지, 사진 정보를 수정할 수 있다.
@@ -157,7 +158,12 @@
 
 
 ## ERD
-![image](https://github.com/JoHyungJun/ZB_technical-challenges/assets/56953934/6a21f092-b16a-4213-8bf3-e5bdeae5b7bd)
+[ERD 링크](https://www.erdcloud.com/d/pWpvQqD8dbnJDFGde)
+<br><br><br>
+
+`참고 사진`
+<br><br>
+![image](https://github.com/JoHyungJun/ZB_technical-challenges/assets/56953934/3c39b75b-6444-4d36-9ce9-0916cf872f24)
 <br><br><br>
 
 
