@@ -132,18 +132,11 @@ public class Store extends BaseEntity {
         return this;
     }
 
-    public Double getAverageStarRating() {
+    public Store modifyStarRating(Double starRating) {
 
-        if(this.reviews.size() == 0) {
-            return 0.0;
-        }
+        this.starRating = starRating;
 
-        Double totalRating = this.reviews
-                .stream()
-                .mapToDouble(review -> review.getStarRating())
-                .sum();
-
-        return totalRating / (double) this.reviews.size();
+        return this;
     }
 
     /**

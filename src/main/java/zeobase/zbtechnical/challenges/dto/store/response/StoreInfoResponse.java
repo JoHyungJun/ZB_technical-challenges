@@ -66,7 +66,7 @@ public class StoreInfoResponse {
                 .reservationTerm(storeReservationInfo.getReservationTerm())
                 .tableCount(storeReservationInfo.getTableCount())
                 .seatingCapacityPerTable(storeReservationInfo.getSeatingCapacityPerTable())
-                .starRating(store.getAverageStarRating())
+                .starRating(store.getStarRating())
                 .reviewParticipantCount(store.getReviewParticipantCount())
                 .build();
     }

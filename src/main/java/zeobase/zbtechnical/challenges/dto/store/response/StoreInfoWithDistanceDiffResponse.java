@@ -38,7 +38,7 @@ public class StoreInfoWithDistanceDiffResponse extends StoreInfoResponse {
                 .longitude(store.getLongitude())
                 .explanation(store.getExplanation())
                 .status(store.getStatus())
-                .starRating(store.getAverageStarRating())
+                .starRating(store.getStarRating())
                 .reviewParticipantCount(store.getReviewParticipantCount())
                 .openHours(store.getOpenHours())
                 .closedHours(store.getClosedHours())

@@ -7,7 +7,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import zeobase.zbtechnical.challenges.entity.ReviewStatistics;
+import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.repository.ReviewStatisticsRepository;
+import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.type.redis.value.CacheReviewStarRating;
 
 import java.util.Comparator;
@@ -17,7 +19,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static zeobase.zbtechnical.challenges.type.common.SQLType.INSERT;
 import static zeobase.zbtechnical.challenges.type.redis.key.RedisKeyType.REVIEW_STATISTICS_STAR_RATING_UPDATE;
 
 @Slf4j
@@ -28,6 +29,7 @@ public class ReviewScheduler {
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final ReviewStatisticsRepository reviewStatisticsRepository;
+    private final StoreRepository storeRepository;
 
 
     @Transactional
@@ -38,7 +40,15 @@ public class ReviewScheduler {
                 .members(REVIEW_STATISTICS_STAR_RATING_UPDATE.getStringKey())
                 .stream()
                 .map(object -> (CacheReviewStarRating) object)
-                .sorted(Comparator.comparingInt(cacheReviewStarRating -> cacheReviewStarRating.getSqlType() == INSERT ? 0 : 1))
+                .sorted(Comparator.comparingInt(
+                    cachedReviewStarRating -> {
+                        switch (cachedReviewStarRating.getSqlType()) {
+                            case INSERT : return 0;
+                            case UPDATE : return 1;
+                            case DELETE : return 2;
+                            default : return -1;
+                        }
+                }))
                 .collect(Collectors.toList());
 
         Set<Long> targetStoreIds = cachedReviewsStarRatings.stream()
@@ -76,6 +86,19 @@ public class ReviewScheduler {
                     reviewStatistics.decreaseTotalStarRating(cachedReviewStarRating.getStarRating());
                     break;
             }
+        }
+
+
+        List<Store> targetStores = storeRepository.findAllById(targetStoreIds);
+        for(Store targetStore : targetStores) {
+
+            reviewStatistics = cachedReviewStatisticsMap.get(targetStore.getId());
+            if(reviewStatistics == null) {
+                log.error("target storeId in ReviewScheduler does not exist in StoreRepository -> {}", targetStore.getId());
+                continue;
+            }
+
+            targetStore.modifyStarRating(reviewStatistics.getStarRating());
         }
 
         redisTemplate.delete(REVIEW_STATISTICS_STAR_RATING_UPDATE.getStringKey());
