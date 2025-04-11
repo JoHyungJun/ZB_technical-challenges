@@ -10,10 +10,12 @@ public class ValidateConstants {
     public static final int MAX_PHONE_LENGTH = 16;  // error 발생!
 
     public static final String PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?!.*\\s).+$";
-    public static final String PHONE_REGEX = "^01([0|1|6|7|8|9])([0-9]{3,4})([0-9]{4})";
+    public static final String PHONE_REGEX = "^01([0|1|6|7|8|9])([0-9]{3,4})([0-9]{4})$";
 
 
     // Review
     public static final long MAX_STAR_RATING = 5l;
     public static final long MIN_STAR_RATING = 0l;
+
+    public static final long MAX_AVAILABLE_REVIEWING_DAYS = 7l;
 }

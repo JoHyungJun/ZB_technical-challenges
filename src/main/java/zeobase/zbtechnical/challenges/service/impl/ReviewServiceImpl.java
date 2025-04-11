@@ -3,6 +3,7 @@ package zeobase.zbtechnical.challenges.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,6 @@ import zeobase.zbtechnical.challenges.dto.review.response.ReviewModifyResponse;
 import zeobase.zbtechnical.challenges.dto.review.response.ReviewWriteResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
-import zeobase.zbtechnical.challenges.entity.ReservationStillAvailableReviewing;
 import zeobase.zbtechnical.challenges.entity.Review;
 import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.exception.MemberException;
@@ -23,30 +23,37 @@ import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
 import zeobase.zbtechnical.challenges.repository.ReservationRepository;
-import zeobase.zbtechnical.challenges.repository.ReservationStillAvailableReviewingRepository;
 import zeobase.zbtechnical.challenges.repository.ReviewRepository;
+import zeobase.zbtechnical.challenges.repository.ReviewStatisticsRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.ReviewService;
 import zeobase.zbtechnical.challenges.type.member.MemberRoleType;
+import zeobase.zbtechnical.challenges.type.redis.value.CacheReviewStarRating;
 import zeobase.zbtechnical.challenges.type.review.ReviewStatusType;
-import zeobase.zbtechnical.challenges.type.review.availability.ReviewWrittenStatusType;
 
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.ALREADY_REVIEW_WRITTEN;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.BLOCKED_REVIEW;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.HIDE_REVIEW;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_REVIEWING_DEADLINE;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_REVIEW_REQUEST;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.INVALID_STAR_RATING_VALUE;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.MISMATCH_ROLE;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_AVAILABLE_MODIFY_RESERVATION_RECORD;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_RESERVATION_ID;
-import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_AVAILABLE_REVIEWING_RESERVATION_RECORD;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_REVIEW_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_ID;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_VISITED_RECORD;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_REVIEW_ID;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_OWNED_STORE_ID;
+import static zeobase.zbtechnical.challenges.type.common.SQLType.DELETE;
+import static zeobase.zbtechnical.challenges.type.common.SQLType.INSERT;
+import static zeobase.zbtechnical.challenges.type.common.SQLType.UPDATE;
+import static zeobase.zbtechnical.challenges.type.redis.key.RedisKeyType.REVIEW_STATISTICS_STAR_RATING_UPDATE;
+import static zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType.VISITED;
+import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MAX_AVAILABLE_REVIEWING_DAYS;
 import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MAX_STAR_RATING;
 import static zeobase.zbtechnical.challenges.utils.ValidateConstants.MIN_STAR_RATING;
 
@@ -65,7 +72,9 @@ public class ReviewServiceImpl implements ReviewService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final ReservationRepository reservationRepository;
-    private final ReservationStillAvailableReviewingRepository reservationStillAvailableReviewingRepository;
+    private final ReviewStatisticsRepository reviewStatisticsRepository;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
 
     /**
@@ -137,6 +146,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     /**
+        TODO : 리뷰 작성 시 redis, DB 동시 저장. (최신순 리뷰 조회를 위해)
+        - 개별 리뷰 조회 시 redis 먼저 살펴보고 DB 접근.
+        - 수정 시 redis에 없다면 거절.
+        - 최대 수정 일자가 지나면 redis에서 expired event로 DB 개별 리뷰에 반영 + 통계 테이블에 저장
+            -> batch + redis + 통계 테이블
+     */
+
+    /**
      * 리뷰를 작성하는 메서드
      * store, member 관련 검증 후
      * 해당 이용자의 예약 기록을 추출하여, 해당 매장을 방문하지 않았다면 리뷰 작성 금지 처리
@@ -153,16 +170,35 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewWriteResponse writeReview(ReviewWriteRequest request, Authentication authentication) {
 
+        // TODO : redis 에 이미 저장 된 key 인지, 그러니까 review 작성 요청이 2 번 이상 들어왔을 떄 처리
+
         // store id 검증
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new StoreException(NOT_FOUND_STORE_ID));
+
+        // store status 검증
+        storeService.validateStoreStatus(store);
+
+        // store signed status 검증
+        storeService.validateStoreSignedStatus(store);
 
         // reservation id 검증
         Reservation reservation = reservationRepository.findById(request.getReservationId())
                 .orElseThrow(() -> new ReservationException(NOT_FOUND_RESERVATION_ID));
 
+        // 해당 reservation 으로 방문했는지 검증
+        if(reservation.getVisitedStatus() != VISITED) {
+            throw new ReviewException(NOT_FOUND_STORE_VISITED_RECORD);
+        }
+
+        // 해당 reservation 이 현재 시각 기준 일주일 안에 일어난 예약인지 검증
+        validateAvailableReviewingDeadlineByReservation(reservation);
+
         // member 추출
         Member member = memberService.getMemberByAuthentication(authentication);
+
+        // member status 검증
+        memberService.validateMemberSignedStatus(member);
 
         // reservation 내에 저장된 member, store 의 정보가 일치하는지 검증
         if(reservation.getMemberIdByValidate() != member.getId()
@@ -170,26 +206,33 @@ public class ReviewServiceImpl implements ReviewService {
             throw new ReservationException(INVALID_REVIEW_REQUEST);
         }
 
-        // member 의 예약(이용) 기록 검증 및 기록 추출
-        ReservationStillAvailableReviewing visitedReservation
-                = reservationStillAvailableReviewingRepository.findByReservationId(request.getReservationId())
-                .orElseThrow(() -> new ReviewException(NOT_FOUND_AVAILABLE_REVIEWING_RESERVATION_RECORD));
-
         // 같은 기록으로 또 다른 리뷰를 추가로 남기려 했을 때 에러 발생
-        if(visitedReservation.getStatus() == ReviewWrittenStatusType.WRITTEN) {
+        Review ownedReview = reservation.getReviewByValidate();
+        if(ownedReview != null) {
             throw new ReviewException(ALREADY_REVIEW_WRITTEN);
         }
 
-        // 리뷰를 작성했다면 status 를 변경하여 같은 기록으로 여러 리뷰를 남길 수 없도록 제한
-        reservationStillAvailableReviewingRepository.save(visitedReservation.modifyStatus(ReviewWrittenStatusType.WRITTEN));
-
         Review review = Review.builder()
-                .startRating(request.getStarRating())
+                .starRating(request.getStarRating())
                 .reviewMessage(request.getReviewMessage())
                 .status(ReviewStatusType.SHOW)
                 .member(member)
                 .store(store)
+                .reservation(reservation)
                 .build();
+
+        // 리뷰를 작성했다면 reservation 의 review 값을 세팅하여 같은 기록으로 여러 리뷰를 남길 수 없도록 제한
+        reservation.setReview(review);
+
+        // 별점 캐싱 및 통계 테이블 반영을 위해 redis 에 저장
+        cacheReviewStarRating(CacheReviewStarRating.builder()
+                .sqlType(INSERT)
+                .reviewId(review.getId())
+                .storeId(store.getId())
+                .starRating(review.getStarRating())
+                .previousStarRatingForUpdate(null)
+                .build());
+
 
         return ReviewWriteResponse.fromEntity(reviewRepository.save(review));
     }
@@ -221,19 +264,38 @@ public class ReviewServiceImpl implements ReviewService {
         // member status 검증
         memberService.validateMemberSignedStatus(member);
 
+        // store 추출
+        Store store = review.getStoreByValidate();
+
+        // store status 검증
+        storeService.validateStoreStatus(store);
+
+        // store signed status 검증
+        storeService.validateStoreSignedStatus(store);
+
         // 본인이 작성한 리뷰가 맞는지 검증
         validateReviewOwner(review, member);
 
+        // reservation 추출
+        Reservation reservation = review.getValidatedReservation();
+
         // 방문 후 일주일 이내의 수정 요청인지 검증
-        ReservationStillAvailableReviewing visitedReservation
-                = reservationStillAvailableReviewingRepository.findByReservationId(request.getReservationId())
-                .orElseThrow(() -> new ReviewException(NOT_FOUND_AVAILABLE_MODIFY_RESERVATION_RECORD));
+        validateAvailableReviewingDeadlineByReservation(reservation);
 
         // star rating 수정 요청 시 검증 및 수정
         if(request.getStarRating() != null) {
 
             // 0.0 이상, 5.0 이하의 값인지 검증
             validateStarRating(request.getStarRating());
+
+            // 별점 캐싱 및 통계 테이블 반영을 위해 redis 에 저장
+            cacheReviewStarRating(CacheReviewStarRating.builder()
+                    .sqlType(UPDATE)
+                    .reviewId(review.getId())
+                    .storeId(store.getId())
+                    .starRating(request.getStarRating())
+                    .previousStarRatingForUpdate(review.getStarRating())
+                    .build());
 
             review.modifyStarRating(request.getStarRating());
         }
@@ -244,15 +306,14 @@ public class ReviewServiceImpl implements ReviewService {
             review.modifyReviewMessage(review.getReviewMessage());
         }
 
-        review = reviewRepository.save(review);
-
+        
         return ReviewModifyResponse.builder()
                 .reviewId(review.getId())
                 .build();
     }
 
     /**
-     * 개별 리뷰를 조회할 수 없도록 숨기는 메서드
+     * 점주가 리뷰를 삭제하는 메서드
      * 현재는 리뷰가 등록된 매장 점주가 요청 가능
      *
      * @param reviewId
@@ -303,15 +364,24 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         // review 의 status 를 HIDE 로 변경 (soft delete)
-        review = reviewRepository.save(
-                review.modifyStatus(ReviewStatusType.HIDE)
-        );
+        review.modifyStatus(ReviewStatusType.HIDE);
+
+        // 별점 캐싱 및 통계 테이블 반영을 위해 redis 에 저장
+        cacheReviewStarRating(CacheReviewStarRating.builder()
+                .sqlType(DELETE)
+                .reviewId(review.getId())
+                .storeId(store.getId())
+                .starRating(review.getStarRating())
+                .previousStarRatingForUpdate(null)
+                .build());
 
         return ReviewHideResponse.builder()
                 .reviewId(review.getId())
                 .build();
     }
 
+    // TODO : 이용자가 리뷰 삭제하는 거 만들어야 함
+    
     /**
      * 요청 받은 별점 값이 0 이상, 5 이하의 값이 맞는지 검증하는 메서드
      *
@@ -356,5 +426,32 @@ public class ReviewServiceImpl implements ReviewService {
             case BLOCKED:
                 throw new ReviewException(BLOCKED_REVIEW);
         }
+    }
+
+    /**
+     * 예약별 작성된 리뷰가 작성/수정 가능한 시간인지 검증
+     *
+     * @param reservation - reservation 의 예약 날짜와 현재 날짜 비교
+     * @return
+     * @exception ReviewException
+     */
+    private void validateAvailableReviewingDeadlineByReservation(Reservation reservation) {
+
+        if(!reservation.getReservationDateTime().plusDays(MAX_AVAILABLE_REVIEWING_DAYS).isBefore(LocalDateTime.now())) {
+            throw new ReviewException(INVALID_REVIEWING_DEADLINE);
+        }
+    }
+
+    /**
+     * 별점 등록/수정/삭제 시 redis 에 반영
+     *
+     * @param cacheReviewStarRating - redis 에 캐싱할 별점 및 관련 정보
+     * @return
+     * @exception
+     */
+    private void cacheReviewStarRating(CacheReviewStarRating cacheReviewStarRating) {
+
+        var setOperations = redisTemplate.opsForSet();
+        setOperations.add(REVIEW_STATISTICS_STAR_RATING_UPDATE.getStringKey(), cacheReviewStarRating);
     }
 }

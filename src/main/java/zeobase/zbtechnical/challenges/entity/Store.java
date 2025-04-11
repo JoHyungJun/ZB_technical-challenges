@@ -140,7 +140,7 @@ public class Store extends BaseEntity {
 
         Double totalRating = this.reviews
                 .stream()
-                .mapToDouble(review -> review.getStartRating())
+                .mapToDouble(review -> review.getStarRating())
                 .sum();
 
         return totalRating / (double) this.reviews.size();

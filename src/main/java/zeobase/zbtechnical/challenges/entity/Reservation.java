@@ -18,11 +18,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_OWNED_RESERVATION;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_REVIEW_OWNED_RESERVATION;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_OWNED_RESERVATION;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NULL_POINT_PRIMARY_KEY;
 
@@ -69,6 +71,16 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @OneToOne(mappedBy = "reservation")
+    private Review review;
+
+
+    public Reservation setReview(Review review) {
+
+        this.review = review;
+
+        return this;
+    }
 
     public Reservation modifyAccepted(ReservationAcceptedType reservationAcceptedType){
 
@@ -174,5 +186,40 @@ public class Reservation extends BaseEntity {
         }
 
         return this.store;
+    }
+
+    /**
+     * 해당 reservation 의 연관관계로 의존하는 review 의 id 를 추출하는 메서드
+     * review id 가 null 이라면 예외 처리
+     * 내부적으로 getReviewByValidate() 메서드를 통해 검증
+     *
+     * @return review id
+     * @exception ReservationException
+     */
+    public Long getReviewIdByValidate() {
+
+        Long validatedId = getReviewByValidate().getId();
+
+        if(validatedId == null) {
+            throw new ReservationException(NULL_POINT_PRIMARY_KEY);
+        }
+
+        return validatedId;
+    }
+
+    /**
+     * 해당 reservation 의 연관관계로 의존하는 review 을 추출하는 메서드
+     * Review 가 null 이라면 예외 처리
+     *
+     * @return "entity/Review"
+     * @exception ReservationException
+     */
+    public Review getReviewByValidate() {
+
+        if(this.review == null) {
+            throw new ReservationException(NOT_FOUND_REVIEW_OWNED_RESERVATION);
+        }
+
+        return this.review;
     }
 }

@@ -28,7 +28,7 @@ public class ReviewInfoResponse {
                 .reviewId(review.getId())
                 .memberId(review.getMember().getId())
                 .storeId(review.getStore().getId())
-                .starRating(review.getStartRating())
+                .starRating(review.getStarRating())
                 .reviewMessage(review.getReviewMessage())
                 .build();
     }

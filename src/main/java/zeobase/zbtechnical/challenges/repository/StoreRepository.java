@@ -14,17 +14,36 @@ import zeobase.zbtechnical.challenges.type.store.StoreStatusType;
  */
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
+    /**
+     * 이 메서드는 직접 사용하지 마세요!
+     * <p>최초 Store 생성 시엔 {@link zeobase.zbtechnical.challenges.service.impl.StoreServiceImpl#saveWithEvent(Store)} 메서드를,</p>
+     * <p>Store 정보 수정 시엔 {@link zeobase.zbtechnical.challenges.service.impl.StoreServiceImpl#updateStore(Store)} 메서드를</p>
+     * <p>사용하세요!</p>
+     *
+     * @deprecated StoreServiceImpl 의 saveWithEvent/updateStore 메서드를 대신 사용하세요.
+     */
+    @Override
+    @Deprecated(since = "2025-04-09", forRemoval = false)
+    <S extends Store> S save(S entity);
+
     boolean existsById(Long id);
 
     @Query(
     nativeQuery = true,
-    value = "SELECT id AS storeId, name, explanation, status, latitude, longitude, " +
-            "       open_hours AS openHours, closed_hours AS closedHours, " +
-            "       star_rating AS starRating, review_participant_count AS reviewParticipantCount, " +
-            "       (6371 * ACOS(cos(RADIANS(:latitude))" +
-            "           * COS(RADIANS(latitude))" +
-            "           * COS(RADIANS(longitude) - RADIANS(:longitude))" +
-            "           + SIN(RADIANS(:latitude)) * SIN(RADIANS(longitude)))) AS `distanceDiff` " +
+    value = "SELECT id AS storeId" +
+            "       , name " +
+            "       , explanation " +
+            "       , status " +
+            "       , latitude " +
+            "       , longitude " +
+            "       , open_hours AS openHours " +
+            "       , closed_hours AS closedHours " +
+            "       , star_rating AS starRating" +
+            "       , review_participant_count AS reviewParticipantCount " +
+            "       , (6371 * ACOS(cos(RADIANS(:latitude))" +
+            "           * COS(RADIANS(:latitude))" +
+            "           * COS(RADIANS(:longitude) - RADIANS(:longitude))" +
+            "           + SIN(RADIANS(:latitude)) * SIN(RADIANS(:longitude)))) AS `distanceDiff` " +
             "FROM store " +
             "WHERE signed_status = 'ACTIVE' " +
             "ORDER BY `distanceDiff` ",
