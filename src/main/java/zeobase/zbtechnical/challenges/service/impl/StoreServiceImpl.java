@@ -1,6 +1,7 @@
 package zeobase.zbtechnical.challenges.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,7 @@ import zeobase.zbtechnical.challenges.dto.store.response.StoreWithdrawResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Store;
 import zeobase.zbtechnical.challenges.entity.StoreReservationInfo;
+import zeobase.zbtechnical.challenges.event.StoreSavedEvent;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
@@ -67,6 +69,8 @@ public class StoreServiceImpl implements StoreService {
 
     private final StoreRepository storeRepository;
     private final StoreReservationInfoRepository storeReservationInfoRepository;
+
+    private final ApplicationEventPublisher eventPublisher;
 
 
     /**
@@ -220,8 +224,7 @@ public class StoreServiceImpl implements StoreService {
                 .build()
         );
 
-        Store store = storeRepository.save(
-                Store.builder()
+        Store newStore = saveWithEvent(Store.builder()
                     .name(request.getName())
                     .latitude(request.getLatitude())
                     .longitude(request.getLongitude())
@@ -234,11 +237,10 @@ public class StoreServiceImpl implements StoreService {
                     .reviewParticipantCount(DEFAULT_REVIEW_PARTICIPANT_COUNT)
                     .member(member)
                     .storeReservationInfo(storeReservationInfo)
-                    .build()
-        );
+                    .build());
 
         return StoreRegistrationResponse.builder()
-                .storeId(store.getId())
+                .storeId(newStore.getId())
                 .build();
     }
 
@@ -418,9 +420,6 @@ public class StoreServiceImpl implements StoreService {
             storeReservationInfo.modifySeatingCapacityPerTable(finalSeatingCapacityPerTable);
         }
 
-        storeRepository.save(store);
-        storeReservationInfoRepository.save(storeReservationInfo);
-
         return StoreModifyResponse.builder()
                 .storeId(store.getId())
                 .build();
@@ -469,9 +468,7 @@ public class StoreServiceImpl implements StoreService {
         // store signed status 검증
         validateStoreSignedStatus(store);
 
-        store = storeRepository.save(
-                store.modifySignedStatus(StoreSignedStatusType.WITHDRAW)
-        );
+        store.modifySignedStatus(StoreSignedStatusType.WITHDRAW);
 
         return StoreWithdrawResponse.builder()
                 .storeId(store.getId())
@@ -510,5 +507,38 @@ public class StoreServiceImpl implements StoreService {
             case BLOCKED:
                 throw new StoreException(BLOCKED_STORE);
         }
+    }
+
+    /**
+     * 가게 등록을 담당하는 메서드
+     * 가게의 최초 생성 및 등록 시, Listener 등록을 위해
+     * store repository 의 save 에 직접 접근하지 말고, 해당 메서드를 사용해야 함.
+     *
+     * @param store - 저장할 새로운 store
+     * @return 저장된 store
+     */
+    @Transactional
+    public Store saveWithEvent(Store store) {
+
+        Store savedStore = storeRepository.save(store);
+        eventPublisher.publishEvent(new StoreSavedEvent(savedStore));
+
+        return savedStore;
+    }
+
+    /**
+     * 가게의 정보 수정을 담당하는 메서드
+     * merge 혹은 detached 상태 객체의 관리를 위해
+     * store repository 의 save 에 직접 접근하지 말고, 해당 메서드를 사용해야 함.
+     *
+     * @param store - 저장할 새로운 store
+     * @return 저장된 store
+     */
+    @Transactional
+    public Store updateStore(Store store) {
+
+        Store updatedStore = storeRepository.save(store);
+
+        return updatedStore;
     }
 }

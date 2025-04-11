@@ -10,17 +10,14 @@ import zeobase.zbtechnical.challenges.dto.kiosk.response.KioskPhoneResponse;
 import zeobase.zbtechnical.challenges.dto.kiosk.response.KioskSigninResponse;
 import zeobase.zbtechnical.challenges.entity.Member;
 import zeobase.zbtechnical.challenges.entity.Reservation;
-import zeobase.zbtechnical.challenges.entity.ReservationStillAvailableReviewing;
 import zeobase.zbtechnical.challenges.exception.KioskException;
 import zeobase.zbtechnical.challenges.exception.MemberException;
 import zeobase.zbtechnical.challenges.exception.StoreException;
 import zeobase.zbtechnical.challenges.repository.MemberRepository;
 import zeobase.zbtechnical.challenges.repository.ReservationRepository;
-import zeobase.zbtechnical.challenges.repository.ReservationStillAvailableReviewingRepository;
 import zeobase.zbtechnical.challenges.repository.StoreRepository;
 import zeobase.zbtechnical.challenges.service.KioskService;
 import zeobase.zbtechnical.challenges.type.reservation.ReservationVisitedType;
-import zeobase.zbtechnical.challenges.type.review.availability.ReviewWrittenStatusType;
 
 import java.time.LocalDateTime;
 
@@ -46,7 +43,6 @@ public class KioskServiceImpl implements KioskService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final ReservationRepository reservationRepository;
-    private final ReservationStillAvailableReviewingRepository reservationStillAvailableReviewingRepository;
 
 
     /**
@@ -90,17 +86,7 @@ public class KioskServiceImpl implements KioskService {
 
         // 해당 예약을 방문 완료 상태로 변경 후 저장
         reservationRepository.save(reservation.modifyVisited(ReservationVisitedType.VISITED));
-        
-        // 방문 완료된 예약 및 이용자 정보를 review availability reservation 엔티티에 저장
-        reservationStillAvailableReviewingRepository.save(
-                ReservationStillAvailableReviewing.builder()
-                        .memberId(member.getId())
-                        .storeId(request.getStoreId())
-                        .reservationId(reservation.getId())
-                        .visitedDate(nowDateTime.toLocalDate())
-                        .status(ReviewWrittenStatusType.NOT_WRITTEN)
-                        .build()
-        );
+
 
         return KioskPhoneResponse.builder()
                 .reservationChecked(true)
@@ -154,16 +140,6 @@ public class KioskServiceImpl implements KioskService {
         // 해당 예약을 방문 완료 상태로 변경 후 저장
         reservationRepository.save(reservation.modifyVisited(ReservationVisitedType.VISITED));
 
-        // 방문 완료된 예약 및 이용자 정보를 review availability reservation 엔티티에 저장
-        reservationStillAvailableReviewingRepository.save(
-                ReservationStillAvailableReviewing.builder()
-                        .memberId(member.getId())
-                        .storeId(request.getStoreId())
-                        .reservationId(reservation.getId())
-                        .visitedDate(nowDateTime.toLocalDate())
-                        .status(ReviewWrittenStatusType.NOT_WRITTEN)
-                        .build()
-        );
 
         return KioskSigninResponse.builder()
                 .reservationChecked(true)

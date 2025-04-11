@@ -56,7 +56,7 @@ public enum ErrorCode {
     MISMATCH_ROLE(HttpStatus.BAD_REQUEST, "이용자의 권한이 적절하지 않습니다."),
 
     WITHDRAWAL_MEMBER(HttpStatus.BAD_REQUEST, "탈퇴한 이용자입니다."),
-    BLOCKED_MEMBER(HttpStatus.BAD_REQUEST, "운영자에 의해 이용지 정지된 이용자입니다."),
+    BLOCKED_MEMBER(HttpStatus.BAD_REQUEST, "운영자에 의해 이용이 정지된 이용자입니다."),
     INACTIVE_MEMBER(HttpStatus.BAD_REQUEST, "비활성화된 이용자입니다."),
 
     EXPIRED_CREDENTIAL(HttpStatus.BAD_REQUEST, "비밀번호가 만료되었습니다."),
@@ -74,6 +74,7 @@ public enum ErrorCode {
 
     NOT_FOUND_MEMBER_OWNED_RESERVATION(HttpStatus.BAD_REQUEST, "해당 예약에 등록된 이용자를 찾을 수 없습니다."),
     NOT_FOUND_STORE_OWNED_RESERVATION(HttpStatus.BAD_REQUEST, "해당 예약에 등록된 매장을 찾을 수 없습니다."),
+    NOT_FOUND_REVIEW_OWNED_RESERVATION(HttpStatus.BAD_REQUEST, "해당 예약에 등록된 리뷰를 찾을 수 없습니다."),
 
     INVALID_PERSON_COUNT_REQUEST(HttpStatus.BAD_REQUEST, "예약 인원 수 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_TABLE_COUNT_REQUEST(HttpStatus.BAD_REQUEST, "예약 테이블 수 정보로 잘못된 인자가 전달되었습니다."),
@@ -93,15 +94,16 @@ public enum ErrorCode {
     NOT_FOUND_REVIEW_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 리뷰 ID 입니다."),
     NOT_OWNED_REVIEW_ID(HttpStatus.BAD_REQUEST, "본인이 등록한 리뷰가 아닙니다."),
     NOT_FOUND_AVAILABLE_REVIEWING_RESERVATION_RECORD(HttpStatus.BAD_REQUEST, "리뷰 작성 기간 내에 매장을 방문한 기록이 없습니다."),
-    NOT_FOUND_AVAILABLE_MODIFY_RESERVATION_RECORD(HttpStatus.BAD_REQUEST, "리뷰 수정 가능한 날짜를 초과했습니다."),
     NOT_FOUND_STORE_VISITED_RECORD(HttpStatus.BAD_REQUEST, "매장을 이용하지 않은 이용자는 리뷰를 남길 수 없습니다."),
     NOT_FOUND_STORE_RESERVED_RECORD(HttpStatus.BAD_REQUEST, "매장을 예약하지 않은 이용자는 리뷰를 남길 수 없습니다."),
+    NOT_FOUND_RESERVATION_OWNED_REVIEW(HttpStatus.BAD_REQUEST, "해당 리뷰의 매장을 찾을 수 없습니다."),
 
     NOT_FOUND_MEMBER_OWNED_REVIEW(HttpStatus.BAD_REQUEST, "해당 리뷰에 등록된 이용자를 찾을 수 없습니다."),
     NOT_FOUND_STORE_OWNED_REVIEW(HttpStatus.BAD_REQUEST, "해당 리뷰에 등록된 매장을 찾을 수 없습니다."),
 
     INVALID_REVIEW_REQUEST(HttpStatus.BAD_REQUEST, "리뷰 정보로 잘못된 인자가 전달되었습니다."),
     INVALID_STAR_RATING_VALUE(HttpStatus.BAD_REQUEST, INVALID_STAR_RATING_MSG),
+    INVALID_REVIEWING_DEADLINE(HttpStatus.BAD_REQUEST, "리뷰를 작성/수정 할 수 있는 기한이 지났습니다."),
 
     ALREADY_REVIEW_WRITTEN(HttpStatus.BAD_REQUEST, "이미 리뷰 작성이 완료된 예약 정보입니다."),
 

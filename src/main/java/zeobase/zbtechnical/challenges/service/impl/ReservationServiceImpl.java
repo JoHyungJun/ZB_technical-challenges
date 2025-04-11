@@ -346,8 +346,6 @@ public class ReservationServiceImpl implements ReservationService {
 
         // store signed status 검증
         storeService.validateStoreSignedStatus(store);
-
-        // 전달된 예약 정보가 해당 매장의 예약인지 검증
         
         // 예약 취소 검증 (점주는 예약 취소 불가능)
         if(request.getAccepted() == ReservationAcceptedType.CANCELED) {

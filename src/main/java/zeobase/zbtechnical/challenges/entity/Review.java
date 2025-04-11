@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import zeobase.zbtechnical.challenges.exception.ReviewException;
 import zeobase.zbtechnical.challenges.type.review.ReviewStatusType;
@@ -15,29 +17,37 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_MEMBER_OWNED_REVIEW;
+import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_RESERVATION_OWNED_REVIEW;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NOT_FOUND_STORE_OWNED_REVIEW;
 import static zeobase.zbtechnical.challenges.type.common.ErrorCode.NULL_POINT_PRIMARY_KEY;
 
 /**
  * 리뷰 관련 Entity 클래스
  */
+@ToString
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@DynamicUpdate
 @Entity
+@Table(name = "review",
+        indexes = @Index(name = "idx_review_created_at", columnList = "created_at"))
 public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double startRating;
+    private Double starRating;
 
     private String reviewMessage;
 
@@ -53,6 +63,10 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @OneToOne
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
+
 
     public Review modifyStatus(ReviewStatusType status) {
 
@@ -63,7 +77,7 @@ public class Review extends BaseEntity {
 
     public Review modifyStarRating(Double startRating) {
 
-        this.startRating = startRating;
+        this.starRating = startRating;
 
         return this;
     }
@@ -143,5 +157,40 @@ public class Review extends BaseEntity {
         }
 
         return this.store;
+    }
+
+    /**
+     * 해당 review 의 연관관계의 주인이 되는 reservation 의 id 를 추출하는 메서드
+     * reservation id 가 null 이라면 예외 처리
+     * 내부적으로 getValidatedReservation() 메서드를 통해 검증
+     *
+     * @return reservation id
+     * @exception ReviewException
+     */
+    public Long getReservationIdByValidate() {
+
+        Long validatedId = getValidatedReservation().getId();
+
+        if(validatedId == null) {
+            throw new ReviewException(NULL_POINT_PRIMARY_KEY);
+        }
+
+        return validatedId;
+    }
+
+    /**
+     * 해당 review 의 연관관계의 주인이 되는 reservation 을 추출하는 메서드
+     * reservation 가 null 이라면 예외 처리
+     *
+     * @return "entity/Reservation"
+     * @exception ReviewException
+     */
+    public Reservation getValidatedReservation() {
+
+        if(this.reservation == null) {
+            throw new ReviewException(NOT_FOUND_RESERVATION_OWNED_REVIEW);
+        }
+
+        return this.reservation;
     }
 }
